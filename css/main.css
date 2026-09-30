@@ -20,6 +20,7 @@ body {
   line-height: 1.5;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
+  font-family: "Lato", sans-serif;
 }
 
 /* 6. Improve media defaults */
@@ -98,3 +99,47 @@ header {
     width: 40px;
     height: 40px;
 }
+
+
+body {
+    background-color: #F7F5F1;
+}
+
+/* Hero */
+
+main {
+    padding: 12px;
+}
+
+h1 {
+    line-height: 1.2;
+}
+
+.hero span {
+    font-size: 0.65rem;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hero-links {
+    display: flex;
+    gap: 10px;
+}
+
+.hero-links a:first-child {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background-color: #171A1C;
+    color: #FFFFFF;
+}
+.hero-links a:last-child {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    color: #171A1C;
+}
+
