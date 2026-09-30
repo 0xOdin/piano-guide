@@ -52,3 +52,49 @@ h1, h2, h3, h4, h5, h6 {
 #root, #__next {
   isolation: isolate;
 }
+
+a {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+/* Header */
+
+header {
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid black;
+    height: 72px;
+}
+
+.header-links {
+    display: none;
+}
+
+.logo {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #171A1C;
+}
+
+.logo-accent {
+    color: #B79D83;
+}
+
+.search-btn,
+.menu-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
