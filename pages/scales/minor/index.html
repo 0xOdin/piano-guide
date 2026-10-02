@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minor Scales: Notes and Fingerings | PianoGuide</title>
+    <meta name="description" content="All 12 minor scales (natural, harmonic and melodic) as sheet music, with right and left hand fingerings.">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/scales.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">Piano<span class="logo-accent">Guide</span></a>
+        <nav class="header-links">
+            <ul>
+                <li><a href="/pages/scales/" aria-current="page">Scales</a></li>
+                <li><a href="/pages/chords/">Chords</a></li>
+                <li><a href="/pages/theory/">Theory</a></li>
+                <li><a href="/tools/">Tools</a></li>
+            </ul>
+        </nav>
+        <div class="header-btn-container">
+            <form class="search-form" role="search" action="/search/">
+                <label class="sr-only" for="site-search">Search</label>
+                <input id="site-search" type="search" name="q" placeholder="Search scales, chords, or topics...">
+            </form>
+            <button class="search-btn">S</button>
+            <button class="menu-btn">M</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <span>SCALES</span>
+            <h1>Minor scales</h1>
+            <p>Pick a key and a type of minor scale, choose which hand to see, and press play to hear it while the notes light up. Numbers show the finger to use, from 1 (thumb) to 5 (little finger).</p>
+        </section>
+
+        <div class="scale-tabs" id="scale-tabs" aria-label="Choose a key"></div>
+
+        <section class="practice">
+            <div class="practice-card">
+                <h2 id="scale-title"></h2>
+                <p class="scale-alt" id="scale-alt" hidden></p>
+                <ul class="scale-notes" id="scale-notes"></ul>
+
+                <div class="options options-4">
+                    <div class="option option-wide">
+                        <span class="option-label">Type</span>
+                        <div class="seg" data-key="type" role="group" aria-label="Type of minor scale">
+                            <button type="button" data-v="natural">Natural</button>
+                            <button type="button" data-v="harmonic">Harmonic</button>
+                            <button type="button" data-v="melodic">Melodic</button>
+                        </div>
+                    </div>
+                    <div class="option">
+                        <span class="option-label">Hands</span>
+                        <div class="seg" data-key="hands" role="group" aria-label="Hands">
+                            <button type="button" data-v="both">Both</button>
+                            <button type="button" data-v="rh">Right</button>
+                            <button type="button" data-v="lh">Left</button>
+                        </div>
+                    </div>
+                    <div class="option">
+                        <span class="option-label">Tempo</span>
+                        <div class="seg" data-key="tempo" role="group" aria-label="Tempo">
+                            <button type="button" data-v="700">Slow</button>
+                            <button type="button" data-v="450">Medium</button>
+                            <button type="button" data-v="280">Fast</button>
+                        </div>
+                    </div>
+                    <div class="option">
+                        <span class="option-label">Fingering</span>
+                        <div class="seg" data-key="fingers" role="group" aria-label="Fingering numbers">
+                            <button type="button" data-v="on">Show</button>
+                            <button type="button" data-v="off">Hide</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="score" id="main-score"></div>
+
+                <div class="practice-foot">
+                    <button type="button" class="keyboard-btn" id="play-btn">▶ Play scale</button>
+                    <div class="fingering-text" id="fingering-text"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scale-reference">
+            <div class="section-header">
+                <h2 id="list-title">All 12 natural minor scales</h2>
+                <p>One octave ascending, both hands. The melodic minor is shown in its ascending form.</p>
+                <div class="seg list-type" data-key="type" role="group" aria-label="Type of minor scale">
+                    <button type="button" data-v="natural">Natural</button>
+                    <button type="button" data-v="harmonic">Harmonic</button>
+                    <button type="button" data-v="melodic">Melodic</button>
+                </div>
+            </div>
+            <div class="scale-list" id="scale-list"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <a href="/" class="logo">PianoGuide</a>
+            <p>A clear and practical reference for piano.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+            <ul>
+                <li><a href="/pages/scales/">Scales</a></li>
+                <li><a href="/pages/chords/">Chords</a></li>
+                <li><a href="/pages/theory/">Theory</a></li>
+                <li><a href="/tools/">Tools</a></li>
+            </ul>
+        </nav>
+        <div class="footer-bottom">
+            <p>&copy; 2026 PianoGuide</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
+    <script src="/js/scales-data.js"></script>
+    <script src="/js/minor-data.js"></script>
+    <script src="/js/scale-score.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

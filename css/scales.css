@@ -1,14 +1,3 @@
-/* "coming soon" card on the scales index */
-.topic-card.is-soon {
-  opacity: 0.6;
-}
-
-.topic-card.is-soon::after {
-  content: "";
-}
-
-
-
 /* Indivisual scale page css */
 
 /* Page hero */
