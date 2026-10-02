@@ -87,6 +87,16 @@ button:focus-visible {
   }
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
 
 /* Mobile */
 
@@ -107,6 +117,10 @@ header {
 
 .logo {
   font-size: 1.3rem;
+}
+
+.header-links a[aria-current="page"] {
+  color: var(--text);
 }
 
 .header-links,

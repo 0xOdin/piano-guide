@@ -1,0 +1,287 @@
+/* "coming soon" card on the scales index */
+.topic-card.is-soon {
+  opacity: 0.6;
+}
+
+.topic-card.is-soon::after {
+  content: "";
+}
+
+
+
+/* Indivisual scale page css */
+
+/* Page hero */
+.page-hero {
+  padding: 36px var(--pad) 24px;
+}
+
+.page-hero>span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent-ink);
+}
+
+.page-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.page-hero p {
+  max-width: 56ch;
+  margin: 0;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Key tabs */
+.scale-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 var(--pad) 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.scale-tabs button {
+  flex: 0 0 auto;
+  min-width: 44px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.scale-tabs button[aria-pressed="true"] {
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
+/* Practice card */
+.practice {
+  padding: 0 var(--pad) 40px;
+}
+
+.practice-card,
+.scale-card {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.practice-card h2 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+}
+
+.scale-alt {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.scale-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.scale-notes li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* option rows */
+.options {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.option-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.seg button {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--text);
+  color: #fff;
+}
+
+/* The score */
+.score svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* the note that is sounding right now */
+.score .vf-stavenote.is-playing path,
+.score .vf-stavenote.is-playing rect {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.score .vf-stavenote.is-playing text {
+  fill: var(--accent-ink);
+}
+
+.practice-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+button.keyboard-btn {
+  align-self: flex-start;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.fingering-text p,
+.fingering-line {
+  margin: 0 0 4px;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.fingering-text strong,
+.fingering-line strong {
+  letter-spacing: 0;
+  color: var(--text);
+}
+
+/* Reference list */
+.scale-reference {
+  padding: 0 var(--pad) 56px;
+}
+
+.scale-list {
+  display: grid;
+  gap: 16px;
+}
+
+.scale-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .page-hero {
+    padding: 56px var(--pad) 32px;
+  }
+
+  .scale-tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .practice-card,
+  .scale-card {
+    padding: 28px;
+  }
+
+  .options {
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
+  }
+
+  .option {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .practice-foot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  button.keyboard-btn {
+    align-self: auto;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+
+  .page-hero,
+  .scale-tabs,
+  .practice,
+  .scale-reference {
+    padding-inline: var(--gutter);
+  }
+
+  .practice-card {
+    padding: 32px 36px;
+  }
+
+  .scale-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
