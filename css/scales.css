@@ -154,6 +154,26 @@
   color: #fff;
 }
 
+/* Type row (minor page): full width on phones so the three buttons fit */
+.option-wide {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.option-wide .seg {
+  display: flex;
+}
+
+.option-wide .seg button {
+  flex: 1;
+  padding: 0 8px;
+}
+
+.list-type {
+  margin-top: 14px;
+}
+
 /* The score */
 .score svg {
   display: block;
@@ -239,6 +259,19 @@ button.keyboard-btn {
     justify-content: space-between;
   }
 
+  .options.options-4 {
+    grid-template-columns: repeat(2, auto);
+    gap: 20px 12px;
+  }
+
+  .option-wide {
+    align-items: flex-start;
+  }
+
+  .option-wide .seg button {
+    padding: 0 14px;
+  }
+
   .option {
     flex-direction: column;
     align-items: flex-start;
@@ -267,6 +300,10 @@ button.keyboard-btn {
 
   .practice-card {
     padding: 32px 36px;
+  }
+
+  .options.options-4 {
+    grid-template-columns: repeat(4, auto);
   }
 
   .scale-list {
