@@ -1,0 +1,230 @@
+/* Chords page css. The page hero, key tabs, practice card, option buttons and score come from scales.css. */
+
+/* Base */
+
+/* keyboard diagram */
+.kb {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.kb rect {
+  transition: fill 0.15s ease;
+}
+
+.kb g {
+  transition: transform 0.1s ease;
+}
+
+.kb text {
+  font-family: "Lato", system-ui, sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+}
+
+.kb .white rect {
+  fill: var(--surface);
+  stroke: rgba(28, 27, 25, 0.3);
+}
+
+.kb .black rect {
+  fill: var(--text);
+  stroke: var(--text);
+}
+
+.kb .white.on rect {
+  fill: var(--accent-light);
+}
+
+.kb .black.on rect {
+  fill: var(--accent);
+}
+
+.kb .on.root rect {
+  fill: var(--accent-ink);
+}
+
+.kb .finger {
+  font-size: 12px;
+  fill: var(--text);
+}
+
+.kb .black .finger,
+.kb .root .finger {
+  fill: #fff;
+}
+
+.kb .octave {
+  font-size: 8px;
+  font-weight: 400;
+  fill: var(--muted);
+}
+
+.kb .on .octave {
+  fill: var(--text);
+}
+
+.kb .root .octave,
+.kb .is-playing .octave {
+  fill: #fff;
+}
+
+/* the key that is sounding right now */
+.kb .is-playing {
+  transform: translateY(2px);
+}
+
+.kb .is-playing rect {
+  fill: var(--accent-ink);
+}
+
+.kb .root.is-playing rect {
+  fill: var(--text);
+}
+
+.kb .is-playing .finger {
+  fill: #fff;
+}
+
+/* note names with their place in the formula underneath */
+.scale-notes li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 12px;
+  line-height: 1.2;
+}
+
+.scale-notes li small {
+  font-size: 0.66rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.tab-break {
+  margin-left: 10px;
+}
+
+/* Mobile */
+
+.tab-label {
+  display: block;
+  padding: 0 var(--pad) 8px;
+}
+
+.chord-visuals {
+  display: grid;
+  gap: 18px;
+  margin: 4px 0;
+}
+
+.chord-score svg {
+  max-width: 220px;
+  margin-inline: auto;
+}
+
+.chord-group+.chord-group {
+  margin-top: 28px;
+}
+
+.group-title {
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.chord-card .score svg {
+  max-width: 170px;
+}
+
+.chord-card .score {
+  margin-bottom: 8px;
+}
+
+.chord-guide {
+  padding: 0 var(--pad) 56px;
+}
+
+.guide-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.guide-card {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.guide-card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.guide-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .chord-visuals {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 480px);
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    margin: 8px 0;
+  }
+
+  #chord-list .scale-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .guide-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .chord-guide {
+    padding-bottom: 64px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+
+  .tab-label,
+  .chord-guide {
+    padding-inline: var(--gutter);
+  }
+
+  .chord-visuals {
+    grid-template-columns: 240px minmax(0, 560px);
+    gap: 48px;
+  }
+
+  #chord-list .scale-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .guide-cards {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .chord-guide {
+    padding-bottom: 88px;
+  }
+}
