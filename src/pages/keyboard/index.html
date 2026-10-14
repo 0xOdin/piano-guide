@@ -1,0 +1,63 @@
+---
+title: Interactive Piano Keyboard: Play Notes, Scales and Chords | PianoGuide
+description: An online piano keyboard: play with your mouse, touch or computer keys, see any scale, arpeggio or chord with its fingering, and find the name of the notes you play.
+styles: page keyboard
+scripts: chords-data keyboard
+---
+        <section class="page-hero">
+            <h1>Keyboard</h1>
+            <p>Click or tap the keys, or play with your computer keyboard. The notes you pick are named below, and you can light up any scale, arpeggio or chord with its fingering.</p>
+        </section>
+
+        <section class="practice">
+            <div class="practice-card kb-tool">
+                <div class="options kb-options">
+                    <div class="option">
+                        <span class="option-label">Show</span>
+                        <div class="seg" data-key="show" role="group" aria-label="Show on the keyboard">
+                            <button type="button" data-v="none">Nothing</button>
+                            <button type="button" data-v="scale">Scale</button>
+                            <button type="button" data-v="arpeggio">Arpeggio</button>
+                            <button type="button" data-v="chord">Chord</button>
+                        </div>
+                    </div>
+                    <div class="option" id="key-option">
+                        <label class="option-label" for="key-select">Key</label>
+                        <select class="kb-select" id="key-select"></select>
+                    </div>
+                    <div class="option" id="form-option">
+                        <span class="option-label">Minor scale</span>
+                        <div class="seg" data-key="form" role="group" aria-label="Form of the minor scale">
+                            <button type="button" data-v="natural">Natural</button>
+                            <button type="button" data-v="harmonic">Harmonic</button>
+                            <button type="button" data-v="melodic">Melodic</button>
+                        </div>
+                    </div>
+                    <div class="option" id="hand-option">
+                        <span class="option-label">Fingering</span>
+                        <div class="seg" data-key="hand" role="group" aria-label="Fingering for">
+                            <button type="button" data-v="rh">Right</button>
+                            <button type="button" data-v="lh">Left</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="piano-scroll">
+                    <div class="piano" id="piano" role="group" aria-label="Piano keyboard, C4 to C6"></div>
+                </div>
+
+                <div class="kb-bar">
+                    <div class="kb-readout" id="readout" aria-live="polite"></div>
+                    <div class="kb-actions">
+                        <button type="button" class="kb-btn is-primary" id="play-btn">▶ Play</button>
+                        <button type="button" class="kb-btn" id="clear-btn">Clear</button>
+                        <button type="button" class="kb-btn" id="mute-btn" aria-pressed="false">Sound on</button>
+                    </div>
+                </div>
+
+                <a class="go-link" id="page-link" hidden></a>
+                <p class="kb-help" id="kb-help">Computer keys: <kbd>A</kbd> to <kbd>;</kbd> play the white keys and <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> the black keys, from <span id="kb-octave">C4</span>. <kbd>Z</kbd> and <kbd>X</kbd> move them down or up an octave.</p>
+            </div>
+        </section>
+
+        <script type="application/json" id="keyboard-data">{{keyboardData}}</script>

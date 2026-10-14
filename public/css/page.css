@@ -30,6 +30,23 @@
   color: var(--muted);
 }
 
+/* breadcrumb above the heading (key pages, theory pages) */
+.crumbs {
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.crumbs span {
+  margin: 0 4px;
+}
+
 /* Key tabs */
 .scale-tabs {
   display: flex;

@@ -32,23 +32,6 @@ main .page-hero .hero-more + .hero-more {
   margin-top: 4px;
 }
 
-/* breadcrumb above the heading */
-.crumbs {
-  margin-bottom: 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-
-.crumbs a:hover {
-  color: var(--text);
-}
-
-.crumbs span {
-  margin: 0 4px;
-}
-
 /* tabs that link to the key's other pages (same look as the key and type pills) */
 .key-tabs {
   display: flex;

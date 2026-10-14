@@ -1,0 +1,342 @@
+/* Theory pages css: /theory/, intervals, circle of fifths. The page hero and breadcrumb come from page.css; the
+   keyboard diagrams on the intervals page use the .kb styles in chords.css. */
+
+/* Base (phones) */
+
+/* /theory/: a card for each topic, with its illustration */
+.theory-index {
+  padding: 0 var(--pad) 56px;
+}
+
+.theory-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.theory-card {
+  position: relative;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background-color 0.2s ease;
+}
+
+.theory-card:hover {
+  background: var(--bg-alt);
+}
+
+.theory-card img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.theory-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* the whole card is the link */
+.theory-card h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+}
+
+.theory-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* a section of explanation */
+.theory-section {
+  padding: 0 var(--pad) 40px;
+}
+
+.theory-section h2 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.theory-section p {
+  max-width: 68ch;
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.theory-steps,
+.theory-facts {
+  max-width: 68ch;
+  margin: 0 0 14px;
+  padding-left: 1.3em;
+  line-height: 1.6;
+}
+
+.theory-facts {
+  list-style: disc;
+}
+
+.theory-steps li + li,
+.theory-facts li + li {
+  margin-top: 6px;
+}
+
+.theory-steps li::marker,
+.theory-facts li::marker {
+  color: var(--accent);
+}
+
+/* Every interval from C: a card with the name, its short name and a keyboard */
+.interval-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.interval-card {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.interval-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.interval-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.interval-short {
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.interval-card .interval-meta {
+  margin: 4px 0 12px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* note names written on the marked keys */
+.kb .note {
+  font-size: 11px;
+  fill: var(--text);
+}
+
+.kb .black .note,
+.kb .root .note {
+  fill: #fff;
+}
+
+/* The circle of fifths */
+.cof-section {
+  display: grid;
+  gap: 24px;
+}
+
+.cof-figure {
+  max-width: 480px;
+}
+
+.cof {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cof path {
+  stroke: var(--surface);
+  stroke-width: 2;
+  transition: fill 0.2s ease;
+}
+
+.cof-major path {
+  fill: var(--bg-alt);
+}
+
+.cof-minor path {
+  fill: var(--placeholder);
+}
+
+a.cof-cell:hover path {
+  fill: var(--accent-light);
+}
+
+/* the bottom position: two keys in one wedge. The halves have no gap between them; the wedge gets the usual outline
+   and a faint line across the middle. */
+.cof .is-half path {
+  stroke: none;
+}
+
+.cof .cof-outline,
+.cof .cof-divider {
+  fill: none;
+  pointer-events: none;
+}
+
+.cof .cof-divider {
+  stroke: rgba(28, 27, 25, 0.14);
+  stroke-width: 1;
+}
+
+.cof-centre {
+  fill: var(--surface);
+}
+
+.cof text {
+  text-anchor: middle;
+  font-family: "Lato", system-ui, sans-serif;
+}
+
+.cof-name {
+  fill: var(--text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cof-minor .cof-name {
+  font-size: 14px;
+}
+
+/* the bottom position is split in two, so its names are a little smaller */
+.cof-major .cof-name.is-small {
+  font-size: 15px;
+}
+
+.cof-minor .cof-name.is-small {
+  font-size: 12px;
+}
+
+.cof-sig {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cof-hint {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cof a:focus-visible {
+  outline: none;
+}
+
+.cof a:focus-visible path,
+.cof a:focus-visible .cof-name {
+  stroke: var(--accent-ink);
+}
+
+/* All key signatures */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.sig-table {
+  width: 100%;
+  max-width: 720px;
+  border-collapse: separate; /* so the corners can be rounded like the other cards */
+  border-spacing: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+}
+
+.sig-table th,
+.sig-table td {
+  padding: 10px 16px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sig-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sig-table tbody td {
+  border-top: 1px solid var(--line);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .theory-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .theory-card {
+    padding: 24px;
+  }
+
+  .theory-section {
+    padding-bottom: 48px;
+  }
+
+  .theory-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .interval-cards {
+    gap: 16px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .theory-index,
+  .theory-section {
+    padding-inline: var(--gutter);
+  }
+
+  .theory-index {
+    padding-bottom: 88px;
+  }
+
+  .theory-cards {
+    max-width: 920px;
+  }
+
+  .interval-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  /* the circle beside its explanation */
+  .cof-section {
+    grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+    align-items: center;
+    gap: 48px;
+  }
+}

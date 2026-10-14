@@ -1,0 +1,307 @@
+/* The interactive keyboard (/keyboard/). The page hero, practice card and option buttons come from page.css. */
+
+/* Base (phones) */
+
+.kb-options {
+  margin-bottom: 18px;
+}
+
+.kb-options .option[hidden] {
+  display: none;
+}
+
+/* phones: each label above its buttons, which share the full width */
+.kb-options .option {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.kb-options .seg {
+  display: flex;
+}
+
+.kb-options .seg button {
+  flex: 1;
+  padding: 0 8px;
+}
+
+/* the key picker, styled like the option buttons */
+.kb-select {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 42px;
+  padding: 0 36px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2375706a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kb-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* the keyboard: white keys side by side, black keys placed on top by keyboard.js */
+.piano-scroll {
+  overflow-x: auto;
+  margin: 0 -4px 18px;
+  padding: 4px;
+}
+
+.piano {
+  position: relative;
+  display: flex;
+  min-width: 560px;
+  height: 200px;
+  border-top: 4px solid var(--text); /* the strip above the keys, like the felt on a real piano */
+  border-radius: 3px 3px 0 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.pkey {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  padding: 0 0 10px;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.12s ease, transform 0.08s ease;
+}
+
+.pkey.white {
+  flex: 1;
+  margin-right: -1px; /* neighbours share one border */
+  background: var(--surface);
+  border: 1px solid rgba(28, 27, 25, 0.22);
+  border-top: 0;
+  border-radius: 0 0 7px 7px;
+  color: var(--text);
+}
+
+.pkey.black {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  height: 60%;
+  padding-bottom: 8px;
+  background: var(--text);
+  border-radius: 0 0 5px 5px;
+  color: #fff;
+}
+
+.pkey:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+
+/* a scale, arpeggio or chord shown on the keys, with its root marked underneath */
+.pkey.white.is-shown {
+  background: var(--accent-light);
+}
+
+.pkey.black.is-shown {
+  background: var(--accent);
+}
+
+.pkey.is-shown.is-root {
+  box-shadow: inset 0 -6px 0 var(--accent-ink);
+}
+
+/* keys picked by a click or tap */
+.pkey.white.is-selected,
+.pkey.black.is-selected {
+  background: var(--accent-ink);
+  color: #fff;
+}
+
+/* keys sounding right now */
+.pkey.is-down {
+  transform: translateY(2px);
+  filter: brightness(0.92);
+}
+
+.pkey-finger {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pkey-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pkey-finger:empty,
+.pkey-name:empty {
+  display: none;
+}
+
+/* the computer key for each piano key: only where there is a keyboard to type on */
+.pkey-hint {
+  display: none;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.45;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pkey-hint:not(:empty) {
+    display: block;
+  }
+}
+
+/* the readout and the buttons under the keyboard */
+.kb-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kb-readout {
+  display: grid;
+  gap: 2px;
+  min-height: 52px;
+}
+
+.kb-name {
+  font-size: 1.4rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.kb-detail {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.kb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kb-btn {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.kb-btn:hover:not(:disabled) {
+  background: var(--bg-alt);
+}
+
+.kb-btn.is-primary {
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
+.kb-btn.is-primary:hover:not(:disabled) {
+  background: var(--text);
+  opacity: 0.88;
+}
+
+.kb-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.kb-btn[aria-pressed="true"] {
+  color: var(--muted);
+}
+
+.kb-tool .go-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 0.88rem;
+}
+
+.kb-tool .go-link[hidden] {
+  display: none;
+}
+
+.kb-help {
+  margin: 14px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.kb-help kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* no computer keys on a phone or tablet */
+@media (hover: none) {
+  .kb-help {
+    display: none;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .kb-options .option {
+    align-items: flex-start;
+  }
+
+  .kb-options .seg button {
+    flex: none;
+    padding: 0 14px;
+  }
+
+  .kb-options {
+    grid-template-columns: repeat(auto-fit, minmax(0, max-content));
+    justify-content: start;
+    gap: 18px 28px;
+  }
+
+  .piano {
+    height: 230px;
+  }
+
+  .kb-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .piano {
+    height: 250px;
+  }
+
+  .pkey-finger {
+    font-size: 1.1rem;
+  }
+}

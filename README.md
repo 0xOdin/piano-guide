@@ -52,7 +52,7 @@ scripts: vexflow intervals
 </section>
 ```
 
-- `nav` marks the current menu item (`scales`, `arpeggios`, `chords` or `keys`)
+- `nav` marks the current menu item (`scales`, `arpeggios`, `chords`, `theory` or `keys`)
 - `styles` loads `/css/<name>.css` after `main.css` (`page` has the hero, tabs and cards the inner pages share)
 - `scripts` loads `/js/<name>.js` after `main.js` (`vexflow` is the sheet music library from its CDN)
 - `sitemap: no` leaves the page out of `sitemap.xml`

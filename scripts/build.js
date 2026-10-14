@@ -35,6 +35,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const diagrams = require("./diagrams.js");
 
 const SITE_URL = (process.env.SITE_URL || "https://example.com").replace(/\/$/, "");
 const ROOT = path.join(__dirname, "..");
@@ -49,6 +50,7 @@ const NAV = [
   ["scales", "/scales/", "Scales"],
   ["arpeggios", "/arpeggios/", "Arpeggios"],
   ["chords", "/chords/", "Chords"],
+  ["theory", "/theory/", "Theory"],
   ["keys", "/keys/", "Keys"],
 ];
 const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
@@ -584,31 +586,6 @@ const majorKeys = KEYS.filter((k) => !isMinor(k)).sort(byLearningOrder);
 const minorKeys = KEYS.filter(isMinor).sort(byLearningOrder);
 const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
 
-// The homepage's "Pick a key": a round badge for each key, in learning order, opening the key's page
-const keyBadges = (keys) => keys.map((key) =>
-  `                    <li><a class="key-badge${isMinor(key) ? " is-minor" : ""}" href="${keyPageUrl(key)}" aria-label="${esc(cap(key.name))}">${esc(key.name.split(" ")[0])}</a></li>`).join("\n");
-
-// What the hand-written pages can use as {{...}}:
-//   keyLinks     for the chords page: the key page of each major and minor triad, as JSON
-//                { "<CHORD_ROOTS index>:<major|minor>": { url, name } }
-//   majorBadges, minorBadges   for the homepage: the "Pick a key" rows
-const siteVars = {
-  keyLinks: safeJSON(Object.fromEntries(KEYS.map((key) => [
-    `${key.rootIndex}:${key.type === "minor" ? "minor" : "major"}`,
-    { url: `/keys/${key.slug}/chord/`, name: cap(key.name) },
-  ]))),
-  majorBadges: keyBadges(majorKeys),
-  minorBadges: keyBadges(minorKeys),
-};
-
-// The hand-written pages: src/pages/chords/index.html -> /chords/, src/pages/404.html -> /404.html
-for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).sort()) {
-  if (!rel.endsWith(".html")) continue;
-  const out = rel.split(path.sep).join("/");
-  const url = "/" + out.replace(/(^|\/)index\.html$/, "$1");
-  addPage(url, out, readPage(path.join(SRC, "pages", rel)), siteVars);
-}
-
 // A major key and its relative minor have the same key signature (C major and A minor). Every key page links to
 // the same page of its relative key: scale to scale (any minor form to the major scale), arpeggio to arpeggio.
 const sameSignature = (a, b) => signatureNotes(a).map((n) => n.name).sort().join() === signatureNotes(b).map((n) => n.name).sort().join();
@@ -789,6 +766,123 @@ addList({
       keyGroup("Minor arpeggios", minorKeys, arpCard),
     ],
   });
+}
+
+/* ---------- The theory pages: intervals and the circle of fifths ---------- */
+
+// Every interval within an octave, measured up from C: [semitones, name, short name, the upper note, a note]
+const INTERVALS = [
+  [1, "Minor 2nd", "m2", "D♭", "a semitone, or half step"],
+  [2, "Major 2nd", "M2", "D", "a tone, or whole step"],
+  [3, "Minor 3rd", "m3", "E♭", ""],
+  [4, "Major 3rd", "M3", "E", ""],
+  [5, "Perfect 4th", "P4", "F", ""],
+  [6, "Augmented 4th / diminished 5th", "A4 / d5", "F♯", "also written C to G♭; called the tritone"],
+  [7, "Perfect 5th", "P5", "G", ""],
+  [8, "Minor 6th", "m6", "A♭", ""],
+  [9, "Major 6th", "M6", "A", ""],
+  [10, "Minor 7th", "m7", "B♭", ""],
+  [11, "Major 7th", "M7", "B", ""],
+  [12, "Octave", "P8", "C", "the same note, eight letters higher"],
+];
+
+const intervalCards = INTERVALS.map(([semis, name, short, upper, note]) => {
+  const marks = new Map([[0, { label: "C", root: true }], [semis, { label: upper }]]);
+  return `                <li class="interval-card">
+                    <div class="interval-head">
+                        <h3>${esc(name)}</h3>
+                        <span class="interval-short">${esc(short)}</span>
+                    </div>
+                    <p class="interval-meta">${semis} semitone${semis === 1 ? "" : "s"} · C to ${esc(upper)}${note ? ` · ${esc(note)}` : ""}</p>
+                    ${diagrams.keyboard({ whiteKeys: 9, marks, label: `${name}: C and ${upper} on the keyboard` })}
+                </li>`;
+}).join("\n");
+
+// The circle: position 0 is C major at the top, and each step clockwise is a 5th higher. A key's place comes from its
+// root: 7 semitones (a 5th) per step, so the step is (root × 7) mod 12. A minor key sits with its relative major, 3
+// semitones above it.
+const circlePlace = (key) => ((rootFor(key).semi + (isMinor(key) ? 3 : 0)) * 7) % 12;
+const signatureCount = (key) => {
+  const notes = signatureNotes(key).filter((n) => n.d !== 0);
+  return notes.length === 0 ? "none" : `${notes.length}${notes[0].d > 0 ? "♯" : "♭"}`;
+};
+// (majorKeys and minorKeys are in learning order, so at the bottom the sharp key comes before the flat one)
+const circleSlots = Array.from({ length: 12 }, (_, i) => {
+  const here = (keys) => keys.filter((k) => circlePlace(k) === i).map((key) => ({
+    name: cap(key.name),
+    label: isMinor(key) ? `${key.name.split(" ")[0]}m` : key.name.split(" ")[0],
+    url: keyPageUrl(key),
+    sig: isMinor(key) ? "" : signatureCount(key),
+  }));
+  return { majors: here(majorKeys), minors: here(minorKeys) };
+});
+
+// The key signatures in a table, for reading (and for screen readers): each major key with its relative minor
+const signatureRows = majorKeys.map((key) => {
+  const rel = relativeOf(key);
+  const link = (k) => k ? `<a class="text-link" href="${keyPageUrl(k)}">${esc(cap(k.name))}</a>` : "–";
+  return `                    <tr><td>${esc(cap(key.signature))}</td><td>${link(key)}</td><td>${link(rel)}</td></tr>`;
+}).join("\n");
+
+/* ---------- The interactive keyboard ---------- */
+
+// For the keyboard's "Show" option: every key's scale (each form for a minor key), arpeggio and chord, with the
+// fingering for both hands and a link to the page. Notes are { name, abs }: abs is the semitone, 0 = middle C, and
+// each starts on the root in the octave above middle C, which is where the keyboard shows them.
+const keyboardShape = (d) => ({ notes: d.notes.map((n) => ({ name: n.name, abs: n.abs })), rh: d.rh, lh: d.lh });
+const keyboardData = safeJSON([...majorKeys, ...minorKeys].map((key) => {
+  const forms = isMinor(key) ? ["natural", "harmonic", "melodic"] : ["major"];
+  const chord = chordData(key)[0]; // root position
+  return {
+    slug: key.slug,
+    name: cap(key.name),
+    minor: isMinor(key),
+    scale: Object.fromEntries(forms.map((form) => [form, {
+      ...keyboardShape(scaleData(key, form === "major" ? "natural" : form)),
+      url: keyPageUrl(key, SCALE_FORMS[form].path),
+    }])),
+    arpeggio: { ...keyboardShape(arpeggioData(key)), url: keyPageUrl(key, ARPEGGIO_PAGE.path) },
+    chord: {
+      notes: chord.rh.notes.map((n) => ({ name: n.name, abs: n.abs })),
+      rh: chord.rh.fingers,
+      lh: chord.lh.fingers,
+      url: keyPageUrl(key, CHORD_PAGE.path),
+    },
+  };
+}));
+
+/* ---------- The hand-written pages ---------- */
+
+// The homepage's "Pick a key": a round badge for each key, in learning order, opening the key's page
+const keyBadges = (keys) => keys.map((key) =>
+  `                    <li><a class="key-badge${isMinor(key) ? " is-minor" : ""}" href="${keyPageUrl(key)}" aria-label="${esc(cap(key.name))}">${esc(key.name.split(" ")[0])}</a></li>`).join("\n");
+
+// What the hand-written pages can use as {{...}}:
+//   keyLinks     for the chords page: the key page of each major and minor triad, as JSON
+//                { "<CHORD_ROOTS index>:<major|minor>": { url, name } }
+//   majorBadges, minorBadges   for the homepage: the "Pick a key" rows
+//   intervalCards              for /theory/intervals/: a card with a keyboard for each interval
+//   circleOfFifths, signatureRows   for /theory/circle-of-fifths/: the circle, and the key signatures as table rows
+//   keyboardData               for /keyboard/: every key's scale, arpeggio and chord, as JSON
+const siteVars = {
+  keyLinks: safeJSON(Object.fromEntries(KEYS.map((key) => [
+    `${key.rootIndex}:${key.type === "minor" ? "minor" : "major"}`,
+    { url: `/keys/${key.slug}/chord/`, name: cap(key.name) },
+  ]))),
+  majorBadges: keyBadges(majorKeys),
+  minorBadges: keyBadges(minorKeys),
+  intervalCards,
+  circleOfFifths: diagrams.circleOfFifths(circleSlots),
+  signatureRows,
+  keyboardData,
+};
+
+// The hand-written pages: src/pages/chords/index.html -> /chords/, src/pages/404.html -> /404.html
+for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).sort()) {
+  if (!rel.endsWith(".html")) continue;
+  const out = rel.split(path.sep).join("/");
+  const url = "/" + out.replace(/(^|\/)index\.html$/, "$1");
+  addPage(url, out, readPage(path.join(SRC, "pages", rel)), siteVars);
 }
 
 /* ---------- Writing the files ---------- */
