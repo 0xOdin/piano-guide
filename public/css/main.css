@@ -97,6 +97,11 @@ main {
   flex: 1;
 }
 
+/* a link to a part of a page (/scales/#minor-scales) stops below the sticky header instead of under it */
+[id] {
+  scroll-margin-top: 84px;
+}
+
 
 /* Mobile */
 
@@ -772,6 +777,10 @@ footer nav ul {
 
 /* Desktop */
 @media (min-width: 1024px) {
+  [id] {
+    scroll-margin-top: 108px;
+  }
+
   :root {
     --pad: 48px;
     --container: 1200px;

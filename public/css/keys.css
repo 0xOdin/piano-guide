@@ -90,16 +90,18 @@ main .page-hero .hero-more + .hero-more {
   color: #fff;
 }
 
-/* the lines between tabs of different kinds: clear after a minor key's three scale forms, faint everywhere else */
+/* the lines between the tabs: clear after a minor key's three scale forms, faint everywhere else */
 .key-tabs .tab-divider {
-  flex: 0 0 1px;
+  flex: 0 0 2px;
   align-self: center;
-  height: 24px;
-  margin: 0 6px;
-  background: rgba(28, 27, 25, 0.32);
+  height: 26px;
+  margin: 0 8px;
+  border-radius: 1px;
+  background: rgba(28, 27, 25, 0.45);
 }
 
 .key-tabs .tab-divider.is-faint {
+  flex-basis: 1px;
   height: 16px;
   margin: 0 3px;
   background: rgba(28, 27, 25, 0.22);

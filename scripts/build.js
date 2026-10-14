@@ -626,14 +626,14 @@ for (const key of KEYS) {
   const keyPages = pagesFor(key);
 
   for (const page of keyPages) {
-    // the tab bar: links, so each tab is its own page. A thin line goes between tabs of different kinds (scale,
-    // arpeggio, chord): a clear one after a minor key's three scale forms, a faint one everywhere else.
-    //   minor  Natural Harmonic Melodic | Arpeggio : Chord      major  Scale : Arpeggio : Chord
+    // the tab bar: links, so each tab is its own page. A thin line goes between every two tabs: a clear one after a
+    // minor key's three scale forms, a faint one everywhere else.
+    //   minor  Natural : Harmonic : Melodic | Arpeggio : Chord      major  Scale : Arpeggio : Chord
     const tabs = keyPages.map((p, i) => {
       const current = p.path === page.path ? ' aria-current="page"' : "";
       const prev = keyPages[i - 1];
       const clear = prev && isMinor(key) && prev.section === "scales" && p.section !== "scales";
-      const divider = prev && prev.section !== p.section
+      const divider = prev
         ? `            <span class="tab-divider${clear ? "" : " is-faint"}" aria-hidden="true"></span>\n` : "";
       return `${divider}            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
     }).join("\n");
