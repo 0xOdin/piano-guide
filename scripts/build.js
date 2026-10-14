@@ -23,9 +23,8 @@
 //              /keys/a-minor/arpeggio/index.html   arpeggio
 //              /keys/a-minor/chord/index.html      chord
 //
-// plus the chromatic scale at /keys/chromatic/, the lists at /keys/, /scales/ and /arpeggios/, /sitemap.xml and /search-index.json
-// (read by the search page). Finally every link to a page or file on the site is checked, and the build fails if
-// one of them goes nowhere.
+// plus the chromatic scale at /keys/chromatic/, the lists at /keys/, /scales/ and /arpeggios/, and /sitemap.xml.
+// Finally every link to a page or file on the site is checked, and the build fails if one of them goes nowhere.
 //
 // Run it with   npm run build   (or npm run dev to build, serve and rebuild on every change).
 // It needs only Node.js, no packages. The fingering is written into the HTML itself, so search engines (and
@@ -796,10 +795,6 @@ fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="
 ${listed.map((p) => `  <url><loc>${SITE_URL}${p.url}</loc></url>`).join("\n")}
 </urlset>
 `);
-
-// for the search page: the title (without "| PianoGuide") and description of every page in the sitemap
-fs.writeFileSync(path.join(DIST, "search-index.json"),
-  JSON.stringify(listed.map((p) => ({ url: p.url, title: p.title.replace(/\s*\|\s*PianoGuide$/, ""), description: p.description }))));
 
 /* ---------- Checking the links ---------- */
 

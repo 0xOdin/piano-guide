@@ -55,14 +55,14 @@ scripts: vexflow intervals
 - `nav` marks the current menu item (`scales`, `arpeggios`, `chords` or `keys`)
 - `styles` loads `/css/<name>.css` after `main.css` (`page` has the hero, tabs and cards the inner pages share)
 - `scripts` loads `/js/<name>.js` after `main.js` (`vexflow` is the sheet music library from its CDN)
-- `sitemap: no` leaves the page out of `sitemap.xml` and search
+- `sitemap: no` leaves the page out of `sitemap.xml`
 
 The menu items are listed once, in `NAV` at the top of `scripts/build.js`.
 
 ### Adding a key
 
 Add an entry to `src/data/keys-data.js` (the comment at the top of the file explains every field). The build writes
-its scale, arpeggio and chord pages, adds it to `/keys/`, `/scales/`, `/arpeggios/`, the sitemap and search, and stops with a message if an
+its scale, arpeggio and chord pages, adds it to `/keys/`, `/scales/`, `/arpeggios/`, and the sitemap, and stops with a message if an
 index in the entry points at the wrong scale or chord.
 
 ### Broken links
