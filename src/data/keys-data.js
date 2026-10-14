@@ -8,6 +8,9 @@
 //   keySig      key signature as VexFlow names it ("C", "G", "Bb", ...)
 //   arpeggio    one octave ascending, lowest note first
 //   chord       one fingering per inversion: root position, 1st inversion, 2nd inversion
+//   altRoot     optional. true when the key's root is the alternate spelling in CHORD_ROOTS: G♭ major, C♯ minor,
+//               G♯ minor, D♯ minor. A major key with altRoot uses the fingering of its scaleIndex scale (G♭ major
+//               plays the same keys as F♯ major) with the notes spelled from its own root.
 //   twoOctave   optional. Two-octave fingerings are worked out from the one-octave ones (see withTwoOctaves in
 //               scripts/build.js). If a key needs different numbers, give them here:
 //               twoOctave: { scale: { rh: [...15 numbers], lh: [...] }, arpeggio: { rh: [...7 numbers], lh: [...] } }
@@ -19,7 +22,8 @@
 //                 scale: { rh: [8 numbers], lh: [8 numbers] }   one-octave fingering of the natural minor scale. The
 //                   notes of all three forms (natural, harmonic, melodic) are made from the formula in scales-data.js.
 //                 forms: { harmonic: { rh, lh }, melodic: { rh, lh } }   optional, if a form needs other numbers
-//                 altRoot: true   for the keys whose root is the alternate spelling in CHORD_ROOTS (C♯ minor, G♯ minor)
+//                 altRoot: true   for the keys whose root is the alternate spelling in CHORD_ROOTS (C♯ minor, G♯ minor,
+//                   D♯ minor)
 //                 keySig is the minor key as VexFlow names it ("Am", "F#m", "Ebm" ...)
 //
 // C major uses the standard fingerings. Before you trust a key with black keys in it, check its numbers against
@@ -116,6 +120,22 @@ module.exports = [
     scaleIndex: 6,
     keySig: "F#",
     signature: "six sharps (F♯, C♯, G♯, D♯, A♯, E♯)",
+    arpeggio: { rh: [2, 4, 1, 2], lh: [4, 2, 1, 4] },
+    chord: {
+      rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
+      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+    },
+  },
+  {
+    // The same keys as F♯ major, written with flats, so it has F♯ major's fingering.
+    // CHECK: arpeggio and chords (as for F♯ major)
+    slug: "g-flat-major",
+    name: "G♭ major",
+    rootIndex: 6,
+    altRoot: true,
+    scaleIndex: 6,
+    keySig: "Gb",
+    signature: "six flats (B♭, E♭, A♭, D♭, G♭, C♭)",
     arpeggio: { rh: [2, 4, 1, 2], lh: [4, 2, 1, 4] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
@@ -291,6 +311,23 @@ module.exports = [
     rootIndex: 3,
     keySig: "Ebm",
     signature: "six flats (B♭, E♭, A♭, D♭, G♭, C♭)",
+    scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    chord: {
+      rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
+      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+    },
+  },
+  {
+    // The same keys as E♭ minor, written with sharps, so it has E♭ minor's fingering.
+    // CHECK: scales (all three forms), arpeggio and chords (as for E♭ minor)
+    type: "minor",
+    slug: "d-sharp-minor",
+    name: "D♯ minor",
+    rootIndex: 3,
+    altRoot: true,
+    keySig: "D#m",
+    signature: "six sharps (F♯, C♯, G♯, D♯, A♯, E♯)",
     scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {

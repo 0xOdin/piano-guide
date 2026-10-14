@@ -169,8 +169,10 @@ function scaleData(key, form = "natural") {
     };
   }
   const s = MAJOR_SCALES[key.scaleIndex];
+  // G♭ major (`altRoot`) plays the keys of F♯ major: the same fingering, the notes spelled from its own root
+  const spelled = key.altRoot ? spellScale(rootFor(key).letter, rootFor(key).semi) : s;
   return {
-    notes: s.notes.map((n, i) => ({ ...parseNote(n), abs: s.semis[i] })),
+    notes: spelled.notes.map((n, i) => ({ ...parseNote(n), abs: spelled.semis[i] })),
     rh: s.rh,
     lh: s.lh,
   };
@@ -544,7 +546,8 @@ function checkKey(key) {
     if (!/ minor$/.test(key.name)) problems.push('name must end in " minor"');
   } else {
     const scale = MAJOR_SCALES[key.scaleIndex];
-    if (!scale || scale.notes[0] !== root) {
+    const first = scale && (key.altRoot ? scale.alt && scale.alt.name : scale.notes[0]);
+    if (first !== root) {
       problems.push(`scaleIndex ${key.scaleIndex} is ${scale ? `the ${scale.notes[0]} major scale` : "past the end of MAJOR_SCALES"}, not ${root}`);
     }
   }
@@ -581,6 +584,23 @@ for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).s
   addPage(url, out, readPage(path.join(SRC, "pages", rel)), siteVars);
 }
 
+// The notes of a key's signature: its major scale, or for a minor key its natural minor scale
+const signatureNotes = (key) => scaleData(key).notes.slice(0, 7);
+const isMinor = (key) => key.type === "minor";
+
+// A major key and its relative minor have the same key signature (C major and A minor). Every key page links to
+// the same page of its relative key: scale to scale (any minor form to the major scale), arpeggio to arpeggio.
+const sameSignature = (a, b) => signatureNotes(a).map((n) => n.name).sort().join() === signatureNotes(b).map((n) => n.name).sort().join();
+const relativeOf = (key) => KEYS.find((k) => isMinor(k) !== isMinor(key) && sameSignature(k, key));
+
+function relativeLine(key, page) {
+  const rel = relativeOf(key);
+  if (!rel) return "";
+  const path = page.section === "scales" ? "" : page.path;
+  return `
+            <p class="hero-more">Relative ${isMinor(rel) ? "minor" : "major"}: <a class="text-link" href="/keys/${rel.slug}/${path}">${esc(cap(rel.name))}</a>, with the same key signature</p>`;
+}
+
 // The key pages. Each one belongs to a section of the menu (a scale page to Scales, an arpeggio page to Arpeggios,
 // a chord page to Chords): that menu item is marked, and the breadcrumb starts with it.
 const keyTemplate = readPage(path.join(SRC, "templates", "key.html"));
@@ -613,7 +633,9 @@ for (const key of KEYS) {
       return `            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
     }).join("\n");
     const tabnav = `        <nav class="key-tabs" aria-label="${esc(cap(key.name))} pages">\n${tabs}\n        </nav>`;
-    addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out: page.build(key) });
+    const out = page.build(key);
+    out.heroExtra = (out.heroExtra || "") + relativeLine(key, page);
+    addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out });
   }
 }
 
@@ -675,8 +697,6 @@ function addList({ url, nav, title, description, heading, intro, groups }) {
 
 // The lists show the keys in the order they are learnt: no sharps or flats first, then one sharp, one flat, two
 // sharps, two flats... (C, G, F, D, B♭ ... for the major keys). The count comes from the key's own scale.
-// a minor key: its natural minor scale, which has exactly the notes of the key signature
-const signatureNotes = (key) => scaleData(key).notes.slice(0, 7);
 const keyFamily = (key) => {
   const notes = signatureNotes(key);
   return notes.some((n) => n.d < 0) ? "flats" : notes.some((n) => n.d > 0) ? "sharps" : "none";
@@ -686,8 +706,8 @@ function learningOrder(key) {
   return count * 2 + (keyFamily(key) === "flats" ? 1 : 0); // sharps before flats
 }
 const byLearningOrder = (a, b) => learningOrder(a) - learningOrder(b);
-const majorKeys = KEYS.filter((k) => k.type !== "minor").sort(byLearningOrder);
-const minorKeys = KEYS.filter((k) => k.type === "minor").sort(byLearningOrder);
+const majorKeys = KEYS.filter((k) => !isMinor(k)).sort(byLearningOrder);
+const minorKeys = KEYS.filter(isMinor).sort(byLearningOrder);
 const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
 const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale", sub: "Every black and white key, starting on any note" });
 

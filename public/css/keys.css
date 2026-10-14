@@ -22,10 +22,14 @@ main .page-hero p {
   line-height: 1.5;
 }
 
-/* a link under the intro (the chord page links to the chord explorer) */
+/* links under the intro: the relative key, and on a chord page the chord explorer */
 main .page-hero .hero-more {
   margin-top: 10px;
   font-size: 0.9rem;
+}
+
+main .page-hero .hero-more + .hero-more {
+  margin-top: 4px;
 }
 
 /* breadcrumb above the heading */
