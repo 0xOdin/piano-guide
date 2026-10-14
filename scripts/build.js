@@ -565,14 +565,40 @@ KEYS.forEach(checkKey);
 
 /* ---------- The pages ---------- */
 
+// The notes of a key's signature: its major scale, or for a minor key its natural minor scale
+const signatureNotes = (key) => scaleData(key).notes.slice(0, 7);
+const isMinor = (key) => key.type === "minor";
+
+// The lists show the keys in the order they are learnt: no sharps or flats first, then one sharp, one flat, two
+// sharps, two flats... (C, G, F, D, B♭ ... for the major keys). The count comes from the key's own scale.
+const keyFamily = (key) => {
+  const notes = signatureNotes(key);
+  return notes.some((n) => n.d < 0) ? "flats" : notes.some((n) => n.d > 0) ? "sharps" : "none";
+};
+function learningOrder(key) {
+  const count = signatureNotes(key).filter((n) => n.d !== 0).length;
+  return count * 2 + (keyFamily(key) === "flats" ? 1 : 0); // sharps before flats
+}
+const byLearningOrder = (a, b) => learningOrder(a) - learningOrder(b);
+const majorKeys = KEYS.filter((k) => !isMinor(k)).sort(byLearningOrder);
+const minorKeys = KEYS.filter(isMinor).sort(byLearningOrder);
+const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
+
+// The homepage's "Pick a key": a round badge for each key, in learning order, opening the key's page
+const keyBadges = (keys) => keys.map((key) =>
+  `                    <li><a class="key-badge${isMinor(key) ? " is-minor" : ""}" href="${keyPageUrl(key)}" aria-label="${esc(cap(key.name))}">${esc(key.name.split(" ")[0])}</a></li>`).join("\n");
+
 // What the hand-written pages can use as {{...}}:
-//   keyLinks   for the chords page: the key page of each major and minor triad, as JSON
-//              { "<CHORD_ROOTS index>:<major|minor>": { url, name } }
+//   keyLinks     for the chords page: the key page of each major and minor triad, as JSON
+//                { "<CHORD_ROOTS index>:<major|minor>": { url, name } }
+//   majorBadges, minorBadges   for the homepage: the "Pick a key" rows
 const siteVars = {
   keyLinks: safeJSON(Object.fromEntries(KEYS.map((key) => [
     `${key.rootIndex}:${key.type === "minor" ? "minor" : "major"}`,
     { url: `/keys/${key.slug}/chord/`, name: cap(key.name) },
   ]))),
+  majorBadges: keyBadges(majorKeys),
+  minorBadges: keyBadges(minorKeys),
 };
 
 // The hand-written pages: src/pages/chords/index.html -> /chords/, src/pages/404.html -> /404.html
@@ -582,10 +608,6 @@ for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).s
   const url = "/" + out.replace(/(^|\/)index\.html$/, "$1");
   addPage(url, out, readPage(path.join(SRC, "pages", rel)), siteVars);
 }
-
-// The notes of a key's signature: its major scale, or for a minor key its natural minor scale
-const signatureNotes = (key) => scaleData(key).notes.slice(0, 7);
-const isMinor = (key) => key.type === "minor";
 
 // A major key and its relative minor have the same key signature (C major and A minor). Every key page links to
 // the same page of its relative key: scale to scale (any minor form to the major scale), arpeggio to arpeggio.
@@ -700,20 +722,6 @@ function addList({ url, nav, title, description, heading, intro, groups }) {
   });
 }
 
-// The lists show the keys in the order they are learnt: no sharps or flats first, then one sharp, one flat, two
-// sharps, two flats... (C, G, F, D, B♭ ... for the major keys). The count comes from the key's own scale.
-const keyFamily = (key) => {
-  const notes = signatureNotes(key);
-  return notes.some((n) => n.d < 0) ? "flats" : notes.some((n) => n.d > 0) ? "sharps" : "none";
-};
-function learningOrder(key) {
-  const count = signatureNotes(key).filter((n) => n.d !== 0).length;
-  return count * 2 + (keyFamily(key) === "flats" ? 1 : 0); // sharps before flats
-}
-const byLearningOrder = (a, b) => learningOrder(a) - learningOrder(b);
-const majorKeys = KEYS.filter((k) => !isMinor(k)).sort(byLearningOrder);
-const minorKeys = KEYS.filter(isMinor).sort(byLearningOrder);
-const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
 const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale", sub: "Every black and white key, starting on any note" });
 
 // /keys/: every key with links to all of its pages
@@ -730,7 +738,7 @@ const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale",
     nav: "keys",
     title: "Piano Keys: Scales, Arpeggios and Chords | PianoGuide",
     description: "Choose a major or minor key to see its scales, arpeggio and chord with fingering, sheet music and keyboard diagrams.",
-    heading: "Piano keys",
+    heading: "Keys",
     intro: "Choose a major or minor key to see its scales, arpeggio and chord, with the fingering, the sheet music and the keys on a keyboard.",
     groups: [
       keyGroup("Major keys", majorKeys, keyCard),
@@ -746,7 +754,7 @@ addList({
   nav: "scales",
   title: "Piano Scales: Fingering for Every Major and Minor Scale | PianoGuide",
   description: "Every major and minor piano scale (natural, harmonic and melodic) with fingering for both hands, sheet music and keyboard diagrams.",
-  heading: "Piano scales",
+  heading: "Scales",
   intro: "Choose a scale to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
   groups: [
     keyGroup("Major scales", majorKeys, (key) => card({ key, href: keyPageUrl(key), title: `${cap(key.name)} scale`, sub: cap(key.signature) })),
@@ -774,7 +782,7 @@ addList({
     nav: "arpeggios",
     title: "Piano Arpeggios: Fingering for Every Major and Minor Key | PianoGuide",
     description: "Every major and minor piano arpeggio with fingering for both hands, one or two octaves, with sheet music and keyboard diagrams.",
-    heading: "Piano arpeggios",
+    heading: "Arpeggios",
     intro: "Choose an arpeggio to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
     groups: [
       keyGroup("Major arpeggios", majorKeys, arpCard),

@@ -102,7 +102,6 @@ main {
   scroll-margin-top: 84px;
 }
 
-
 /* Mobile */
 
 /* Header */
@@ -329,7 +328,7 @@ header {
   grid-column: 1 / -1;
 }
 
-.explore-card:not(.is-soon):active {
+.explore-card:active {
   transform: scale(0.98);
 }
 
@@ -361,14 +360,13 @@ header {
   color: var(--muted);
 }
 
-.explore-card h3 a::after,
-.topic-card h3 a::after {
+.explore-card h3 a::after {
   content: "";
   position: absolute;
   inset: 0;
 }
 
-/* pages that are not written yet: shown, but not links */
+/* a small label: "Coming soon" */
 .soon {
   display: inline-block;
   margin-left: 6px;
@@ -383,18 +381,90 @@ header {
   vertical-align: 2px;
 }
 
-.is-soon {
-  cursor: default;
+/* a key's root note in a circle: filled for a major key, outlined for a minor key. Used on the cards of the
+   lists and in the homepage's "Pick a key", where each one is a link */
+.key-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
-.is-soon h3,
-.is-soon .card-icon,
-.is-soon .topic-img {
-  opacity: 0.6;
+.key-badge.is-minor {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px var(--accent-light);
 }
 
-.topic-card.is-soon::after {
-  content: none;
+a.key-badge {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+a.key-badge:hover {
+  background: var(--accent-ink);
+  color: #fff;
+}
+
+a.key-badge.is-minor:hover {
+  box-shadow: none;
+}
+
+a.key-badge:active {
+  transform: scale(0.94);
+}
+
+/* Pick a key (homepage): a row of badges for the major keys, one for the minor keys */
+.key-picker {
+  padding: 0 var(--pad) 40px;
+}
+
+.picker-rows {
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.picker-label {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.picker-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.picker-keys + .picker-label {
+  margin-top: 20px;
+}
+
+/* Coming soon (homepage): one quiet line */
+.coming-soon {
+  padding: 0 var(--pad) 48px;
+}
+
+.coming-soon p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.coming-soon .soon {
+  margin: 0 8px 0 0;
 }
 
 /* a link inside running text */
@@ -402,130 +472,6 @@ header {
   color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-/* Popular topics */
-.popular-topics {
-  padding: 0 var(--pad) 44px;
-}
-
-.topic-cards {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.topic-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 14px;
-  align-items: center;
-  padding: 16px 44px 16px 18px;
-  transition: background-color 0.2s ease;
-}
-
-.topic-card:not(.is-soon):active {
-  background: var(--accent-soft);
-}
-
-.topic-card+.topic-card {
-  border-top: 1px solid var(--line);
-}
-
-.topic-card::after {
-  content: "\203A";
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-52%);
-  font-size: 1.5rem;
-  color: var(--accent);
-}
-
-.topic-img {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  width: 108px;
-  height: auto;
-}
-
-.topic-card h3 {
-  grid-column: 2;
-  align-self: end;
-  margin: 0 0 3px;
-  font-size: 0.98rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.topic-card p {
-  grid-column: 2;
-  align-self: start;
-  margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--muted);
-}
-
-/* Keyboard */
-.keyboard {
-  padding: 0 var(--pad) 48px;
-}
-
-.keyboard-card {
-  padding: 20px;
-  background: var(--bg-alt);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.keyboard-header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.keyboard-header h2 {
-  margin: 0 0 6px;
-  font-size: 1.2rem;
-  font-weight: 300;
-  letter-spacing: -0.02em;
-}
-
-.keyboard-header p {
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-.keyboard-btn {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: 12px;
-  background: var(--accent-light);
-  font-size: 0.88rem;
-  font-weight: 700;
-  transition: transform 0.15s ease;
-}
-
-.keyboard-btn:active {
-  transform: scale(0.97);
-}
-
-.keyboard-img {
-  width: 100%;
-  height: 96px;
-  border: 1px solid rgba(28, 27, 25, 0.14);
-  border-radius: 0 0 8px 8px;
 }
 
 /* Footer */
@@ -564,7 +510,6 @@ footer nav ul {
   font-size: 0.75rem;
   color: var(--muted);
 }
-
 
  /* Tablet */
 @media (min-width: 768px) {
@@ -637,6 +582,29 @@ footer nav ul {
     padding-bottom: 56px;
   }
 
+  /* Pick a key */
+  .key-picker {
+    padding-bottom: 56px;
+  }
+
+  .picker-rows {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 18px 24px;
+    padding: 24px 28px;
+  }
+
+  .picker-label,
+  .picker-keys + .picker-label {
+    margin: 0;
+    min-width: 52px;
+  }
+
+  .coming-soon {
+    padding-bottom: 64px;
+  }
+
   .explore-cards {
     gap: 16px;
   }
@@ -672,94 +640,6 @@ footer nav ul {
     font-size: 0.85rem;
   }
 
-  /* Popular topics */
-  .popular-topics {
-    padding-bottom: 64px;
-  }
-
-  .topic-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    background: none;
-    border: 0;
-    box-shadow: none;
-    overflow: visible;
-  }
-
-  .topic-card {
-    grid-template-columns: 1fr;
-    align-content: start;
-    align-items: start;
-    padding: 22px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-
-  .topic-card::after {
-    top: 22px;
-    right: 22px;
-    transform: none;
-  }
-
-  .topic-img {
-    grid-column: 1;
-    grid-row: 3;
-    width: 100%;
-    margin-top: 18px;
-  }
-
-  .topic-card h3,
-  .topic-card p {
-    grid-column: 1;
-    align-self: auto;
-    margin-right: 28px;
-  }
-
-  .topic-card h3 {
-    font-size: 1.05rem;
-  }
-
-  .topic-card p {
-    font-size: 0.88rem;
-  }
-
-  /* Keyboard */
-  .keyboard {
-    padding-bottom: 64px;
-  }
-
-  .keyboard-card {
-    padding: 28px;
-  }
-
-  .keyboard-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 24px;
-  }
-
-  .keyboard-header h2 {
-    font-size: 1.4rem;
-  }
-
-  .keyboard-header p {
-    font-size: 0.92rem;
-  }
-
-  .keyboard-btn {
-    align-self: auto;
-    flex-shrink: 0;
-  }
-
-  .keyboard-img {
-    height: 128px;
-  }
-
   /* Footer */
   footer {
     flex-direction: row;
@@ -773,7 +653,6 @@ footer nav ul {
     flex-basis: 100%;
   }
 }
-
 
 /* Desktop */
 @media (min-width: 1024px) {
@@ -879,6 +758,19 @@ footer nav ul {
     padding: 56px var(--gutter) 72px;
   }
 
+  /* Pick a key */
+  .key-picker {
+    padding: 0 var(--gutter) 72px;
+  }
+
+  .picker-keys {
+    gap: 10px;
+  }
+
+  .coming-soon {
+    padding: 0 var(--gutter) 88px;
+  }
+
   .explore-cards {
     grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 20px;
@@ -909,42 +801,6 @@ footer nav ul {
     align-self: auto;
   }
 
-  /* Popular topics */
-  .popular-topics {
-    padding: 0 var(--gutter) 88px;
-  }
-
-  .topic-cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-  }
-
-  .topic-card {
-    padding: 24px;
-  }
-
-  .topic-card::after {
-    top: 24px;
-    right: 24px;
-  }
-
-  /* Keyboard banner */
-  .keyboard {
-    padding: 0 var(--gutter) 88px;
-  }
-
-  .keyboard-card {
-    padding: 32px 36px;
-  }
-
-  .keyboard-header h2 {
-    font-size: 1.6rem;
-  }
-
-  .keyboard-img {
-    height: 150px;
-  }
-
   /* Footer */
   footer {
     padding: 48px var(--gutter) 36px;
@@ -953,13 +809,11 @@ footer nav ul {
 
 @media (min-width: 1024px) and (hover: hover) {
 
-  .explore-card,
-  .topic-card {
+  .explore-card {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .explore-card:not(.is-soon):hover,
-  .topic-card:not(.is-soon):hover {
+  .explore-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 2px 4px rgba(40, 30, 20, 0.05),
       0 18px 32px -12px rgba(40, 30, 20, 0.2);

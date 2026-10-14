@@ -7,13 +7,13 @@ description: A clear and practical piano reference: scales, chords and arpeggios
             <h1>Everything you need to know about piano.</h1>
             <p>Explore scales, chords, fingerings, theory, and more with clear explanations and practical references.</p>
             <div class="hero-links">
-                <a href="#explore">Explore the Guide</a>
-                <a href="/scales/">Browse All Scales</a>
+                <a href="/scales/">Browse Scales</a>
+                <a href="/chords/">Chord Explorer</a>
             </div>
             <img class="hero-img" src="/assets/images/hero-keys.svg" alt="" width="600" height="480">
         </section>
 
-        <section class="explore" id="explore">
+        <section class="explore">
             <div class="section-header">
                 <h2>Explore Piano</h2>
                 <p>Browse the essential piano topics and tools.</p>
@@ -43,55 +43,24 @@ description: A clear and practical piano reference: scales, chords and arpeggios
             </ul>
         </section>
 
-        <section class="popular-topics">
+        <section class="key-picker">
             <div class="section-header">
-                <h2>Popular Topics</h2>
-                <p>Quick references for the things pianists look up most often.</p>
+                <h2>Pick a Key</h2>
+                <p>Jump straight to a key's scale, arpeggio, and chord, in the order you learn them.</p>
             </div>
 
-            <ul class="topic-cards">
-                <li class="topic-card">
-                    <img class="topic-img" src="/assets/images/major-scale.svg" alt="" width="242" height="76">
-                    <h3><a href="/scales/#major-scales">Major Scales</a></h3>
-                    <p>All 12 major scales with notes and fingerings.</p>
-                </li>
-                <li class="topic-card">
-                    <img class="topic-img" src="/assets/images/minor-scale.svg" alt="" width="242" height="76">
-                    <h3><a href="/scales/#minor-scales">Minor Scales</a></h3>
-                    <p>Natural, harmonic, and melodic minor scales.</p>
-                </li>
-                <li class="topic-card">
-                    <img class="topic-img" src="/assets/images/chord.svg" alt="" width="242" height="76">
-                    <h3><a href="/chords/">Piano Chords</a></h3>
-                    <p>Major, minor, seventh chords, inversions, and more.</p>
-                </li>
-                <li class="topic-card">
-                    <img class="topic-img" src="/assets/images/arpeggio.svg" alt="" width="242" height="76">
-                    <h3><a href="/arpeggios/">Arpeggios</a></h3>
-                    <p>Arpeggios in every major and minor key, with fingerings.</p>
-                </li>
-                <li class="topic-card is-soon">
-                    <img class="topic-img" src="/assets/images/interval.svg" alt="" width="242" height="76">
-                    <h3>Intervals <span class="soon">Soon</span></h3>
-                    <p>Understand the distance between notes on the keyboard.</p>
-                </li>
-                <li class="topic-card is-soon">
-                    <img class="topic-img" src="/assets/images/circle-of-fifths.svg" alt="" width="242" height="76">
-                    <h3>Circle of Fifths <span class="soon">Soon</span></h3>
-                    <p>Explore key signatures and relationships between keys.</p>
-                </li>
-            </ul>
+            <div class="picker-rows">
+                <h3 class="picker-label" id="picker-major">Major</h3>
+                <ul class="picker-keys" aria-labelledby="picker-major">
+{{majorBadges}}
+                </ul>
+                <h3 class="picker-label" id="picker-minor">Minor</h3>
+                <ul class="picker-keys" aria-labelledby="picker-minor">
+{{minorBadges}}
+                </ul>
+            </div>
         </section>
 
-        <section class="keyboard">
-            <div class="keyboard-card">
-                <div class="keyboard-header">
-                    <div>
-                        <h2>Every Chord on the Keyboard</h2>
-                        <p>Pick a root and a chord type to see its notes, inversions, and fingering on the keys.</p>
-                    </div>
-                    <a class="keyboard-btn" href="/chords/">Open Chords</a>
-                </div>
-                <img class="keyboard-img" src="/assets/images/keyboard.svg" alt="" width="280" height="100">
-            </div>
+        <section class="coming-soon">
+            <p><span class="soon">Coming soon</span> Interactive Keyboard · Theory · Intervals · Circle of Fifths</p>
         </section>
