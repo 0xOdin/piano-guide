@@ -3,8 +3,9 @@
 A clear and practical piano reference: scales, chords and arpeggios in every key, with fingering, sheet music and
 keyboard diagrams.
 
-Each key (C major, F♯ minor, ...) has its own pages for the scale, arpeggio and chord. The chord explorer at
-`/chords/` covers every chord type on every root, and links to the key pages for major and minor triads.
+Each key (C major, F♯ minor, ...) has its own pages for the scale, arpeggio and chord. `/scales/` and `/arpeggios/`
+list them, each card opening the page itself, and `/keys/` lists every key with all of its pages. The chord
+explorer at `/chords/` covers every chord type on every root, and links to the key pages for major and minor triads.
 
 The site is plain HTML, CSS and JavaScript, built by a small Node.js script with no packages to install.
 
@@ -25,7 +26,7 @@ at the right address: `SITE_URL=https://your-domain.com npm run build`. Then upl
 src/
   layout.html        the <head>, header, menu and footer shared by every page
   pages/             hand-written pages: src/pages/chords/index.html becomes /chords/
-  templates/         the key pages and the list of keys, filled in from the data
+  templates/         the key pages and the lists (keys, scales, arpeggios), filled in from the data
   data/              the keys (keys-data.js) and the major scales (scales-data.js)
 public/              copied as it is: css/, js/, assets/
 scripts/
@@ -51,7 +52,7 @@ scripts: vexflow intervals
 </section>
 ```
 
-- `nav` marks the current menu item (`keys` or `chords`)
+- `nav` marks the current menu item (`scales`, `arpeggios`, `chords` or `keys`)
 - `styles` loads `/css/<name>.css` after `main.css` (`page` has the hero, tabs and cards the inner pages share)
 - `scripts` loads `/js/<name>.js` after `main.js` (`vexflow` is the sheet music library from its CDN)
 - `sitemap: no` leaves the page out of `sitemap.xml` and search
@@ -61,7 +62,7 @@ The menu items are listed once, in `NAV` at the top of `scripts/build.js`.
 ### Adding a key
 
 Add an entry to `src/data/keys-data.js` (the comment at the top of the file explains every field). The build writes
-its scale, arpeggio and chord pages, adds it to `/keys/`, the sitemap and search, and stops with a message if an
+its scale, arpeggio and chord pages, adds it to `/keys/`, `/scales/`, `/arpeggios/`, the sitemap and search, and stops with a message if an
 index in the entry points at the wrong scale or chord.
 
 ### Broken links

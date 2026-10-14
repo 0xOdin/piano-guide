@@ -6,7 +6,7 @@
 //                      ---
 //                      title: Piano Chords | PianoGuide
 //                      description: ...
-//                      nav: chords                  the menu item to mark as the current page (keys, chords)
+//                      nav: chords                  the menu item to mark as the current page (see NAV)
 //                      styles: page chords          /css/<name>.css, after main.css
 //                      scripts: vexflow chords      /js/<name>.js after main.js ("vexflow" is the CDN copy)
 //                      sitemap: no                  leave the page out of sitemap.xml
@@ -23,7 +23,7 @@
 //              /keys/a-minor/arpeggio/index.html   arpeggio
 //              /keys/a-minor/chord/index.html      chord
 //
-// plus the chromatic scale at /keys/chromatic/, the list of all keys at /keys/, /sitemap.xml and /search-index.json
+// plus the chromatic scale at /keys/chromatic/, the lists at /keys/, /scales/ and /arpeggios/, /sitemap.xml and /search-index.json
 // (read by the search page). Finally every link to a page or file on the site is checked, and the build fails if
 // one of them goes nowhere.
 //
@@ -47,8 +47,10 @@ const DIST = path.join(ROOT, "dist");
 
 // The menu in the header and the footer: [nav id, url, label]
 const NAV = [
-  ["keys", "/keys/", "Keys"],
+  ["scales", "/scales/", "Scales"],
+  ["arpeggios", "/arpeggios/", "Arpeggios"],
   ["chords", "/chords/", "Chords"],
+  ["keys", "/keys/", "Keys"],
 ];
 const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
 
@@ -388,6 +390,7 @@ const SCALE_FORMS = {
 function scalePage(form) {
   return {
     ...SCALE_FORMS[form],
+    section: "scales",
     build(key) {
       const minor = form !== "major";
       const d = withTwoOctaves(scaleData(key, form), key.twoOctave && key.twoOctave.scale);
@@ -412,7 +415,7 @@ function scalePage(form) {
 }
 
 const ARPEGGIO_PAGE = {
-  tab: "Arpeggio", path: "arpeggio/",
+  tab: "Arpeggio", path: "arpeggio/", section: "arpeggios",
   build(key) {
     const d = withTwoOctaves(arpeggioData(key), key.twoOctave && key.twoOctave.arpeggio);
     const one = d[1];
@@ -430,7 +433,7 @@ const ARPEGGIO_PAGE = {
 };
 
 const CHORD_PAGE = {
-  tab: "Chord", path: "chord/",
+  tab: "Chord", path: "chord/", section: "chords",
   build(key) {
     const inv = chordData(key);
     const name = key.name;
@@ -578,11 +581,15 @@ for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).s
   addPage(url, out, readPage(path.join(SRC, "pages", rel)), siteVars);
 }
 
-// The key pages
+// The key pages. Each one belongs to a section of the menu (a scale page to Scales, an arpeggio page to Arpeggios,
+// a chord page to Chords): that menu item is marked, and the breadcrumb starts with it.
 const keyTemplate = readPage(path.join(SRC, "templates", "key.html"));
 
-function addKeyPage({ url, keyUrl, keyName, tabnav, out }) {
-  addPage(url, `${url.slice(1)}index.html`, { ...keyTemplate, meta: { ...keyTemplate.meta, title: out.title, description: out.description } }, {
+function addKeyPage({ url, keyUrl, keyName, section, tabnav, out }) {
+  const [, sectionUrl, sectionName] = NAV.find(([id]) => id === section);
+  addPage(url, `${url.slice(1)}index.html`, { ...keyTemplate, meta: { ...keyTemplate.meta, nav: section, title: out.title, description: out.description } }, {
+    sectionUrl,
+    sectionName,
     keyUrl,
     keyName: esc(keyName),
     heading: esc(out.heading),
@@ -606,54 +613,149 @@ for (const key of KEYS) {
       return `            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
     }).join("\n");
     const tabnav = `        <nav class="key-tabs" aria-label="${esc(cap(key.name))} pages">\n${tabs}\n        </nav>`;
-    addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), tabnav, out: page.build(key) });
+    addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out: page.build(key) });
   }
 }
 
 // The chromatic scale: one page, not tied to a key
 {
   const out = chromaticPage();
-  addKeyPage({ url: "/keys/chromatic/", keyUrl: "/keys/chromatic/", keyName: "Chromatic scale", tabnav: out.tabnav, out });
+  addKeyPage({ url: "/keys/chromatic/", keyUrl: "/keys/chromatic/", keyName: "Chromatic scale", section: "scales", tabnav: out.tabnav, out });
 }
 
-// The /keys/ page: major keys, then minor keys, one card for each key with links to its pages.
-{
-  const card = (key) => {
-    const keyUrl = `/keys/${key.slug}/`;
-    const links = pagesFor(key).map((p) => `<a href="${keyUrl}${p.path}">${p.tab}</a>`).join("\n                        ");
-    return `                <li class="key-card">
-                    <h3><a href="${keyUrl}">${esc(cap(key.name))}</a></h3>
-                    <p class="key-sig">${esc(cap(key.signature))}</p>
-                    <div class="key-links">
-                        ${links}
-                    </div>
-                </li>`;
-  };
-  const group = (title, keys) => keys.length === 0 ? "" : `            <div class="key-group" id="${title.toLowerCase().replace(/ /g, "-")}">
-                <h2 class="key-group-title">${title}</h2>
-                <ul class="key-grid">
-${keys.map(card).join("\n")}
-                </ul>
-            </div>`;
-  const chromaticCard = `                <li class="key-card">
-                    <h3><a href="/keys/chromatic/">Chromatic scale</a></h3>
-                    <p class="key-sig">Every black and white key, starting on any note</p>
-                    <div class="key-links">
-                        <a href="/keys/chromatic/">Fingering</a>
-                    </div>
-                </li>`;
-  const groups = [
-    group("Major keys", KEYS.filter((k) => k.type !== "minor")),
-    group("Minor keys", KEYS.filter((k) => k.type === "minor")),
-    `            <div class="key-group" id="other-scales">
-                <h2 class="key-group-title">Other scales</h2>
-                <ul class="key-grid">
-${chromaticCard}
-                </ul>
-            </div>`,
-  ].filter(Boolean).join("\n");
+/* ---------- The lists: /keys/, /scales/, /arpeggios/ ---------- */
 
-  addPage("/keys/", "keys/index.html", readPage(path.join(SRC, "templates", "keys-index.html")), { groups });
+// All three are built from src/templates/key-list.html: groups of cards, one card per key. The whole card links
+// to `href`; `key` puts its root note in the round badge (filled for a major key, outlined for a minor one; no key
+// shows the keyboard icon); `links` (optional) are small buttons on the card for the key's other pages, and
+// `textLinks` (optional) a single line of plain links under the subtitle, which keeps the card small.
+const listTemplate = readPage(path.join(SRC, "templates", "key-list.html"));
+
+const badge = (key) => key
+  ? `<span class="key-badge${key.type === "minor" ? " is-minor" : ""}" aria-hidden="true">${esc(key.name.split(" ")[0])}</span>`
+  : `<span class="key-badge"><img src="/assets/icons/keys.svg" alt="" width="22" height="22"></span>`;
+
+const card = ({ key, href, title, sub, links = [], textLinks = [] }) => `                <li class="key-card">
+                    ${badge(key)}
+                    <div class="key-text">
+                        <h4><a href="${href}">${esc(title)}</a></h4>
+                        <p class="key-sig">${esc(sub)}</p>${textLinks.length ? `
+                        <p class="key-text-links">${textLinks.map(([label, url]) => `<a href="${url}">${label}</a>`).join('<span aria-hidden="true"> · </span>')}</p>` : ""}
+                    </div>${links.length ? `
+                    <div class="key-links">
+                        ${links.map(([label, url]) => `<a href="${url}">${label}</a>`).join("\n                        ")}
+                    </div>` : ""}
+                </li>`;
+
+// A group: a heading, then one or more rows of cards, each row with an optional small label.
+// "Major scales" -> <div id="major-scales">, so the homepage can link straight to a group.
+const group = (title, rows) => `            <div class="key-group" id="${title.toLowerCase().replace(/ /g, "-")}">
+                <h2 class="key-group-title">${title}</h2>${rows.filter(([, cards]) => cards.length).map(([label, cards]) => `${label ? `
+                <h3 class="key-row-title">${label}</h3>` : ""}
+                <ul class="key-grid">
+${cards.join("\n")}
+                </ul>`).join("")}
+            </div>`;
+
+// The keys of a group split the way they are taught: the key with no sharps or flats, then the sharp keys, then
+// the flat keys, each row in learning order.
+const keyGroup = (title, keys, toCard) => group(title, [
+  ["No sharps or flats", keys.filter((k) => keyFamily(k) === "none")],
+  ["Sharps", keys.filter((k) => keyFamily(k) === "sharps")],
+  ["Flats", keys.filter((k) => keyFamily(k) === "flats")],
+].map(([label, ks]) => [label, ks.map(toCard)]));
+
+function addList({ url, nav, title, description, heading, intro, groups }) {
+  addPage(url, `${url.slice(1)}index.html`, { ...listTemplate, meta: { ...listTemplate.meta, nav, title, description } }, {
+    heading: esc(heading),
+    intro: esc(intro),
+    groups: groups.filter(Boolean).join("\n"),
+  });
+}
+
+// The lists show the keys in the order they are learnt: no sharps or flats first, then one sharp, one flat, two
+// sharps, two flats... (C, G, F, D, B♭ ... for the major keys). The count comes from the key's own scale.
+// a minor key: its natural minor scale, which has exactly the notes of the key signature
+const signatureNotes = (key) => scaleData(key).notes.slice(0, 7);
+const keyFamily = (key) => {
+  const notes = signatureNotes(key);
+  return notes.some((n) => n.d < 0) ? "flats" : notes.some((n) => n.d > 0) ? "sharps" : "none";
+};
+function learningOrder(key) {
+  const count = signatureNotes(key).filter((n) => n.d !== 0).length;
+  return count * 2 + (keyFamily(key) === "flats" ? 1 : 0); // sharps before flats
+}
+const byLearningOrder = (a, b) => learningOrder(a) - learningOrder(b);
+const majorKeys = KEYS.filter((k) => k.type !== "minor").sort(byLearningOrder);
+const minorKeys = KEYS.filter((k) => k.type === "minor").sort(byLearningOrder);
+const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
+const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale", sub: "Every black and white key, starting on any note" });
+
+// /keys/: every key with links to all of its pages
+{
+  const keyCard = (key) => card({
+    key,
+    href: keyPageUrl(key),
+    title: cap(key.name),
+    sub: cap(key.signature),
+    links: pagesFor(key).map((p) => [p.tab, keyPageUrl(key, p.path)]),
+  });
+  addList({
+    url: "/keys/",
+    nav: "keys",
+    title: "Piano Keys: Scales, Arpeggios and Chords | PianoGuide",
+    description: "Choose a major or minor key to see its scales, arpeggio and chord with fingering, sheet music and keyboard diagrams.",
+    heading: "Piano keys",
+    intro: "Choose a major or minor key to see its scales, arpeggio and chord, with the fingering, the sheet music and the keys on a keyboard.",
+    groups: [
+      keyGroup("Major keys", majorKeys, keyCard),
+      keyGroup("Minor keys", minorKeys, keyCard),
+      group("Other scales", [[null, [chromaticCard]]]),
+    ],
+  });
+}
+
+// /scales/: each card opens the scale; a minor key also links to its three forms
+addList({
+  url: "/scales/",
+  nav: "scales",
+  title: "Piano Scales: Fingering for Every Major and Minor Scale | PianoGuide",
+  description: "Every major and minor piano scale (natural, harmonic and melodic) with fingering for both hands, sheet music and keyboard diagrams.",
+  heading: "Piano scales",
+  intro: "Choose a scale to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
+  groups: [
+    keyGroup("Major scales", majorKeys, (key) => card({ key, href: keyPageUrl(key), title: `${cap(key.name)} scale`, sub: cap(key.signature) })),
+    keyGroup("Minor scales", minorKeys, (key) => card({
+      key,
+      href: keyPageUrl(key),
+      title: `${cap(key.name)} scale`,
+      sub: cap(key.signature),
+      textLinks: ["natural", "harmonic", "melodic"].map((form) => [SCALE_FORMS[form].tab, keyPageUrl(key, SCALE_FORMS[form].path)]),
+    })),
+    group("Other scales", [[null, [chromaticCard]]]),
+  ],
+});
+
+// /arpeggios/: each card opens the arpeggio
+{
+  const arpCard = (key) => card({
+    key,
+    href: keyPageUrl(key, ARPEGGIO_PAGE.path),
+    title: `${cap(key.name)} arpeggio`,
+    sub: cap(key.signature),
+  });
+  addList({
+    url: "/arpeggios/",
+    nav: "arpeggios",
+    title: "Piano Arpeggios: Fingering for Every Major and Minor Key | PianoGuide",
+    description: "Every major and minor piano arpeggio with fingering for both hands, one or two octaves, with sheet music and keyboard diagrams.",
+    heading: "Piano arpeggios",
+    intro: "Choose an arpeggio to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
+    groups: [
+      keyGroup("Major arpeggios", majorKeys, arpCard),
+      keyGroup("Minor arpeggios", minorKeys, arpCard),
+    ],
+  });
 }
 
 /* ---------- Writing the files ---------- */
