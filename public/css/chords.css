@@ -130,20 +130,10 @@
   margin-bottom: 8px;
 }
 
-/* link to the key page, under the fingering, when the chord is a major or minor triad */
-.key-link {
+/* the link to the key page, under the fingering, when the chord is a major or minor triad (.go-link in page.css) */
+.practice-foot .go-link {
   align-self: flex-start;
   font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--accent-ink);
-}
-
-.key-link::after {
-  content: " \203A";
-}
-
-.key-link:hover {
-  color: var(--text);
 }
 
 .chord-guide {

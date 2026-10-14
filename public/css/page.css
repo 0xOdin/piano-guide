@@ -200,6 +200,20 @@
   color: var(--text);
 }
 
+/* a link to another part of the site: the key page from the chord explorer, the chord explorer from a key page */
+.go-link {
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.go-link::after {
+  content: " \203A";
+}
+
+.go-link:hover {
+  color: var(--text);
+}
+
 /* Reference list */
 .scale-reference {
   padding: 0 var(--pad) 56px;

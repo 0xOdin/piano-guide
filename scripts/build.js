@@ -447,7 +447,7 @@ const CHORD_PAGE = {
       intro: `The ${name} chord has the notes ${names}. In root position the right hand plays ${list(inv[0].rh.fingers)} and the left hand plays ${list(inv[0].lh.fingers)}. The fingering below covers root position and both inversions.`,
       // the chord explorer opens on this chord, with the 7th, sus and other chords on the same root a click away
       heroExtra: `
-            <p class="hero-more"><a class="text-link" href="/chords/?root=${noteSlug(root)}&amp;type=${key.type === "minor" ? "minor" : "major"}">All chords on ${esc(root)}: 7th, sus, diminished and more</a></p>`,
+            <p class="hero-more"><a class="go-link" href="/chords/?root=${noteSlug(root)}&amp;type=${key.type === "minor" ? "minor" : "major"}">All chords on ${esc(root)}: 7th, sus, diminished and more</a></p>`,
       fingering: chordFingering(inv),
       viewer: chordViewer(),
       data: { mode: "chord", name, inversions: inv },
@@ -626,14 +626,20 @@ for (const key of KEYS) {
   const keyPages = pagesFor(key);
 
   for (const page of keyPages) {
-    // the tab bar: links, so each tab is its own page
-    const tabs = keyPages.map((p) => {
+    // the tab bar: links, so each tab is its own page. A thin line goes between tabs of different kinds (scale,
+    // arpeggio, chord): a clear one after a minor key's three scale forms, a faint one everywhere else.
+    //   minor  Natural Harmonic Melodic | Arpeggio : Chord      major  Scale : Arpeggio : Chord
+    const tabs = keyPages.map((p, i) => {
       const current = p.path === page.path ? ' aria-current="page"' : "";
-      return `            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
+      const prev = keyPages[i - 1];
+      const clear = prev && isMinor(key) && prev.section === "scales" && p.section !== "scales";
+      const divider = prev && prev.section !== p.section
+        ? `            <span class="tab-divider${clear ? "" : " is-faint"}" aria-hidden="true"></span>\n` : "";
+      return `${divider}            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
     }).join("\n");
     const tabnav = `        <nav class="key-tabs" aria-label="${esc(cap(key.name))} pages">\n${tabs}\n        </nav>`;
     const out = page.build(key);
-    out.heroExtra = (out.heroExtra || "") + relativeLine(key, page);
+    out.heroExtra = relativeLine(key, page) + (out.heroExtra || ""); // the relative key first, then the page's own links
     addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out });
   }
 }

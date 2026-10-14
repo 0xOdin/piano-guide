@@ -90,6 +90,21 @@ main .page-hero .hero-more + .hero-more {
   color: #fff;
 }
 
+/* the lines between tabs of different kinds: clear after a minor key's three scale forms, faint everywhere else */
+.key-tabs .tab-divider {
+  flex: 0 0 1px;
+  align-self: center;
+  height: 24px;
+  margin: 0 6px;
+  background: rgba(28, 27, 25, 0.32);
+}
+
+.key-tabs .tab-divider.is-faint {
+  height: 16px;
+  margin: 0 3px;
+  background: rgba(28, 27, 25, 0.22);
+}
+
 /* the chromatic page: "Start on" and the twelve buttons use the tab bar's look */
 .tabs-label {
   flex: 0 0 auto;
