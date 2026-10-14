@@ -1,47 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piano Chords: Notes, Inversions and Fingerings | PianoGuide</title>
-    <meta name="description" content="Piano chords in every key: major, minor, diminished, augmented, suspended and seventh chords, with notes, inversions, fingerings and sound.">
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/scales.css">
-    <link rel="stylesheet" href="/css/chords.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-</head>
-
-<body>
-    <header>
-        <a href="/" class="logo">Piano<span class="logo-accent">Guide</span></a>
-
-        <nav class="header-links" aria-label="Main navigation">
-            <ul>
-                <li><a href="/pages/scales/">Scales</a></li>
-                <li><a href="/pages/chords/" aria-current="page">Chords</a></li>
-                <li><a href="/pages/theory/">Theory</a></li>
-                <li><a href="/tools/">Tools</a></li>
-            </ul>
-        </nav>
-
-        <div class="header-btn-container">
-            <form class="search-form" role="search" action="/search/">
-                <label class="sr-only" for="site-search">Search</label>
-                <input id="site-search" type="search" name="q" placeholder="Search scales, chords, or topics...">
-            </form>
-            <button class="search-btn" type="button" aria-label="Search"><img src="/assets/icons/search.svg" alt=""></button>
-            <button class="menu-btn" type="button" aria-label="Menu"><img src="/assets/icons/menu.svg" alt=""></button>
-        </div>
-    </header>
-
-    <main>
+---
+title: Piano Chords: Notes, Inversions and Fingerings | PianoGuide
+description: Piano chords in every key: major, minor, diminished, augmented, suspended and seventh chords, with notes, inversions and fingerings.
+nav: chords
+styles: page chords
+scripts: vexflow chords-data chords
+---
         <section class="page-hero">
             <span>CHORDS</span>
             <h1>Piano chords</h1>
-            <p>Pick a root note and a chord type to see it written out, laid on the keyboard, and played. Numbers show the finger to use, from 1 (thumb) to 5 (little finger).</p>
+            <p>Pick a root note and a chord type to see it written out and laid on the keyboard. Numbers show the finger to use, from 1 (thumb) to 5 (little finger).</p>
         </section>
 
         <div class="tab-group">
@@ -72,13 +39,6 @@
                         <span class="option-label">Inversion</span>
                         <div class="seg" id="inv-seg" data-key="inv" role="group" aria-label="Inversion"></div>
                     </div>
-                    <div class="option">
-                        <span class="option-label">Play</span>
-                        <div class="seg" data-key="style" role="group" aria-label="How to play the chord">
-                            <button type="button" data-v="block">Together</button>
-                            <button type="button" data-v="spread">Spread</button>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="chord-visuals">
@@ -87,8 +47,8 @@
                 </div>
 
                 <div class="practice-foot">
-                    <button type="button" class="keyboard-btn" id="play-btn">▶ Play chord</button>
                     <div class="fingering-text" id="fingering-text"></div>
+                    <a class="key-link" id="key-link" hidden></a>
                 </div>
             </div>
         </section>
@@ -125,30 +85,5 @@
                 </li>
             </ul>
         </section>
-    </main>
 
-    <footer>
-        <div class="footer-brand">
-            <a href="/" class="logo">PianoGuide</a>
-            <p>A clear and practical reference for piano.</p>
-        </div>
-        <nav aria-label="Footer navigation">
-            <ul>
-                <li><a href="/pages/scales/">Scales</a></li>
-                <li><a href="/pages/chords/">Chords</a></li>
-                <li><a href="/pages/theory/">Theory</a></li>
-                <li><a href="/tools/">Tools</a></li>
-            </ul>
-        </nav>
-        <div class="footer-bottom">
-            <p>&copy; 2026 PianoGuide</p>
-        </div>
-    </footer>
-
-    <script src="/js/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js"></script>
-    <script src="/js/chords-data.js"></script>
-    <script src="/js/chords.js"></script>
-</body>
-
-</html>
+        <script type="application/json" id="key-links">{{keyLinks}}</script>

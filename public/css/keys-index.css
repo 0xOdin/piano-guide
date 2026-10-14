@@ -1,0 +1,120 @@
+/* The /keys/ page: a grid with one card for each key. The header, footer, hero and breadcrumb styles come from
+   main.css, page.css and keys.css. */
+
+.key-index {
+  padding: 0 var(--pad) 40px;
+}
+
+.key-group + .key-group {
+  margin-top: 36px;
+}
+
+.key-group-title {
+  margin: 0 0 14px;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.key-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* the whole card is clickable: the key name's link stretches over it, and the three page links sit on top */
+.key-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background-color 0.2s ease;
+}
+
+.key-card:hover {
+  background: var(--bg-alt);
+}
+
+.key-card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.key-card h3 a::after {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  content: "";
+}
+
+.key-sig {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* same look as the tabs on a key page */
+.key-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.key-links a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
+}
+
+.key-links a:hover {
+  background: var(--bg-alt);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .key-grid {
+    gap: 14px;
+  }
+
+  .key-group-title {
+    font-size: 1.8rem;
+  }
+
+  .key-card {
+    padding: 18px 20px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .key-index {
+    padding-inline: var(--gutter);
+    padding-bottom: 56px;
+  }
+
+  .key-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}

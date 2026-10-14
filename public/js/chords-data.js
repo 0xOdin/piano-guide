@@ -1,4 +1,4 @@
-// Chord data. Notes are GENERATED from a formula (like scales-data.js); fingerings are entered by hand.
+// Chord data. Notes are GENERATED from a formula (like src/data/scales-data.js); fingerings are entered by hand.
 const LETTER_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
 const NATURAL_SEMIS = [0, 2, 4, 5, 7, 9, 11]; // semitone of each natural letter
 

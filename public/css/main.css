@@ -270,6 +270,7 @@ header {
   width: 100%;
   height: 170px;
   object-fit: cover;
+  object-position: center 85%; /* keep the ends of the keys and the finger numbers in view */
   border-radius: 20px;
   background: var(--placeholder);
   box-shadow: var(--shadow);
@@ -318,7 +319,12 @@ header {
   transition: transform 0.15s ease;
 }
 
-.explore-card:active {
+/* with an odd number of cards, the last one takes the whole row (phones and tablets) */
+.explore-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.explore-card:not(.is-soon):active {
   transform: scale(0.98);
 }
 
@@ -357,6 +363,42 @@ header {
   inset: 0;
 }
 
+/* pages that are not written yet: shown, but not links */
+.soon {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+
+.is-soon {
+  cursor: default;
+}
+
+.is-soon h3,
+.is-soon .card-icon,
+.is-soon .topic-img {
+  opacity: 0.6;
+}
+
+.topic-card.is-soon::after {
+  content: none;
+}
+
+/* a link inside running text */
+.text-link {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Popular topics */
 .popular-topics {
   padding: 0 var(--pad) 44px;
@@ -380,7 +422,7 @@ header {
   transition: background-color 0.2s ease;
 }
 
-.topic-card:active {
+.topic-card:not(.is-soon):active {
   background: var(--accent-soft);
 }
 
@@ -812,6 +854,7 @@ footer nav ul {
     width: 52%;
     height: 100%;
     border-radius: 0;
+    background: none;
     box-shadow: none;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 40%);
     mask-image: linear-gradient(to right, transparent, #000 40%);
@@ -828,8 +871,12 @@ footer nav ul {
   }
 
   .explore-cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 20px;
+  }
+
+  .explore-card:last-child:nth-child(odd) {
+    grid-column: auto;
   }
 
   .explore-card {
@@ -902,8 +949,8 @@ footer nav ul {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .explore-card:hover,
-  .topic-card:hover {
+  .explore-card:not(.is-soon):hover,
+  .topic-card:not(.is-soon):hover {
     transform: translateY(-3px);
     box-shadow: 0 2px 4px rgba(40, 30, 20, 0.05),
       0 18px 32px -12px rgba(40, 30, 20, 0.2);

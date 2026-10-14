@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <meta name="description" content="{{description}}">
+    <link rel="canonical" href="{{canonical}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+{{styles}}
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Piano<span class="logo-accent">Guide</span></a>
+
+        <nav class="header-links" aria-label="Main navigation">
+            <ul>
+{{nav}}
+            </ul>
+        </nav>
+
+        <div class="header-btn-container">
+            <form class="search-form" role="search" action="/search/">
+                <label class="sr-only" for="site-search">Search</label>
+                <input id="site-search" type="search" name="q" placeholder="Search scales, chords, or keys...">
+            </form>
+            <button class="search-btn" type="button" aria-label="Search"><img src="/assets/icons/search.svg" alt=""></button>
+            <button class="menu-btn" type="button" aria-label="Menu"><img src="/assets/icons/menu.svg" alt=""></button>
+        </div>
+    </header>
+
+    <main>
+{{content}}
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <a href="/" class="logo">PianoGuide</a>
+            <p>A clear and practical reference for piano.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+            <ul>
+{{footerNav}}
+            </ul>
+        </nav>
+        <div class="footer-bottom">
+            <p>&copy; {{year}} PianoGuide</p>
+        </div>
+    </footer>
+
+{{scripts}}
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "piano-guide",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PianoGuide: a clear and practical piano reference with scales, chords and fingering for every key.",
+  "scripts": {
+    "dev": "node scripts/serve.js --watch",
+    "build": "node scripts/build.js",
+    "start": "node scripts/serve.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

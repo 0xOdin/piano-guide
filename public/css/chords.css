@@ -1,4 +1,5 @@
-/* Chords page css. The page hero, key tabs, practice card, option buttons and score come from scales.css. */
+/* Chords page css, and the keyboard diagram also used by the key pages. The page hero, tabs, practice card, option
+   buttons and score come from page.css. */
 
 /* Base */
 
@@ -67,25 +68,7 @@
   fill: var(--text);
 }
 
-.kb .root .octave,
-.kb .is-playing .octave {
-  fill: #fff;
-}
-
-/* the key that is sounding right now */
-.kb .is-playing {
-  transform: translateY(2px);
-}
-
-.kb .is-playing rect {
-  fill: var(--accent-ink);
-}
-
-.kb .root.is-playing rect {
-  fill: var(--text);
-}
-
-.kb .is-playing .finger {
+.kb .root .octave {
   fill: #fff;
 }
 
@@ -145,6 +128,22 @@
 
 .chord-card .score {
   margin-bottom: 8px;
+}
+
+/* link to the key page, under the fingering, when the chord is a major or minor triad */
+.key-link {
+  align-self: flex-start;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.key-link::after {
+  content: " \203A";
+}
+
+.key-link:hover {
+  color: var(--text);
 }
 
 .chord-guide {

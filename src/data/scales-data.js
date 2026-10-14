@@ -1,4 +1,5 @@
-// Scale data. Notes are GENERATED from a formula; fingerings are entered by hand.
+// Major scale data, read by scripts/build.js for the key pages. Notes are GENERATED from a formula; fingerings are
+// entered by hand.
 const LETTERS = ["C", "D", "E", "F", "G", "A", "B"];
 const NATURALS = [0, 2, 4, 5, 7, 9, 11];   // semitone of each natural letter
 const MAJOR_STEPS = [2, 2, 1, 2, 2, 2, 1]; // whole, whole, half, whole, whole, whole, half

@@ -1,0 +1,20 @@
+---
+nav: keys
+styles: page chords keys
+scripts: vexflow key-page
+---
+        <section class="page-hero">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="/keys/">Keys</a> <span aria-hidden="true">›</span> <a href="{{keyUrl}}">{{keyName}}</a>
+            </nav>
+            <h1>{{heading}}</h1>
+            <p>{{intro}}</p>{{heroExtra}}
+        </section>
+
+{{tabnav}}
+
+{{fingering}}
+
+{{viewer}}
+
+        <script type="application/json" id="page-data">{{data}}</script>

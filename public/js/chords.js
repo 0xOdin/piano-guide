@@ -1,18 +1,22 @@
 // Piano chords page. Drawn with VexFlow (loaded from a CDN before this file) plus a keyboard diagram.
-// Top of the page: an interactive viewer (pick a root and a chord type, then hand, inversion and play style).
+// Top of the page: an interactive viewer (pick a root and a chord type, then hand and inversion).
 // Bottom of the page: every chord type on the chosen root, written out for reference.
+// The address keeps the choice (/chords/?root=c-sharp&type=minor), so a chord can be linked to directly.
 const { Renderer, Stave, StaveNote, Voice, Formatter, Barline, Accidental } = Vex.Flow;
 
 const INK = "#1c1b19";
 const $ = (id) => document.getElementById(id);
 
 // what the viewer is currently showing
-const state = { root: 0, type: 0, inv: 0, hands: "rh", style: "block" };
+const state = { root: 0, type: 0, inv: 0, hands: "rh" };
 
-let current = []; // the notes being shown, lowest first
-let timers = [];
-let playing = false;
-let audioCtx, master;
+// the key page for each major and minor triad, written into the page by scripts/build.js:
+// { "<root index>:<major|minor>": { url, name } }
+const KEY_LINKS = JSON.parse($("key-links").textContent);
+
+// "C♯" -> "c-sharp", "Maj7" -> "maj7": how a root and a chord type are written in the address
+const noteSlug = (name) => name.replace("♯", "-sharp").replace("♭", "-flat").toLowerCase();
+const typeSlug = (type) => type.tab.toLowerCase();
 
 /* ---------- Sheet music ---------- */
 
@@ -105,14 +109,12 @@ function keyboardSVG(notes, fingers, hand, label) {
 /* ---------- Viewer ---------- */
 
 function renderViewer() {
-  stopPlayback();
   const root = CHORD_ROOTS[state.root];
   const type = CHORD_TYPES[state.type];
   const tones = spellChord(root, type);
   state.inv = Math.min(state.inv, tones.length - 1);
 
   const notes = voiceChord(tones, state.inv, state.hands);
-  current = notes;
   const fingers = FINGERING[tones.length][state.hands][state.inv];
   const title = `${root.name} ${type.name}`;
   const symbol = chordSymbol(root, type);
@@ -146,60 +148,19 @@ function renderViewer() {
     `<p><strong>${handName}:</strong> ${fingers.join(" ")}</p>` +
     `<p><strong>Bass note:</strong> ${bassText}</p>`;
 
+  // a major or minor triad has its own key page, with both hands, the scale and the arpeggio
+  const keyPage = KEY_LINKS[`${state.root}:${type.name}`];
+  $("key-link").hidden = !keyPage;
+  if (keyPage) {
+    $("key-link").href = keyPage.url;
+    $("key-link").textContent = `${keyPage.name}: both hands, scale and arpeggio`;
+  }
+
   document.querySelectorAll("#root-tabs button").forEach((b, i) => b.setAttribute("aria-pressed", String(i === state.root)));
   document.querySelectorAll("#type-tabs button").forEach((b, i) => b.setAttribute("aria-pressed", String(i === state.type)));
   document.querySelectorAll(".seg").forEach((seg) =>
     seg.querySelectorAll("button").forEach((b) =>
       b.setAttribute("aria-pressed", String(String(state[seg.dataset.key]) === b.dataset.v))));
-}
-
-/* ---------- Sound ---------- */
-
-function tone(semi, t, length, peak) {
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const end = t + Math.max(length * 1.6, 0.5);
-  osc.type = "triangle";
-  osc.frequency.value = 261.63 * Math.pow(2, semi / 12); // 261.63 Hz = middle C
-  gain.gain.setValueAtTime(0.0001, t);
-  gain.gain.exponentialRampToValueAtTime(peak, t + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.001, end);
-  osc.connect(gain).connect(master);
-  osc.start(t);
-  osc.stop(end + 0.05);
-}
-
-const keyGroups = (abs) => document.querySelectorAll(`#chord-keys g[data-abs="${abs}"]`);
-
-function stopPlayback() {
-  timers.forEach(clearTimeout);
-  timers = [];
-  document.querySelectorAll("#chord-keys .is-playing").forEach((e) => e.classList.remove("is-playing"));
-  if (master) { master.disconnect(); master = null; } // cuts off any notes still ringing
-  playing = false;
-  $("play-btn").textContent = "▶ Play chord";
-}
-
-function playChord() {
-  if (playing) return stopPlayback();
-  audioCtx = audioCtx || new AudioContext(); // must be created after a click
-  if (audioCtx.state === "suspended") audioCtx.resume();
-  master = audioCtx.createGain();
-  master.connect(audioCtx.destination);
-
-  const spread = state.style === "spread";
-  const gap = spread ? 0.32 : 0; // seconds between notes when spread out
-  const hold = 1.3;
-  const peak = 0.34 / Math.sqrt(current.length); // keeps four notes from being louder than three
-
-  current.forEach((n, i) => {
-    tone(n.abs, audioCtx.currentTime + 0.05 + i * gap, hold, peak);
-    timers.push(setTimeout(() => keyGroups(n.abs).forEach((g) => g.classList.add("is-playing")), 50 + i * gap * 1000));
-  });
-  const total = 50 + ((current.length - 1) * gap + hold) * 1000;
-  timers.push(setTimeout(stopPlayback, total));
-  playing = true;
-  $("play-btn").textContent = "■ Stop";
 }
 
 /* ---------- Reference list ---------- */
@@ -260,7 +221,7 @@ $("type-tabs").addEventListener("click", (e) => {
   renderViewer();
 });
 
-// every option group (.seg) has data-key="hands" | "inv" | "style"
+// every option group (.seg) has data-key="hands" | "inv"
 document.querySelector(".options").addEventListener("click", (e) => {
   const b = e.target.closest(".seg button");
   if (!b) return;
@@ -269,6 +230,24 @@ document.querySelector(".options").addEventListener("click", (e) => {
   renderViewer();
 });
 
-$("play-btn").addEventListener("click", playChord);
+// the address: open on the chord it names, and keep it up to date
+function saveToAddress() {
+  const params = new URLSearchParams({ root: noteSlug(CHORD_ROOTS[state.root].name), type: typeSlug(CHORD_TYPES[state.type]) });
+  history.replaceState(null, "", `?${params}`);
+}
+
+{
+  const params = new URLSearchParams(location.search);
+  const root = params.get("root");
+  const type = params.get("type");
+  // a root can be given in either spelling: "c-sharp" and "d-flat" are the same key
+  const r = CHORD_ROOTS.findIndex((x) => noteSlug(x.name) === root || (x.alt && noteSlug(x.alt.name) === root));
+  const t = CHORD_TYPES.findIndex((x) => typeSlug(x) === type);
+  if (r >= 0) state.root = r;
+  if (t >= 0) state.type = t;
+}
+
+document.querySelectorAll("#root-tabs, #type-tabs").forEach((tabs) => tabs.addEventListener("click", saveToAddress));
+
 renderViewer();
 renderList();

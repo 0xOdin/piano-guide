@@ -1,0 +1,5 @@
+# build output: npm run build writes the site here
+dist/
+
+node_modules/
+.DS_Store

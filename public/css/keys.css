@@ -1,0 +1,508 @@
+/* Key pages css (scale, arpeggio and chord pages for one key). The hero, practice card, option buttons, score and
+   keyboard diagram come from page.css and chords.css; the rules here tighten them up so a whole section fits
+   on one screen. */
+
+/* Base (phones) */
+
+/* a tighter hero than the scales pages have */
+main .page-hero {
+  padding-block: 22px 12px;
+}
+
+main .page-hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  line-height: 1.15;
+}
+
+main .page-hero p {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* a link under the intro (the chord page links to the chord explorer) */
+main .page-hero .hero-more {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* breadcrumb above the heading */
+.crumbs {
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.crumbs span {
+  margin: 0 4px;
+}
+
+/* tabs that link to the key's other pages (same look as the key and type pills) */
+.key-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 var(--pad) 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.key-tabs a,
+.key-tabs button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 38px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.key-tabs a:hover,
+.key-tabs button:hover {
+  background: var(--bg-alt);
+}
+
+.key-tabs a[aria-current="page"],
+.key-tabs button[aria-pressed="true"] {
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
+/* the chromatic page: "Start on" and the twelve buttons use the tab bar's look */
+.tabs-label {
+  flex: 0 0 auto;
+  align-self: center;
+  padding-right: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* the short how-to under the chromatic page's title */
+.how-to {
+  max-width: 68ch;
+  margin: 12px 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.how-to li+li {
+  margin-top: 4px;
+}
+
+/* the fingering card: the first thing on the page */
+.fingering {
+  padding: 0 var(--pad) 16px;
+}
+
+.fingering-card {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* the heading row of a card: the title on the left, its controls on the right */
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.fingering-card h2,
+.practice-card .card-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+}
+
+.finger-note {
+  margin: 12px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* The fingering table: notes across the top, then a row for each hand. Two octaves are one long table: when it
+   is wider than the screen it scrolls sideways inside .finger-scroll, with the RH / LH labels staying in view. */
+.finger-scroll {
+  overflow-x: auto;
+}
+
+.finger-grid {
+  width: 100%;
+  min-width: calc(40px + var(--cols) * 28px);
+  max-width: calc(48px + var(--cols) * 64px);
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+}
+
+.finger-grid th,
+.finger-grid td {
+  padding: 0;
+}
+
+.finger-grid thead th {
+  padding: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.finger-grid th:first-child {
+  position: sticky;
+  left: 0;
+  width: 40px;
+  background: var(--surface);
+  text-align: left;
+}
+
+.finger-grid tbody tr {
+  border-top: 1px solid var(--line);
+}
+
+.finger-grid tbody th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.finger-grid abbr {
+  text-decoration: none;
+}
+
+.finger-grid td {
+  height: 42px;
+  font-size: 1.35rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the thumb, so the points where it goes under or the hand moves are easy to spot */
+.finger-grid td.thumb {
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+/* the chord page: root position and the inversions, one table each */
+.finger-blocks {
+  display: grid;
+  gap: 18px;
+}
+
+.finger-block h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* the sheet music and keyboard sections sit close together; the last one leaves room before the footer */
+.practice {
+  padding-bottom: 16px;
+}
+
+main>.practice:last-of-type {
+  padding-bottom: 40px;
+}
+
+main .practice>.practice-card {
+  padding: 16px;
+}
+
+main .practice-card .options {
+  margin-bottom: 12px;
+  gap: 10px 16px;
+}
+
+/* a row of option groups that sit side by side and wrap when the screen is narrow */
+main .practice-card .options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+}
+
+main .practice-card .options-row>.option {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+/* option buttons keep their label on one line, even on a narrow phone ("2 octaves") */
+.seg button {
+  white-space: nowrap;
+}
+
+/* The sheet music. It is drawn to fill the card's width, which makes it huge on a wide screen, so its height is
+   capped. A long line (two octaves) scrolls sideways on a phone instead of shrinking the notes. */
+.score {
+  overflow-x: auto;
+}
+
+.score svg {
+  display: block;
+  margin-inline: auto;
+}
+
+.score[data-hands="one"] svg {
+  max-height: 180px;
+}
+
+.score[data-hands="both"] svg {
+  max-height: 300px;
+}
+
+/* a chord drawn alone in its card (both hands: a grand staff) */
+.chord-score svg {
+  max-width: 200px;
+  max-height: 300px;
+  margin-inline: auto;
+}
+
+/* the keyboard diagrams: one per hand, the right hand above the left, on every screen size */
+.kb-blocks {
+  display: grid;
+  gap: 14px;
+}
+
+.kb-block {
+  max-width: 560px;
+}
+
+.kb-block .option-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* a wide keyboard (two octaves) scrolls sideways on a phone instead of shrinking the keys */
+.kb-block>div {
+  overflow-x: auto;
+}
+
+/* The keys are plain white and black like a real piano. The keys of the scale, arpeggio or chord are marked:
+   white keys turn beige, black keys a darker brown, and the finger number sits on each of them. These rules
+   replace the chords.css colours. */
+.kb .white.is-marked rect {
+  fill: var(--accent-light);
+}
+
+.kb .black.is-marked rect {
+  fill: var(--accent);
+}
+
+.kb .white.is-marked .finger,
+.kb .white.is-marked .octave {
+  fill: var(--text);
+}
+
+.kb .black.is-marked .finger {
+  fill: #fff;
+}
+
+/* The chord page and the arpeggio page (on a desktop): the sheet music and the keyboard card in one row instead of
+   one above the other. Both are stacked on a phone. */
+.practice-pair {
+  padding-bottom: 40px;
+}
+
+.practice-pair .practice {
+  padding-inline: var(--pad);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .key-tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .fingering-card,
+  main .practice>.practice-card {
+    padding: 20px 24px;
+  }
+
+  .finger-grid td {
+    height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .finger-blocks.three {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  /* chord: a narrow sheet music column beside the keyboards, from tablet width up */
+  .practice-pair-chord {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0 16px;
+    padding: 0 var(--pad) 40px;
+  }
+
+  .practice-pair-chord .practice {
+    padding: 0;
+  }
+
+  .practice-pair-chord .practice>.practice-card {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  /* the sheet music column is narrow: stack its options */
+  .practice-pair-chord .practice:first-child .options {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .practice-pair-chord .practice:first-child .option-wide {
+    grid-column: auto;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+
+  .key-tabs,
+  .fingering {
+    padding-inline: var(--gutter);
+  }
+
+  .practice-pair {
+    padding-inline: var(--gutter);
+    gap: 0 20px;
+  }
+
+  .fingering-card,
+  main .practice>.practice-card {
+    padding: 20px 28px;
+  }
+
+  main>.practice:last-of-type {
+    padding-bottom: 48px;
+  }
+
+  .practice-pair {
+    padding-bottom: 48px;
+  }
+
+  .practice-pair .practice>.practice-card {
+    padding: 20px 24px;
+  }
+
+  /* arpeggio: two equal columns, sheet music on the left and the keyboards on the right, one above the other
+     (the column is too narrow for two keyboards side by side) */
+  .practice-pair-arp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .practice-pair-arp .practice {
+    padding: 0;
+  }
+
+  .practice-pair-arp .practice>.practice-card {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .practice-pair-arp #keyboards {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    column-gap: 0;
+  }
+
+  .practice-pair-arp #keyboards>.kb-block:not(:only-child) {
+    max-width: 560px;
+  }
+
+  .practice-pair-arp #keyboards>.kb-block+.kb-block {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .finger-blocks.three {
+    gap: 32px;
+  }
+
+  /* the keyboards: right hand and left hand next to each other, with a line between them. One hand on its own
+     keeps the single-keyboard width. */
+  #keyboards {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    column-gap: 28px;
+  }
+
+  #keyboards>.kb-block:not(:only-child) {
+    max-width: none;
+  }
+
+  #keyboards>.kb-block+.kb-block {
+    padding-left: 28px;
+    border-left: 1px solid var(--line);
+  }
+}
+
+/* The chord page's keyboard card sits beside the sheet music and is stretched to the same height. The keyboards
+   stay one above the other, fill the width of the card (up to a limit) and are centred in it, so the card is
+   not left half empty. */
+.practice-pair-chord .practice:last-child .practice-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.practice-pair-chord #chord-keys {
+  margin-block: auto;
+}
+
+.practice-pair-chord .kb-block {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+/* iPad mini in portrait (744px wide) and other widths just under the tablet layout: the three sheet music options
+   (Hands, Octaves, Fingering) fit on one line instead of wrapping. Only this width range is affected. */
+@media (min-width: 600px) and (max-width: 767px) {
+  main .practice-card .options-row {
+    flex-wrap: nowrap;
+    gap: 10px 14px;
+  }
+
+  main .practice-card .options-row>.option {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  main .practice-card .options-row .seg button {
+    padding-inline: 11px;
+    font-size: 0.85rem;
+  }
+}

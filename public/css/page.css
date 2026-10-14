@@ -1,4 +1,5 @@
-/* Indivisual scale page css */
+/* Parts shared by the inner pages (key pages, chords, search, 404): the page hero, pill tabs, the practice card,
+   option buttons and the score. Loaded after main.css. */
 
 /* Page hero */
 .page-hero {
@@ -170,10 +171,6 @@
   padding: 0 8px;
 }
 
-.list-type {
-  margin-top: 14px;
-}
-
 /* The score */
 .score svg {
   display: block;
@@ -181,29 +178,11 @@
   height: auto;
 }
 
-/* the note that is sounding right now */
-.score .vf-stavenote.is-playing path,
-.score .vf-stavenote.is-playing rect {
-  fill: var(--accent);
-  stroke: var(--accent);
-}
-
-.score .vf-stavenote.is-playing text {
-  fill: var(--accent-ink);
-}
-
 .practice-foot {
   display: flex;
   flex-direction: column;
   gap: 14px;
   margin-top: 16px;
-}
-
-button.keyboard-btn {
-  align-self: flex-start;
-  border: 0;
-  font-family: inherit;
-  cursor: pointer;
 }
 
 .fingering-text p,
@@ -259,11 +238,6 @@ button.keyboard-btn {
     justify-content: space-between;
   }
 
-  .options.options-4 {
-    grid-template-columns: repeat(2, auto);
-    gap: 20px 12px;
-  }
-
   .option-wide {
     align-items: flex-start;
   }
@@ -282,10 +256,6 @@ button.keyboard-btn {
     align-items: center;
     justify-content: space-between;
   }
-
-  button.keyboard-btn {
-    align-self: auto;
-  }
 }
 
 /* Desktop */
@@ -300,10 +270,6 @@ button.keyboard-btn {
 
   .practice-card {
     padding: 32px 36px;
-  }
-
-  .options.options-4 {
-    grid-template-columns: repeat(4, auto);
   }
 
   .scale-list {
