@@ -8,7 +8,7 @@
 //   { mode: "chord", inversions: [ ... ] }                               chord
 const { Renderer, Stave, StaveNote, Voice, Formatter, StaveConnector, Barline, FretHandFinger, Modifier, Accidental } = Vex.Flow;
 
-const INK = "#1c1b19";
+const INK = "#121316";
 const $ = (id) => document.getElementById(id);
 const data = JSON.parse($("page-data").textContent);
 

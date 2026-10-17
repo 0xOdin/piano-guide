@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#1c1b19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#121316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <!-- Arpeggio: three rising noteheads on beamed stems -->
   <ellipse cx="15" cy="50" rx="6" ry="4.2" transform="rotate(-20 15 50)" fill="currentColor"/>
   <ellipse cx="31" cy="42" rx="6" ry="4.2" transform="rotate(-20 31 42)" fill="currentColor"/>
   <ellipse cx="47" cy="34" rx="6" ry="4.2" transform="rotate(-20 47 34)" fill="currentColor"/>
   <path d="M20.6 48.5V14M36.6 40.5V14M52.6 32.5V14"/>
-  <path d="M20.6 12h32v5h-32z" fill="#1c1b19"/>
+  <path d="M20.6 12h32v5h-32z" fill="#121316"/>
 </svg>

@@ -4,7 +4,7 @@
 // The address keeps the choice (/chords/?root=c-sharp&type=minor), so a chord can be linked to directly.
 const { Renderer, Stave, StaveNote, Voice, Formatter, Barline, Accidental } = Vex.Flow;
 
-const INK = "#1c1b19";
+const INK = "#121316";
 const $ = (id) => document.getElementById(id);
 
 // what the viewer is currently showing

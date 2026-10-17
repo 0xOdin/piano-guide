@@ -25,7 +25,7 @@
 .chart .key-group-title {
   margin: 0 0 14px;
   font-size: 1.5rem;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -124,7 +124,7 @@
 .chart-table .hand + .hand {
   margin-top: 5px;
   padding-top: 5px;
-  border-top: 1px solid rgba(28, 27, 25, 0.16);
+  border-top: 1px solid rgba(18, 19, 22, 0.16);
 }
 
 .chart-table .hand abbr {
@@ -161,7 +161,7 @@
   height: 1.1em;
   margin: 0 5px;
   vertical-align: middle;
-  background: rgba(28, 27, 25, 0.2);
+  background: rgba(18, 19, 22, 0.2);
 }
 
 .chart-foot {

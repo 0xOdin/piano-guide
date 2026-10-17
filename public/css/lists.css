@@ -12,7 +12,7 @@
 .key-group-title {
   margin: 0 0 14px;
   font-size: 1.5rem;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -66,9 +66,9 @@
 
 .key-card h4 {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 400;
-  letter-spacing: -0.025em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .key-card h4 a::after {

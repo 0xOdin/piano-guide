@@ -160,14 +160,12 @@ function drawPiano() {
 function render() {
   const show = currentShow();
   const shown = new Map(show ? show.notes.map((n, i) => [n.abs, { name: n.name, finger: show.fingers[i] }]) : []);
-  const rootPc = show ? pc(show.notes[0].abs) : null;
   const down = new Set([...[...held.values()].map((h) => h.abs), ...flashing]);
 
   keyEls.forEach((el, abs) => {
     const s = shown.get(abs);
     const isSelected = selected.has(abs);
     el.classList.toggle("is-shown", !!s);
-    el.classList.toggle("is-root", !!s && pc(abs) === rootPc);
     el.classList.toggle("is-selected", isSelected);
     el.classList.toggle("is-down", down.has(abs));
     el.setAttribute("aria-pressed", String(isSelected));

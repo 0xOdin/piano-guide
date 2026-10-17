@@ -18,7 +18,7 @@
 .page-hero h1 {
   margin: 0 0 12px;
   font-size: clamp(2rem, 8vw, 2.8rem);
-  font-weight: 300;
+  font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
@@ -100,7 +100,7 @@
 .practice-card h2 {
   margin: 0 0 4px;
   font-size: 1.5rem;
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -249,7 +249,7 @@
 .scale-card h3 {
   margin: 0 0 8px;
   font-size: 1.15rem;
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 

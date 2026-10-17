@@ -1,21 +1,26 @@
 :root {
-  --bg: #f8f6f1;
-  --bg-alt: #f1ede4;
-  --surface: #fffdf9;
-  --placeholder: #e6dfd3;
-  --text: #1c1b19;
-  --muted: #75706a;
-  --accent: #9a7b57;
-  --accent-ink: #86694a;
-  --accent-light: #d6bd96;
-  --accent-soft: rgba(154, 123, 87, 0.12);
-  --line: rgba(28, 27, 25, 0.08);
+  /* the colours of the instrument: white and black keys, and the red felt along the back of the keys */
+  --bg: #ffffff; /* paper */
+  --bg-alt: #f5f5f3; /* ivory: quiet panels, hovers */
+  --surface: #ffffff;
+  --placeholder: #ededea;
+  --text: #121316; /* ebony */
+  --muted: #5d6068; /* graphite */
+  --accent: #b8312f; /* felt */
+  --accent-ink: #9c2421; /* felt, dark enough for text */
+  --accent-light: #f5d9d6; /* felt, as a fill for marked white keys */
+  --accent-soft: rgba(184, 49, 47, 0.08);
+  --line: #e5e5e2; /* hairline */
+  --line-strong: #cfcfcb;
 
-  --radius: 16px;
-  --pad: 22px;
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
 
-  --shadow: 0 1px 2px rgba(40, 30, 20, 0.05),
-    0 10px 24px -10px rgba(40, 30, 20, 0.14);
+  --radius: 12px;
+  --pad: 20px;
+
+  /* cards are outlined, not lifted */
+  --shadow: none;
 }
 
 * {
@@ -28,12 +33,18 @@ html {
 
 body {
   margin: 0;
-  font-family: "Lato", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+.logo {
+  font-family: var(--font-display);
 }
 
 a {
@@ -53,13 +64,12 @@ img {
 }
 
 .logo {
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .logo-accent {
   color: var(--accent);
-  font-weight: 400;
 }
 
 .sr-only {
@@ -112,10 +122,9 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--pad);
-  background: rgba(248, 246, 241, 0.82);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  padding: 12px var(--pad);
+  background: var(--bg);
+  border-top: 3px solid var(--accent); /* the felt strip */
   border-bottom: 1px solid var(--line);
 }
 
@@ -222,7 +231,7 @@ header {
 .hero h1 {
   margin: 0 0 16px;
   font-size: clamp(2rem, 9vw, 2.5rem);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.035em;
   text-wrap: balance;
@@ -274,10 +283,9 @@ header {
   width: 100%;
   height: 170px;
   object-fit: cover;
-  object-position: center 85%; /* keep the ends of the keys and the finger numbers in view */
-  border-radius: 20px;
-  background: var(--placeholder);
-  box-shadow: var(--shadow);
+  object-position: center 62%; /* keep the ends of the keys and the finger numbers in view */
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
 }
 
 /* Section headers */
@@ -288,7 +296,7 @@ header {
 .section-header h2 {
   margin: 0 0 6px;
   font-size: 1.5rem;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -341,9 +349,9 @@ header {
   height: 36px;
   margin-bottom: 10px;
   border-radius: 50%;
-  background: var(--accent-soft);
+  background: var(--bg-alt);
   font-size: 1.05rem;
-  color: var(--accent-ink);
+  color: var(--text);
 }
 
 .explore-card h3 {
@@ -375,8 +383,8 @@ header {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
+  background: var(--bg-alt);
+  color: var(--text);
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -385,7 +393,7 @@ header {
 
 .key-badge.is-minor {
   background: var(--surface);
-  box-shadow: inset 0 0 0 1.5px var(--accent-light);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
 }
 
 a.key-badge {
@@ -393,7 +401,7 @@ a.key-badge {
 }
 
 a.key-badge:hover {
-  background: var(--accent-ink);
+  background: var(--text);
   color: #fff;
 }
 
@@ -460,7 +468,7 @@ a.key-badge:active {
 .keyboard-header h2 {
   margin: 0 0 6px;
   font-size: 1.2rem;
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
@@ -478,7 +486,8 @@ a.key-badge:active {
   min-height: 44px;
   padding: 0 18px;
   border-radius: 12px;
-  background: var(--accent-light);
+  background: var(--text);
+  color: #fff;
   font-size: 0.88rem;
   font-weight: 700;
   transition: transform 0.15s ease;
@@ -488,11 +497,16 @@ a.key-badge:active {
   transform: scale(0.97);
 }
 
-.keyboard-img {
-  width: 100%;
+/* a strip of keys at real proportions: one octave (keyboard.svg) repeated across the banner, so a wider screen
+   shows more keys rather than wider ones; the first octave has the C major chord marked (keyboard-chord.svg) */
+.keyboard-keys {
   height: 96px;
-  border: 1px solid rgba(28, 27, 25, 0.14);
+  border: 1px solid var(--line-strong);
+  border-top: 3px solid var(--accent); /* the felt strip, as on the keyboard page */
   border-radius: 0 0 8px 8px;
+  background:
+    url(/assets/images/keyboard-chord.svg) no-repeat left top / auto 100%,
+    url(/assets/images/keyboard.svg) repeat-x left top / auto 100%;
 }
 
 /* a link inside running text */
@@ -645,7 +659,7 @@ footer nav ul {
     flex-shrink: 0;
   }
 
-  .keyboard-img {
+  .keyboard-keys {
     height: 128px;
   }
 
@@ -799,6 +813,7 @@ footer nav ul {
     right: 0;
     width: 52%;
     height: 100%;
+    border: 0;
     border-radius: 0;
     background: none;
     box-shadow: none;
@@ -834,7 +849,7 @@ footer nav ul {
     font-size: 1.6rem;
   }
 
-  .keyboard-img {
+  .keyboard-keys {
     height: 150px;
   }
 
@@ -881,13 +896,12 @@ footer nav ul {
 @media (min-width: 1024px) and (hover: hover) {
 
   .explore-card {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 
   .explore-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 2px 4px rgba(40, 30, 20, 0.05),
-      0 18px 32px -12px rgba(40, 30, 20, 0.2);
+    border-color: var(--line-strong);
+    background: var(--bg-alt);
   }
 
   .header-links a:hover {
