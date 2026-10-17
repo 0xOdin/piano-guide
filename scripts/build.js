@@ -23,7 +23,8 @@
 //              /keys/a-minor/arpeggio/index.html   arpeggio
 //              /keys/a-minor/chord/index.html      chord
 //
-// plus the chromatic scale at /keys/chromatic/, the lists at /keys/, /scales/ and /arpeggios/, and /sitemap.xml.
+// plus the chromatic scale at /keys/chromatic/, the lists and fingering charts at /scales/ and /arpeggios/, and
+// /sitemap.xml.
 // Finally every link to a page or file on the site is checked, and the build fails if one of them goes nowhere.
 //
 // Run it with   npm run build   (or npm run dev to build, serve and rebuild on every change).
@@ -51,7 +52,6 @@ const NAV = [
   ["arpeggios", "/arpeggios/", "Arpeggios"],
   ["chords", "/chords/", "Chords"],
   ["theory", "/theory/", "Theory"],
-  ["keys", "/keys/", "Keys"],
 ];
 const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
 
@@ -145,6 +145,13 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const list = (arr) => arr.join(" ");
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 const noteSlug = (note) => note.replace("♯", "-sharp").replace("♭", "-flat").toLowerCase(); // "C♯" -> "c-sharp"
+
+// Page titles and descriptions also spell sharps and flats out in words, the way people type them into a search:
+// "C♯ minor" is found by "c sharp minor" as well as "c♯ minor".
+const titleCase = (s) => s.replace(/(^|\s)([a-z])/g, (_, space, c) => space + c.toUpperCase()); // "C♯ minor" -> "C♯ Minor"
+const inWords = (name) => name.replace(/♯/g, " sharp").replace(/♭/g, " flat"); // "C♯ minor" -> "C sharp minor"
+const hasAccidental = (name) => /[♯♭]/.test(name);
+const alsoInWords = (name) => (hasAccidental(name) ? ` (${inWords(name)})` : ""); // " (C sharp minor)" or ""
 
 // "F♯" -> letter "F", d = 1  |  "B♭" -> letter "B", d = -1
 function parseNote(name) {
@@ -405,8 +412,11 @@ function scalePage(form) {
         ? ". Coming down, play the natural minor scale (the 6th and 7th notes go back down) with the same fingers in reverse."
         : ", then come back down the same way in reverse.";
       return {
-        title: `${cap(name)} Scale Fingering for Both Hands | PianoGuide`,
-        description: `How to finger the ${name} scale on piano: right hand ${list(one.rh)}, left hand ${list(one.lh)}. One or two octaves, with sheet music and keyboard diagrams.`,
+        // "C♯ Minor Scale Fingering (C Sharp Natural Minor)", "A Minor Scale Fingering (Natural Minor)",
+        // "C♯ Harmonic Minor Scale Fingering (C Sharp Harmonic Minor)", "C Major Scale Fingering for Both Hands"
+        title: `${titleCase(form === "natural" ? key.name : name)} Scale Fingering${
+          hasAccidental(name) ? ` (${titleCase(inWords(name))})` : form === "natural" ? " (Natural Minor)" : " for Both Hands"} | PianoGuide`,
+        description: `How to finger the ${name}${alsoInWords(name)} scale on piano: right hand ${list(one.rh)}, left hand ${list(one.lh)}. One or two octaves, with sheet music and keyboard diagrams.`,
         heading: `${cap(name)} scale fingering`,
         intro: `The ${name} scale has ${key.signature}${raised}. Play one octave going up with the right hand on ${list(one.rh)} and the left hand on ${list(one.lh)}${back}`,
         fingering: melodicFingering(d, form === "melodic" ? MELODIC_MINOR_CAPTION : MELODIC_CAPTION),
@@ -424,8 +434,8 @@ const ARPEGGIO_PAGE = {
     const one = d[1];
     const name = key.name;
     return {
-      title: `${cap(name)} Arpeggio Fingering on Piano | PianoGuide`,
-      description: `How to finger the ${name} arpeggio on piano: right hand ${list(one.rh)}, left hand ${list(one.lh)}. One or two octaves, with sheet music and keyboard diagrams.`,
+      title: `${titleCase(name)} Arpeggio Fingering${hasAccidental(name) ? ` (${titleCase(inWords(name))})` : " on Piano"} | PianoGuide`,
+      description: `How to finger the ${name}${alsoInWords(name)} arpeggio on piano: right hand ${list(one.rh)}, left hand ${list(one.lh)}. One or two octaves, with sheet music and keyboard diagrams.`,
       heading: `${cap(name)} arpeggio fingering`,
       intro: `The ${name} arpeggio plays the notes of the ${name} chord (${list(one.notes.slice(0, 3).map((n) => n.name))}) one at a time, then the root again an octave higher. Use ${list(one.rh)} in the right hand and ${list(one.lh)} in the left hand.`,
       fingering: melodicFingering(d, MELODIC_CAPTION),
@@ -443,8 +453,8 @@ const CHORD_PAGE = {
     const names = list(inv[0].rh.notes.map((n) => n.name));
     const root = name.split(" ")[0]; // "C♯ minor" -> "C♯"
     return {
-      title: `${cap(name)} Chord on Piano: Notes and Fingering | PianoGuide`,
-      description: `The ${name} chord on piano: notes ${names}, with fingering for both hands in root position and both inversions.`,
+      title: `${titleCase(name)} Chord on Piano: Notes and Fingering${hasAccidental(name) ? ` (${titleCase(inWords(name))})` : ""} | PianoGuide`,
+      description: `The ${name}${alsoInWords(name)} chord on piano: notes ${names}, with fingering for both hands in root position and both inversions.`,
       heading: `${cap(name)} chord fingering`,
       intro: `The ${name} chord has the notes ${names}. In root position the right hand plays ${list(inv[0].rh.fingers)} and the left hand plays ${list(inv[0].lh.fingers)}. The fingering below covers root position and both inversions.`,
       // the chord explorer opens on this chord, with the 7th, sus and other chords on the same root a click away
@@ -649,9 +659,9 @@ for (const key of KEYS) {
   addKeyPage({ url: "/keys/chromatic/", keyUrl: "/keys/chromatic/", keyName: "Chromatic scale", section: "scales", tabnav: out.tabnav, out });
 }
 
-/* ---------- The lists: /keys/, /scales/, /arpeggios/ ---------- */
+/* ---------- The lists: /scales/, /arpeggios/ ---------- */
 
-// All three are built from src/templates/key-list.html: groups of cards, one card per key. The whole card links
+// Both are built from src/templates/key-list.html: groups of cards, one card per key. The whole card links
 // to `href`; `key` puts its root note in the round badge (filled for a major key, outlined for a minor one; no key
 // shows the keyboard icon); `links` (optional) are small buttons on the card for the key's other pages, and
 // `textLinks` (optional) a single line of plain links under the subtitle, which keeps the card small.
@@ -691,39 +701,17 @@ const keyGroup = (title, keys, toCard) => group(title, [
   ["Flats", keys.filter((k) => keyFamily(k) === "flats")],
 ].map(([label, ks]) => [label, ks.map(toCard)]));
 
-function addList({ url, nav, title, description, heading, intro, groups }) {
+function addList({ url, nav, title, description, heading, intro, chart, groups }) {
   addPage(url, `${url.slice(1)}index.html`, { ...listTemplate, meta: { ...listTemplate.meta, nav, title, description } }, {
     heading: esc(heading),
     intro: esc(intro),
+    chartLink: chart ? `
+            <p class="hero-more"><a class="go-link" href="${url}fingering-chart/">${chart}</a></p>` : "",
     groups: groups.filter(Boolean).join("\n"),
   });
 }
 
 const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale", sub: "Every black and white key, starting on any note" });
-
-// /keys/: every key with links to all of its pages
-{
-  const keyCard = (key) => card({
-    key,
-    href: keyPageUrl(key),
-    title: cap(key.name),
-    sub: cap(key.signature),
-    links: pagesFor(key).map((p) => [p.tab, keyPageUrl(key, p.path)]),
-  });
-  addList({
-    url: "/keys/",
-    nav: "keys",
-    title: "Piano Keys: Scales, Arpeggios and Chords | PianoGuide",
-    description: "Choose a major or minor key to see its scales, arpeggio and chord with fingering, sheet music and keyboard diagrams.",
-    heading: "Keys",
-    intro: "Choose a major or minor key to see its scales, arpeggio and chord, with the fingering, the sheet music and the keys on a keyboard.",
-    groups: [
-      keyGroup("Major keys", majorKeys, keyCard),
-      keyGroup("Minor keys", minorKeys, keyCard),
-      group("Other scales", [[null, [chromaticCard]]]),
-    ],
-  });
-}
 
 // /scales/: each card opens the scale; a minor key also links to its three forms
 addList({
@@ -733,6 +721,7 @@ addList({
   description: "Every major and minor piano scale (natural, harmonic and melodic) with fingering for both hands, sheet music and keyboard diagrams.",
   heading: "Scales",
   intro: "Choose a scale to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
+  chart: "Every scale's fingering on one page",
   groups: [
     keyGroup("Major scales", majorKeys, (key) => card({ key, href: keyPageUrl(key), title: `${cap(key.name)} scale`, sub: cap(key.signature) })),
     keyGroup("Minor scales", minorKeys, (key) => card({
@@ -761,9 +750,123 @@ addList({
     description: "Every major and minor piano arpeggio with fingering for both hands, one or two octaves, with sheet music and keyboard diagrams.",
     heading: "Arpeggios",
     intro: "Choose an arpeggio to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
+    chart: "Every arpeggio's fingering on one page",
     groups: [
       keyGroup("Major arpeggios", majorKeys, arpCard),
       keyGroup("Minor arpeggios", minorKeys, arpCard),
+    ],
+  });
+}
+
+/* ---------- The fingering charts: /scales/fingering-chart/, /arpeggios/fingering-chart/ ---------- */
+
+// Every key's fingering in one table, going up, in learning order: quick to look up, and easy to print and keep on
+// the piano. Each row links to the key's own page. Both the one-octave and the two-octave fingering are in the page
+// (the same numbers as on the key pages); the 1 octave / 2 octaves switch (public/js/chart.js) shows one of them.
+const chartTemplate = readPage(path.join(SRC, "templates", "fingering-chart.html"));
+
+// finger numbers with the thumb picked out, as on the key pages. `octave` (two octaves only): how many numbers one
+// octave has. A faint line goes just before the middle note (the second C in C major), where the second octave
+// starts, in the same place for both hands.
+const chartFingers = (fingers, octave) => fingers.map((f, i) =>
+  (i === octave - 1 ? '<span class="oct-split" aria-hidden="true"></span>' : "")
+  + `<span class="f${f === 1 ? " thumb" : ""}">${f}</span>`).join("");
+
+// one hand's line in the Fingering cell, with both octave choices: "RH 1 2 3 1 2 3 4 5"
+const chartHand = (label, title, one, two) => `<span class="hand"><abbr title="${title}">${label}</abbr>`
+  + `<span class="oct-1">${chartFingers(one)}</span><span class="oct-2">${chartFingers(two, one.length)}</span></span>`;
+
+// rows: [{ name, url, notes, octaves, more }]: `octaves` is withTwoOctaves() output, `more` an optional line of
+// small links under the name
+const chartTable = (title, column, rows) => `            <div class="chart-group" id="${title.toLowerCase().replace(/ /g, "-")}">
+                <h2 class="key-group-title">${title}</h2>
+                <div class="table-scroll">
+                    <table class="chart-table">
+                        <thead>
+                            <tr><th scope="col">${column}</th><th scope="col">Fingering</th></tr>
+                        </thead>
+                        <tbody>
+${rows.map((r) => `                            <tr>
+                                <th scope="row"><a href="${r.url}">${esc(r.name)}</a><span class="chart-notes">${esc(list(r.notes))}</span>${r.more || ""}</th>
+                                <td>${chartHand("RH", "Right hand", r.octaves[1].rh, r.octaves[2].rh)}${chartHand("LH", "Left hand", r.octaves[1].lh, r.octaves[2].lh)}</td>
+                            </tr>`).join("\n")}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+
+function addChart({ section, title, description, heading, intro, tables }) {
+  const [, sectionUrl, sectionName] = NAV.find(([id]) => id === section);
+  const url = `${sectionUrl}fingering-chart/`;
+  addPage(url, `${url.slice(1)}index.html`, { ...chartTemplate, meta: { ...chartTemplate.meta, nav: section, title, description } }, {
+    sectionUrl,
+    sectionName,
+    url,
+    heading: esc(heading),
+    intro: esc(intro),
+    tables: tables.join("\n"),
+  });
+}
+
+// one and two octaves, exactly as the key pages work them out
+const scaleOctaves = (key, form) => withTwoOctaves(scaleData(key, form), key.twoOctave && key.twoOctave.scale);
+const arpeggioOctaves = (key) => withTwoOctaves(arpeggioData(key), key.twoOctave && key.twoOctave.arpeggio);
+
+// A minor key gets one row when its three forms share a fingering (the usual case), with links to each form;
+// otherwise one row per fingering, named after the forms that use it.
+const MINOR_FORMS = ["natural", "harmonic", "melodic"];
+function minorScaleRows(key) {
+  const root = key.name.split(" ")[0];
+  const groups = new Map(); // fingering -> forms
+  for (const form of MINOR_FORMS) {
+    const octaves = scaleOctaves(key, form);
+    const id = JSON.stringify([octaves[1].rh, octaves[1].lh, octaves[2].rh, octaves[2].lh]);
+    if (!groups.has(id)) groups.set(id, { octaves, forms: [] });
+    groups.get(id).forms.push(form);
+  }
+  return [...groups.values()].map(({ octaves, forms }) => ({
+    name: forms.length === 3 ? cap(key.name) : `${root} ${forms.join(" / ")} minor`,
+    url: keyPageUrl(key, SCALE_FORMS[forms[0]].path),
+    notes: octaves[1].notes.map((n) => n.name),
+    octaves,
+    more: forms.length === 3 ? `<span class="chart-more">${MINOR_FORMS.map((f) =>
+      `<a href="${keyPageUrl(key, SCALE_FORMS[f].path)}">${SCALE_FORMS[f].tab}</a>`).join('<span aria-hidden="true"> · </span>')}</span>` : "",
+  }));
+}
+
+{
+  const sameForms = minorKeys.every((key) => minorScaleRows(key).length === 1);
+  addChart({
+    section: "scales",
+    title: "Piano Scale Fingering Chart: Every Major and Minor Scale | PianoGuide",
+    description: "The fingering for every major and minor piano scale on one page, right and left hand, in the order they are learnt.",
+    heading: "Scale fingering chart",
+    intro: `Every scale on one page, going up: RH is the right hand, LH the left. Finger 1 is the thumb.${sameForms ? " Minor scales use the same fingering in their natural, harmonic and melodic forms." : ""}`,
+    tables: [
+      chartTable("Major scales", "Scale", majorKeys.map((key) => {
+        const octaves = scaleOctaves(key);
+        return { name: cap(key.name), url: keyPageUrl(key), notes: octaves[1].notes.map((n) => n.name), octaves };
+      })),
+      chartTable("Minor scales", "Scale", minorKeys.flatMap(minorScaleRows)),
+      `            <p class="chart-foot">The <a class="text-link" href="/keys/chromatic/">chromatic scale</a> has its own pattern: thumb on the white keys, finger 3 on the black keys.</p>`,
+    ],
+  });
+}
+
+{
+  const arpRow = (key) => {
+    const octaves = arpeggioOctaves(key);
+    return { name: cap(key.name), url: keyPageUrl(key, ARPEGGIO_PAGE.path), notes: octaves[1].notes.map((n) => n.name), octaves };
+  };
+  addChart({
+    section: "arpeggios",
+    title: "Piano Arpeggio Fingering Chart: Every Major and Minor Arpeggio | PianoGuide",
+    description: "The fingering for every major and minor piano arpeggio on one page, right and left hand, in the order they are learnt.",
+    heading: "Arpeggio fingering chart",
+    intro: "Every arpeggio on one page, going up: RH is the right hand, LH the left. Finger 1 is the thumb.",
+    tables: [
+      chartTable("Major arpeggios", "Arpeggio", majorKeys.map(arpRow)),
+      chartTable("Minor arpeggios", "Arpeggio", minorKeys.map(arpRow)),
     ],
   });
 }

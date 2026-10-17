@@ -1,0 +1,231 @@
+/* The fingering charts (/scales/fingering-chart/, /arpeggios/fingering-chart/). The page hero and breadcrumb come
+   from page.css and keys.css. */
+
+.chart {
+  padding: 0 var(--pad) 56px;
+}
+
+/* the 1 octave / 2 octaves switch under the intro; each cell has both sets of numbers and shows one */
+.chart-options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.chart:not([data-octaves="2"]) .oct-2,
+.chart[data-octaves="2"] .oct-1 {
+  display: none;
+}
+
+.chart-group + .chart-group {
+  margin-top: 32px;
+}
+
+.chart .key-group-title {
+  margin: 0 0 14px;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.chart-table {
+  width: 100%;
+  border-collapse: separate; /* so the corners can be rounded like the other cards */
+  border-spacing: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+}
+
+.chart-table th,
+.chart-table td {
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.chart-table thead th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.chart-table tbody th,
+.chart-table tbody td {
+  border-top: 1px solid var(--line);
+}
+
+/* the key: its name (a link), its notes, and for a minor scale its three forms */
+.chart-table tbody th {
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* the key's name stays in view while the finger numbers scroll sideways on a narrow screen */
+.chart-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+  box-shadow: 1px 0 0 var(--line);
+}
+
+.chart-table thead th:first-child {
+  border-top-left-radius: var(--radius);
+}
+
+.chart-table tbody tr:last-child th:first-child {
+  border-bottom-left-radius: var(--radius);
+}
+
+.chart-table tbody th > a {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chart-table tbody th > a:hover {
+  color: var(--accent-ink);
+}
+
+.chart-notes,
+.chart-more {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.chart-more a {
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.chart-more a:hover {
+  color: var(--text);
+}
+
+/* the fingering: the right hand above the left, each line labelled; the numbers evenly spaced and the thumb picked
+   out as on the key pages */
+.chart-table td {
+  white-space: nowrap;
+}
+
+.chart-table .hand {
+  display: flex;
+  align-items: center;
+}
+
+/* a clear line between the right hand and the left hand */
+.chart-table .hand + .hand {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(28, 27, 25, 0.16);
+}
+
+.chart-table .hand abbr {
+  flex: 0 0 2.4em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.chart-table .f {
+  display: inline-block;
+  width: 1.35em;
+  text-align: center;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-table .f.thumb {
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+/* two octaves: the numbers sit a little closer, and the table may use the full width */
+.chart[data-octaves="2"] .f {
+  width: 1.15em;
+}
+
+/* a faint line where the second octave starts */
+.chart-table .oct-split {
+  display: inline-block;
+  width: 1px;
+  height: 1.1em;
+  margin: 0 5px;
+  vertical-align: middle;
+  background: rgba(28, 27, 25, 0.2);
+}
+
+.chart-foot {
+  margin: 20px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .chart-table th,
+  .chart-table td {
+    padding: 12px 20px;
+  }
+
+  .chart .key-group-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .chart {
+    padding: 0 var(--gutter) 88px;
+  }
+
+  .chart-table {
+    max-width: 640px;
+  }
+
+  .chart[data-octaves="2"] .chart-table {
+    max-width: none;
+  }
+}
+
+/* Printing: just the charts, to keep on the piano */
+@media print {
+  header,
+  footer,
+  .crumbs,
+  .chart-options,
+  .chart-more {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .chart,
+  main .page-hero {
+    padding-inline: 0;
+  }
+
+  .chart-table {
+    box-shadow: none;
+    font-size: 0.8rem;
+  }
+
+  .chart-table tr {
+    break-inside: avoid;
+  }
+
+  .chart-group + .chart-group {
+    break-before: page;
+  }
+}

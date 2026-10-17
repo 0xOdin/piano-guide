@@ -4,7 +4,7 @@ A clear and practical piano reference: scales, chords and arpeggios in every key
 keyboard diagrams.
 
 Each key (C major, F♯ minor, ...) has its own pages for the scale, arpeggio and chord. `/scales/` and `/arpeggios/`
-list them, each card opening the page itself, and `/keys/` lists every key with all of its pages. The chord
+list them, each card opening the page itself, and each has a fingering chart with every key on one page. The chord
 explorer at `/chords/` covers every chord type on every root, and links to the key pages for major and minor triads.
 
 The site is plain HTML, CSS and JavaScript, built by a small Node.js script with no packages to install.
@@ -26,7 +26,7 @@ at the right address: `SITE_URL=https://your-domain.com npm run build`. Then upl
 src/
   layout.html        the <head>, header, menu and footer shared by every page
   pages/             hand-written pages: src/pages/chords/index.html becomes /chords/
-  templates/         the key pages and the lists (keys, scales, arpeggios), filled in from the data
+  templates/         the key pages, the lists and the fingering charts, filled in from the data
   data/              the keys (keys-data.js) and the major scales (scales-data.js)
 public/              copied as it is: css/, js/, assets/
 scripts/
@@ -43,7 +43,7 @@ Create `src/pages/<name>/index.html` with the page's content (what goes inside `
 ---
 title: Intervals | PianoGuide
 description: The distance between two notes, on the keyboard and in sheet music.
-nav: keys
+nav: theory
 styles: page
 scripts: vexflow intervals
 ---
@@ -52,7 +52,7 @@ scripts: vexflow intervals
 </section>
 ```
 
-- `nav` marks the current menu item (`scales`, `arpeggios`, `chords`, `theory` or `keys`)
+- `nav` marks the current menu item (`scales`, `arpeggios`, `chords` or `theory`)
 - `styles` loads `/css/<name>.css` after `main.css` (`page` has the hero, tabs and cards the inner pages share)
 - `scripts` loads `/js/<name>.js` after `main.js` (`vexflow` is the sheet music library from its CDN)
 - `sitemap: no` leaves the page out of `sitemap.xml`
@@ -62,7 +62,7 @@ The menu items are listed once, in `NAV` at the top of `scripts/build.js`.
 ### Adding a key
 
 Add an entry to `src/data/keys-data.js` (the comment at the top of the file explains every field). The build writes
-its scale, arpeggio and chord pages, adds it to `/keys/`, `/scales/`, `/arpeggios/`, and the sitemap, and stops with a message if an
+its scale, arpeggio and chord pages, adds it to the lists, the fingering charts, the circle of fifths and the sitemap, and stops with a message if an
 index in the entry points at the wrong scale or chord.
 
 ### Broken links

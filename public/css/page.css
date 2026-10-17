@@ -47,6 +47,11 @@
   margin: 0 4px;
 }
 
+/* a table that scrolls sideways on a narrow screen instead of squashing (theory, fingering charts) */
+.table-scroll {
+  overflow-x: auto;
+}
+
 /* Key tabs */
 .scale-tabs {
   display: flex;

@@ -1,0 +1,22 @@
+---
+styles: page keys chart
+scripts: chart
+---
+        <section class="page-hero">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="{{sectionUrl}}">{{sectionName}}</a> <span aria-hidden="true">›</span> <a href="{{url}}">Fingering chart</a>
+            </nav>
+            <h1>{{heading}}</h1>
+            <p>{{intro}}</p>
+            <div class="chart-options">
+                <span class="option-label">Octaves</span>
+                <div class="seg" data-key="octaves" role="group" aria-label="Octaves">
+                    <button type="button" data-v="1" aria-pressed="true">1 octave</button>
+                    <button type="button" data-v="2" aria-pressed="false">2 octaves</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="chart">
+{{tables}}
+        </section>

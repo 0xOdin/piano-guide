@@ -55,6 +55,35 @@
   color: var(--muted);
 }
 
+/* In short: the main points at the top of a theory page, for a quick reminder */
+.in-short {
+  max-width: 720px;
+  margin: 0 var(--pad) 36px;
+  padding: 16px 20px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+}
+
+.in-short h2 {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+.in-short ul {
+  margin: 0;
+  padding-left: 1.2em;
+  line-height: 1.6;
+}
+
+.in-short li + li {
+  margin-top: 4px;
+}
+
 /* a section of explanation */
 .theory-section {
   padding: 0 var(--pad) 40px;
@@ -254,10 +283,6 @@ a.cof-cell:hover path {
 }
 
 /* All key signatures */
-.table-scroll {
-  overflow-x: auto;
-}
-
 .sig-table {
   width: 100%;
   max-width: 720px;
@@ -318,6 +343,10 @@ a.cof-cell:hover path {
   .theory-index,
   .theory-section {
     padding-inline: var(--gutter);
+  }
+
+  .in-short {
+    margin-inline: var(--gutter);
   }
 
   .theory-index {
