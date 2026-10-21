@@ -1,0 +1,181 @@
+---
+title: Piano Practice: Scales, Chords and Keys Quiz | PianoGuide
+description: Practise piano scales and chords with random questions: play or write out a scale, a chord or the chords of a key, or name a chord, interval or scale by eye or by ear. Answer on the keys, with a MIDI keyboard or through your microphone.
+nav: practice
+styles: page keyboard practice
+scripts: chords-data practice-music listen practice
+---
+        <section class="page-hero">
+            <h1>Practice</h1>
+            <p>A random scale or chord to play or write out, the chords of a key, or something to name by eye or by ear. Answer on the keys below or a MIDI keyboard, or play your own piano and let the page listen.</p>
+        </section>
+
+        <div class="scale-tabs pr-drills" id="drills" role="group" aria-label="What to practise">
+            <button type="button" data-v="scales">Scales</button>
+            <button type="button" data-v="chords">Chords</button>
+            <button type="button" data-v="key">Chords in a key</button>
+            <button type="button" data-v="name">Name it</button>
+        </div>
+
+        <section class="practice">
+            <div class="practice-card pr-card">
+                <div class="pr-bar">
+                    <div class="option pr-mode" data-for="scales chords key">
+                        <span class="option-label">Answer by</span>
+                        <div class="seg" data-setting="answer" role="group" aria-label="Answer by">
+                            <button type="button" data-v="play">Playing</button>
+                            <button type="button" data-v="listen">Listening</button>
+                            <button type="button" data-v="type">Typing</button>
+                            <button type="button" data-v="self">Self-check</button>
+                        </div>
+                    </div>
+                    <div class="option pr-mode" data-for="name">
+                        <span class="option-label">Show</span>
+                        <div class="seg" data-setting="nameHow" role="group" aria-label="Show it as">
+                            <button type="button" data-v="see">Keys</button>
+                            <button type="button" data-v="hear">Sound</button>
+                            <button type="button" data-v="both">Both</button>
+                        </div>
+                    </div>
+
+                    <details class="pr-options">
+                        <summary><span class="pr-options-label">Options</span><span class="pr-summary" id="options-summary"></span></summary>
+                        <div class="pr-option-grid">
+                            <div class="pr-option" data-for="scales name">
+                                <span class="option-label">Scales</span>
+                                <div class="chips" data-setting="scaleForms" role="group" aria-label="Scales">
+                                    <button type="button" data-v="major">Major</button>
+                                    <button type="button" data-v="natural">Natural minor</button>
+                                    <button type="button" data-v="harmonic">Harmonic minor</button>
+                                    <button type="button" data-v="melodic">Melodic minor</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="name">
+                                <span class="option-label">Name</span>
+                                <div class="chips" data-setting="nameWhat" role="group" aria-label="Name">
+                                    <button type="button" data-v="chords">Chords</button>
+                                    <button type="button" data-v="intervals">Intervals</button>
+                                    <button type="button" data-v="scales">Scales</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="key">
+                                <span class="option-label">Ask for</span>
+                                <div class="seg" data-setting="keyMode" role="group" aria-label="Ask for">
+                                    <button type="button" data-v="one">One chord</button>
+                                    <button type="button" data-v="all">All seven in order</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="key">
+                                <span class="option-label">Chords</span>
+                                <div class="seg" data-setting="keySize" role="group" aria-label="Chords">
+                                    <button type="button" data-v="3">Triads</button>
+                                    <button type="button" data-v="4">7th chords</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="scales key name">
+                                <label class="option-label" for="keys-select">Keys</label>
+                                <select class="kb-select" id="keys-select" data-setting="keys"></select>
+                            </div>
+                            <div class="pr-option" data-for="key" id="key-types">
+                                <span class="option-label">Major or minor</span>
+                                <div class="chips" data-setting="keyTypes" role="group" aria-label="Major or minor keys">
+                                    <button type="button" data-v="major">Major keys</button>
+                                    <button type="button" data-v="minor">Minor keys</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="key" id="minor-form">
+                                <span class="option-label">Minor keys use</span>
+                                <div class="seg" data-setting="minorForm" role="group" aria-label="Minor keys use">
+                                    <button type="button" data-v="natural">Natural minor</button>
+                                    <button type="button" data-v="harmonic">Harmonic minor</button>
+                                </div>
+                            </div>
+                            <div class="pr-option pr-option-wide" data-for="chords name">
+                                <span class="option-label">Chord types</span>
+                                <div class="chips" data-setting="chordTypes" id="type-chips" role="group" aria-label="Chord types"></div>
+                            </div>
+                            <div class="pr-option" data-for="chords name">
+                                <span class="option-label">Roots</span>
+                                <div class="seg" data-setting="roots" role="group" aria-label="Roots">
+                                    <button type="button" data-v="all">Any note</button>
+                                    <button type="button" data-v="white">White keys</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="chords name">
+                                <span class="option-label">Inversions</span>
+                                <div class="seg" data-setting="inversions" role="group" aria-label="Inversions">
+                                    <button type="button" data-v="off">Root position</button>
+                                    <button type="button" data-v="on">Any inversion</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="scales chords key name">
+                                <span class="option-label">After a right answer</span>
+                                <div class="seg" data-setting="autoNext" role="group" aria-label="After a right answer">
+                                    <button type="button" data-v="on">Next question</button>
+                                    <button type="button" data-v="off">Wait for me</button>
+                                </div>
+                            </div>
+                            <div class="pr-option" data-for="scales chords key name">
+                                <span class="option-label">Sound</span>
+                                <div class="seg" data-setting="sound" role="group" aria-label="Sound">
+                                    <button type="button" data-v="on">On</button>
+                                    <button type="button" data-v="off">Off</button>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="pr-question">
+                    <p class="pr-ask" id="ask"></p>
+                    <h2 class="pr-title" id="title"></h2>
+                    <p class="pr-sub" id="sub"></p>
+                </div>
+
+                <ol class="pr-slots" id="slots" aria-label="Your answer"></ol>
+                <div class="pr-choices" id="choices" role="group" aria-label="Answers"></div>
+                <form class="pr-type" id="type-form" autocomplete="off">
+                    <label class="sr-only" for="type-input">Your answer</label>
+                    <input class="pr-input-text" id="type-input" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="done">
+                    <button type="submit" class="kb-btn is-primary">Check</button>
+                </form>
+                <p class="pr-feedback" id="feedback" aria-live="polite"></p>
+
+                <div class="pr-listen" id="listen-panel">
+                    <div class="pr-mic-ask" id="mic-ask">
+                        <h3>Let this page hear your piano?</h3>
+                        <p>It uses your microphone to check what you play. The sound is checked here in your browser: nothing is recorded, saved or sent anywhere. Your browser may ask too.</p>
+                        <button type="button" class="kb-btn is-primary" id="mic-allow">Allow the microphone</button>
+                        <p class="pr-mic-error" id="mic-error" aria-live="polite"></p>
+                    </div>
+                    <div class="pr-mic-on" id="mic-on" hidden>
+                        <span class="pr-mic-dot" aria-hidden="true"></span>
+                        <strong>Listening</strong>
+                        <span class="pr-meter" aria-hidden="true"><span id="mic-level"></span></span>
+                        <button type="button" class="kb-btn" id="mic-stop">Stop</button>
+                    </div>
+                    <p class="pr-note">Single notes are heard well. For chords, play with one hand in the middle of the piano, in a quiet room.</p>
+                </div>
+
+                <div class="piano-scroll">
+                    <div class="piano" id="piano" role="group" aria-label="Piano keyboard, C4 to C6"></div>
+                </div>
+
+                <div class="pr-actions">
+                    <button type="button" class="kb-btn is-primary" id="check-btn">Check</button>
+                    <button type="button" class="kb-btn" id="clear-btn">Clear</button>
+                    <button type="button" class="kb-btn" id="hear-btn">▶ Play</button>
+                    <button type="button" class="kb-btn" id="reveal-btn">Show answer</button>
+                    <button type="button" class="kb-btn" id="next-btn">Next</button>
+                </div>
+
+                <div class="pr-midi" id="midi-row">
+                    <button type="button" class="kb-btn" id="midi-btn">Connect a MIDI keyboard</button>
+                    <span class="pr-status" id="midi-status" aria-live="polite"></span>
+                    <button type="button" class="pr-link" id="midi-sound" hidden></button>
+                </div>
+                <p class="kb-help" id="kb-help">Computer keys: <kbd>A</kbd> to <kbd>;</kbd> play the white keys and <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> the black keys, from <span id="kb-octave">C4</span>. <kbd>Z</kbd> and <kbd>X</kbd> move them down or up an octave. <kbd>Enter</kbd> checks a chord, and goes on to the next question.</p>
+            </div>
+        </section>
+
+        <script type="application/json" id="keys-data">{{keyboardData}}</script>

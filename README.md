@@ -7,6 +7,10 @@ Each key (C major, F♯ minor, ...) has its own pages for the scale, arpeggio an
 list them, each card opening the page itself, and each has a fingering chart with every key on one page. The chord
 explorer at `/chords/` covers every chord type on every root, and links to the key pages for major and minor triads.
 
+`/practice/` asks for a random scale, chord or chord of a key to play or write out, or something to name by eye or
+ear. Answers can be played on the page's keys, on a MIDI keyboard, or on a real piano through the microphone, or
+typed.
+
 The site is plain HTML, CSS and JavaScript, built by a small Node.js script with no packages to install.
 
 ## Commands

@@ -893,6 +893,17 @@ footer nav ul {
   }
 }
 
+/* Small desktops: the menu and the search box sit closer, so all five menu items fit beside it */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .header-links ul {
+    gap: 24px;
+  }
+
+  .search-form input {
+    width: 240px;
+  }
+}
+
 @media (min-width: 1024px) and (hover: hover) {
 
   .explore-card {

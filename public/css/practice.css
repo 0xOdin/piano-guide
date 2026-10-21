@@ -1,0 +1,575 @@
+/* The practice page (/practice/). The page hero, pill tabs, practice card and option buttons come from page.css, the
+   keyboard and its buttons from keyboard.css. */
+
+:root {
+  /* a right answer: the one colour the rest of the site doesn't use */
+  --good: #2e7a4c;
+  --good-ink: #1f5c37;
+  --good-light: #dcefe3;
+  /* the right key, spelled another way */
+  --near: #7a5200;
+  --near-light: #fbefd5;
+}
+
+/* Base (phones) */
+
+/* every part of the card can be hidden, whatever its display */
+.pr-card [hidden] {
+  display: none !important;
+}
+
+.pr-drills {
+  padding-bottom: 20px;
+}
+
+/* what to answer with, and the options under it. The column may shrink below the summary's one long line. */
+.pr-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pr-mode {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.pr-mode .seg {
+  display: flex;
+}
+
+.pr-mode .seg button {
+  flex: 1;
+  padding: 0 4px;
+  font-size: 0.8rem;
+}
+
+.pr-options summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pr-options summary::-webkit-details-marker {
+  display: none;
+}
+
+.pr-options summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.pr-options-label {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.pr-options-label::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.pr-options[open] .pr-options-label::after {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.pr-summary {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pr-option-grid {
+  display: grid;
+  gap: 18px;
+  padding: 18px 0 6px;
+}
+
+.pr-option {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.pr-option .seg {
+  max-width: 100%;
+}
+
+/* several choices at once */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chips button {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.chips button[aria-pressed="true"] {
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
+/* the question */
+.pr-question {
+  margin-bottom: 16px;
+}
+
+.pr-ask {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+.practice-card .pr-title {
+  margin: 0;
+  font-size: clamp(2.1rem, 9vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.pr-sub {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+/* the answer so far: one box per note or chord */
+.pr-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.pr-slot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 32px; /* eight fit across a phone */
+  height: 42px;
+  padding: 0 5px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pr-slot.has-label {
+  min-width: 56px;
+  height: 54px;
+}
+
+.pr-slot-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.pr-slot.is-right,
+.pr-slot.is-shown,
+.pr-slot.is-wrong,
+.pr-slot.is-spelling {
+  border-style: solid;
+  border-color: transparent;
+}
+
+.pr-slot.is-right {
+  background: var(--good-light);
+  color: var(--good-ink);
+}
+
+.pr-slot.is-right .pr-slot-label {
+  color: var(--good-ink);
+}
+
+.pr-slot.is-shown {
+  background: var(--bg-alt);
+  border-color: var(--line);
+}
+
+.pr-slot.is-wrong {
+  background: var(--accent-light);
+  color: var(--accent-ink);
+  text-decoration: line-through;
+}
+
+.pr-slot.is-spelling {
+  background: var(--near-light);
+  color: var(--near);
+}
+
+/* "Name it": four answers */
+.pr-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pr-choice {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 2px;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pr-choice strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.pr-choice span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.pr-choice kbd {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.pr-choice:hover:not(:disabled) {
+  background: var(--bg-alt);
+}
+
+.pr-choice:disabled {
+  cursor: default;
+}
+
+.pr-choice.is-right {
+  border-color: var(--good);
+  background: var(--good-light);
+}
+
+.pr-choice.is-wrong {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+/* typing */
+.pr-type {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pr-input-text {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.pr-input-text:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.pr-input-text:disabled {
+  background: var(--bg-alt);
+}
+
+.pr-type .kb-btn {
+  height: 44px;
+}
+
+.pr-feedback {
+  min-height: 1.5em;
+  margin: 0 0 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pr-feedback.is-good {
+  color: var(--good-ink);
+}
+
+.pr-feedback.is-bad {
+  color: var(--accent-ink);
+}
+
+.pr-feedback.is-info {
+  color: var(--text);
+}
+
+/* the keys: right ones turn green, wrong ones red with a cross (picked and shown keys are styled in keyboard.css) */
+.pkey.white.is-right {
+  background: #c6e5d1; /* a little stronger than --good-light, to show on a white key */
+  color: var(--good-ink);
+}
+
+.pkey.black.is-right {
+  background: var(--good);
+  color: #fff;
+}
+
+.pkey.white.is-wrong,
+.pkey.black.is-wrong {
+  background: var(--accent);
+  color: #fff;
+  animation: pr-shake 0.3s ease;
+}
+
+@keyframes pr-shake {
+  25% { translate: -2px 0; }
+  75% { translate: 2px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pkey.is-wrong {
+    animation: none !important;
+  }
+}
+
+.pr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* MIDI */
+.pr-midi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.pr-status {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.pr-status:empty {
+  display: none;
+}
+
+.pr-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Listening: the page asks for the microphone first, then shows that it is listening */
+.pr-listen {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+}
+
+.pr-mic-ask {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.pr-mic-ask h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
+}
+
+.pr-mic-ask p {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.pr-mic-ask .pr-mic-error {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.pr-mic-error:empty {
+  display: none;
+}
+
+.pr-mic-on {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+/* the red light of a recording device: the microphone is on */
+.pr-mic-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pr-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pr-pulse {
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-mic-dot {
+    animation: none;
+  }
+}
+
+.pr-meter {
+  width: 120px;
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.pr-meter span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--good);
+  transition: width 0.08s linear;
+}
+
+.pr-note {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .pr-mode {
+    align-items: flex-start;
+  }
+
+  .pr-mode .seg button {
+    flex: none;
+    padding: 0 14px;
+    font-size: 0.84rem;
+  }
+
+  .pr-listen {
+    padding: 18px 20px;
+  }
+
+  .pr-option-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 28px;
+  }
+
+  .pr-slots {
+    gap: 6px;
+  }
+
+  .pr-slot {
+    min-width: 46px;
+    padding: 0 10px;
+  }
+
+  .pr-option-wide {
+    grid-column: 1 / -1;
+  }
+
+  .pr-choices {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  /* as wide as the keyboard (880px) plus the card's padding, like the keyboard page */
+  .pr-card {
+    max-width: 952px;
+  }
+
+  .pr-option-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

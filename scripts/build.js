@@ -52,6 +52,7 @@ const NAV = [
   ["arpeggios", "/arpeggios/", "Arpeggios"],
   ["chords", "/chords/", "Chords"],
   ["theory", "/theory/", "Theory"],
+  ["practice", "/practice/", "Practice"],
 ];
 const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
 
@@ -966,7 +967,7 @@ const keyBadges = (keys) => keys.map((key) =>
 //   majorBadges, minorBadges   for the homepage: the "Pick a key" rows
 //   intervalCards              for /theory/intervals/: a card with a keyboard for each interval
 //   circleOfFifths, signatureRows   for /theory/circle-of-fifths/: the circle, and the key signatures as table rows
-//   keyboardData               for /keyboard/: every key's scale, arpeggio and chord, as JSON
+//   keyboardData               for /keyboard/ and /practice/: every key's scale, arpeggio and chord, as JSON
 const siteVars = {
   keyLinks: safeJSON(Object.fromEntries(KEYS.map((key) => [
     `${key.rootIndex}:${key.type === "minor" ? "minor" : "major"}`,
