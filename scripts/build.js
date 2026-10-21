@@ -302,13 +302,22 @@ function chordFingering(inversions) {
 
 /* ---------- The sheet music and keyboard sections (filled in by js/key-page.js) ---------- */
 
+// Plays what the sheet music shows on the recorded piano, lighting each key as it sounds (key-page.js). Pressed
+// again while playing, it stops.
+const playButton = (indent) => `
+${indent}<button type="button" class="play-score" id="play-score">
+${indent}  <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+${indent}  <svg class="stop-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
+${indent}  <span>Play</span>
+${indent}</button>`;
+
 // Scale and arpeggio: the sheet music card (hands, octaves, fingering) and the keyboard card, which shows the
 // same notes and finger numbers on a keyboard.
 const melodicSections = () => `
         <section class="practice">
           <div class="practice-card">
             <div class="card-head">
-              <h2>Sheet music</h2>
+              <h2>Sheet music</h2>${playButton("              ")}
             </div>
 
             <div class="options options-row">
@@ -360,7 +369,7 @@ const chordViewer = () => `
           <section class="practice">
             <div class="practice-card">
               <div class="card-head">
-                <h2>Sheet music</h2>
+                <h2>Sheet music</h2>${playButton("                ")}
               </div>
 
               <div class="options">
@@ -392,6 +401,34 @@ const chordViewer = () => `
             </div>
           </section>
         </div>`;
+
+/* ---------- The hero of a key page ---------- */
+
+// Beside the heading, the key signature on a small stave (drawn by key-page.js from data-sig); under it, the notes
+// as chips that sound when tapped, each with its place in the scale or chord. `notes`: [{ name, abs, degree }].
+function keyHero(key, notes, what) {
+  const sigWords = cap(key.signature.split(" (")[0]); // "Three sharps"
+  return {
+    sig: `
+                <figure class="sig-tile">
+                    <div class="sig-stave" id="hero-sig" data-sig="${key.keySig}" aria-label="Key signature: ${esc(key.signature)}"></div>
+                    <figcaption>${esc(sigWords)}</figcaption>
+                </figure>`,
+    notes: `
+            <ul class="note-chips" aria-label="${esc(cap(what))}, tap one to hear it">
+${notes.map((n, i) => `                <li><button type="button" class="note-chip${i === 0 ? " is-root" : ""}" data-abs="${n.abs}" aria-label="${esc(n.name)}">${esc(n.name)}<small aria-hidden="true">${esc(n.degree)}</small></button></li>`).join("\n")}
+            </ul>`,
+  };
+}
+
+// a scale's notes numbered against the major scale on the same note: A natural minor is 1 2 ♭3 4 5 ♭6 ♭7
+const MAJOR_STEPS = [0, 2, 4, 5, 7, 9, 11];
+const scaleDegrees = (notes) => notes.slice(0, 7).map((n, i) => {
+  const diff = n.abs - notes[0].abs - MAJOR_STEPS[i];
+  return { name: n.name, abs: n.abs, degree: `${diff < 0 ? "♭" : diff > 0 ? "♯" : ""}${i + 1}` };
+});
+// a triad's notes with their place in the chord (1 ♭3 5)
+const chordDegrees = (key) => spellChord(rootFor(key), triadFor(key)).map((n) => ({ name: n.name, abs: n.abs, degree: n.label }));
 
 /* ---------- The three page types ---------- */
 
@@ -431,7 +468,10 @@ function scalePage(form) {
         intro: `The ${name} scale has ${key.signature}${raised}. Play one octave going up with the right hand on ${list(one.rh)} and the left hand on ${list(one.lh)}${back}`,
         fingering: melodicFingering(d, form === "melodic" ? MELODIC_MINOR_CAPTION : MELODIC_CAPTION),
         viewer: scaleViewer(),
-        data: { mode: "melodic", name, keySig: key.keySig, octaves: d, octaveShift: key.octaveShift || {} },
+        hero: keyHero(key, scaleDegrees(one.notes), `notes of the ${name} scale`),
+        // melodic minor comes down as the natural minor: the notes the Play button plays on the way down
+        data: { mode: "melodic", name, keySig: key.keySig, octaves: d, octaveShift: key.octaveShift || {},
+          ...(form === "melodic" && { down: Object.fromEntries(Object.entries(withTwoOctaves(scaleData(key, "natural"))).map(([n, o]) => [n, o.notes.map((x) => x.abs)])) }) },
       };
     },
   };
@@ -450,6 +490,7 @@ const ARPEGGIO_PAGE = {
       intro: `The ${name} arpeggio plays the notes of the ${name} chord (${list(one.notes.slice(0, 3).map((n) => n.name))}) one at a time, then the root again an octave higher. Use ${list(one.rh)} in the right hand and ${list(one.lh)} in the left hand.`,
       fingering: melodicFingering(d, MELODIC_CAPTION),
       viewer: arpeggioViewer(),
+      hero: keyHero(key, chordDegrees(key), `notes of the ${name} arpeggio`),
       data: { mode: "melodic", name, keySig: null, octaves: d, octaveShift: key.octaveShift || {} }, // no key signature for arpeggios: every sharp and flat is written by its note
     };
   },
@@ -472,6 +513,7 @@ const CHORD_PAGE = {
             <p class="hero-more"><a class="go-link" href="/chords/?root=${noteSlug(root)}&amp;type=${key.type === "minor" ? "minor" : "major"}">All chords on ${esc(root)}: 7th, sus, diminished and more</a></p>`,
       fingering: chordFingering(inv),
       viewer: chordViewer(),
+      hero: keyHero(key, chordDegrees(key), `notes of the ${name} chord`),
       data: { mode: "chord", name, inversions: inv },
     };
   },
@@ -630,7 +672,13 @@ function addKeyPage({ url, keyUrl, keyName, section, tabnav, out }) {
     sectionName,
     keyUrl,
     keyName: esc(keyName),
-    heading: esc(out.heading),
+    // "A melodic minor scale fingering": the key large, what the page is for underneath
+    heading: /^(.*?) ((?:scale |arpeggio |chord )?fingering)$/.test(out.heading)
+      ? out.heading.replace(/^(.*?) ((?:scale |arpeggio |chord )?fingering)$/,
+        (_, name, what) => `<span class="h1-name">${esc(name)}</span> <span class="h1-what">${esc(what)}</span>`)
+      : esc(out.heading),
+    heroSig: out.hero ? out.hero.sig : "",
+    heroNotes: out.hero ? out.hero.notes : "",
     intro: esc(out.intro),
     heroExtra: out.heroExtra || "",
     tabnav,
@@ -672,17 +720,13 @@ for (const key of KEYS) {
 /* ---------- The lists: /scales/, /arpeggios/ ---------- */
 
 // Both are built from src/templates/key-list.html: groups of cards, one card per key. The whole card links
-// to `href`; `key` puts its root note in the round badge (filled for a major key, outlined for a minor one; no key
-// shows the keyboard icon); `links` (optional) are small buttons on the card for the key's other pages, and
-// `textLinks` (optional) a single line of plain links under the subtitle, which keeps the card small.
+// to `href`; `notes` (the notes of the scale or arpeggio, going up) are lit on a small keyboard at the side of the
+// card; `links` (optional) are small buttons on the card for the key's other pages, and `textLinks` (optional) a
+// single line of plain links under the subtitle, which keeps the card small.
 const listTemplate = readPage(path.join(SRC, "templates", "key-list.html"));
 
-const badge = (key) => key
-  ? `<span class="key-badge${key.type === "minor" ? " is-minor" : ""}" aria-hidden="true">${esc(key.name.split(" ")[0])}</span>`
-  : `<span class="key-badge"><img src="/assets/icons/keys.svg" alt="" width="22" height="22"></span>`;
-
-const card = ({ key, href, title, sub, links = [], textLinks = [] }) => `                <li class="key-card">
-                    ${badge(key)}
+const card = ({ notes, href, title, sub, links = [], textLinks = [] }) => `                <li class="key-card">
+                    ${diagrams.miniKeyboard({ from: notes[0].abs, lit: notes.map((n) => n.abs) })}
                     <div class="key-text">
                         <h4><a href="${href}">${esc(title)}</a></h4>
                         <p class="key-sig">${esc(sub)}</p>${textLinks.length ? `
@@ -721,7 +765,12 @@ function addList({ url, nav, title, description, heading, intro, chart, groups }
   });
 }
 
-const chromaticCard = card({ href: "/keys/chromatic/", title: "Chromatic scale", sub: "Every black and white key, starting on any note" });
+const chromaticCard = card({
+  notes: chromaticOctaves(0, false)[1].notes,
+  href: "/keys/chromatic/",
+  title: "Chromatic scale",
+  sub: "Every black and white key, starting on any note",
+});
 
 // /scales/: each card opens the scale; a minor key also links to its three forms
 addList({
@@ -733,9 +782,9 @@ addList({
   intro: "Choose a scale to see its fingering for both hands, one or two octaves, with the sheet music and the keys on a keyboard.",
   chart: "Every scale's fingering on one page",
   groups: [
-    keyGroup("Major scales", majorKeys, (key) => card({ key, href: keyPageUrl(key), title: `${cap(key.name)} scale`, sub: cap(key.signature) })),
+    keyGroup("Major scales", majorKeys, (key) => card({ notes: scaleData(key).notes, href: keyPageUrl(key), title: `${cap(key.name)} scale`, sub: cap(key.signature) })),
     keyGroup("Minor scales", minorKeys, (key) => card({
-      key,
+      notes: scaleData(key).notes,
       href: keyPageUrl(key),
       title: `${cap(key.name)} scale`,
       sub: cap(key.signature),
@@ -748,7 +797,7 @@ addList({
 // /arpeggios/: each card opens the arpeggio
 {
   const arpCard = (key) => card({
-    key,
+    notes: arpeggioData(key).notes,
     href: keyPageUrl(key, ARPEGGIO_PAGE.path),
     title: `${cap(key.name)} arpeggio`,
     sub: cap(key.signature),

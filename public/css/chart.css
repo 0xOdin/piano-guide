@@ -19,14 +19,14 @@
 }
 
 .chart-group + .chart-group {
-  margin-top: 32px;
+  margin-top: 48px;
 }
 
 .chart .key-group-title {
-  margin: 0 0 14px;
-  font-size: 1.5rem;
+  margin: 0 0 16px;
+  font-size: 1.6rem;
   font-weight: 600;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .chart-table {
@@ -35,7 +35,7 @@
   border-spacing: 0;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
   font-size: 0.9rem;
 }
@@ -48,6 +48,7 @@
 }
 
 .chart-table thead th {
+  background: var(--bg-alt);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -76,16 +77,31 @@
 }
 
 .chart-table thead th:first-child {
-  border-top-left-radius: var(--radius);
+  background: var(--bg-alt);
+  border-top-left-radius: 14px;
+}
+
+.chart-table thead th:last-child {
+  border-top-right-radius: 14px;
 }
 
 .chart-table tbody tr:last-child th:first-child {
-  border-bottom-left-radius: var(--radius);
+  border-bottom-left-radius: 14px;
+}
+
+/* the row under the pointer, to follow it across */
+@media (hover: hover) {
+  .chart-table tbody tr:hover th,
+  .chart-table tbody tr:hover td {
+    background: #fcfbfa;
+  }
 }
 
 .chart-table tbody th > a {
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .chart-table tbody th > a:hover {
@@ -139,19 +155,28 @@
 .chart-table .f {
   display: inline-block;
   width: 1.35em;
+  height: 1.35em;
+  line-height: 1.35em;
   text-align: center;
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
 }
 
+/* the thumb on a felt disc, as on the key pages; printed too */
 .chart-table .f.thumb {
+  border-radius: 50%;
+  background: var(--accent-light);
   font-weight: 700;
   color: var(--accent-ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 /* two octaves: the numbers sit a little closer, and the table may use the full width */
 .chart[data-octaves="2"] .f {
   width: 1.15em;
+  height: 1.15em;
+  line-height: 1.15em;
 }
 
 /* a faint line where the second octave starts */
@@ -178,7 +203,7 @@
   }
 
   .chart .key-group-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 }
 
@@ -219,6 +244,11 @@
   .chart-table {
     box-shadow: none;
     font-size: 0.8rem;
+  }
+
+  .chart-table thead th,
+  .chart-table thead th:first-child {
+    background: none;
   }
 
   .chart-table tr {

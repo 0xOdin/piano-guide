@@ -32,6 +32,37 @@ function keyboard({ whiteKeys, marks, label }) {
   return `<svg class="kb" viewBox="0 0 ${whiteKeys * KW} ${KH}" role="img" aria-label="${esc(label)}">${whites}${blacks}</svg>`;
 }
 
+/* ---------- A mini keyboard for the list cards ---------- */
+
+// Nine white keys from the white key at or below `from` (a semitone, 0 = C), so a scale fits from its first note to
+// the same note an octave up. The keys in `lit` (semitones on the same count, 12 being the next C) are filled in and
+// the key it starts on, `from`, has a dot. The felt strip runs along the top as on the homepage's keyboard. The card's
+// title says what it shows, so the drawing is hidden from screen readers. Coloured by .mini-kb in lists.css.
+function miniKeyboard({ from, lit }) {
+  const KW = 11, KH = 44, BW = 6.6, BH = 27, FELT = 2.5, WHITES = 9;
+  let s = from;
+  while (!NATURAL_SEMIS.includes(((s % 12) + 12) % 12)) s--;
+  const on = new Set(lit);
+  let whites = "";
+  let blacks = "";
+  let dot = "";
+  for (let w = 0; w < WHITES; s++) {
+    const cls = on.has(s) ? " on" : "";
+    if (NATURAL_SEMIS.includes(((s % 12) + 12) % 12)) {
+      const x = w * KW;
+      whites += `<rect class="w${cls}" x="${x}" y="-3" width="${KW}" height="${KH + 3}" rx="1.8"/>`;
+      if (s === from) dot = `<circle class="dot" cx="${x + KW / 2}" cy="${KH - 6}" r="2.1"/>`;
+      w++;
+    } else {
+      const x = w * KW - BW / 2; // a black key sits on the line between two white keys
+      blacks += `<rect class="b${cls}" x="${x}" y="-3" width="${BW}" height="${BH + 3}" rx="1.4"/>`;
+      if (s === from) dot = `<circle class="dot dot-light" cx="${x + BW / 2}" cy="${BH - 5}" r="1.7"/>`;
+    }
+  }
+  return `<svg class="mini-kb" viewBox="0 0 ${WHITES * KW} ${KH + FELT}" aria-hidden="true" focusable="false">`
+    + `<g transform="translate(0 ${FELT})">${whites}${blacks}${dot}</g><rect class="felt" width="${WHITES * KW}" height="${FELT}"/></svg>`;
+}
+
 /* ---------- The circle of fifths ---------- */
 
 // `slots`: 12 positions, clockwise from the top (C major), each { majors: [{ name, label, url, sig }], minors: [...] }.
@@ -82,4 +113,4 @@ function circleOfFifths(slots) {
 </svg>`;
 }
 
-module.exports = { keyboard, circleOfFifths };
+module.exports = { keyboard, miniKeyboard, circleOfFifths };

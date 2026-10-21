@@ -1,29 +1,43 @@
-/* The lists (/scales/, /arpeggios/): a grid with one card for each key. The header, footer, hero and breadcrumb styles come from
-   main.css, page.css and keys.css. */
+/* The lists (/scales/, /arpeggios/): a grid with one card for each key, a small keyboard on each card with the
+   notes lit. The header, footer, hero and breadcrumb styles come from main.css, page.css and keys.css. */
 
 .key-index {
-  padding: 0 var(--pad) 40px;
+  padding: 4px var(--pad) 48px;
+}
+
+.key-group {
+  scroll-margin-top: 88px; /* the homepage links straight to a group: keep its title clear of the sticky header */
 }
 
 .key-group + .key-group {
-  margin-top: 36px;
+  margin-top: 48px;
 }
 
 .key-group-title {
-  margin: 0 0 14px;
-  font-size: 1.5rem;
+  margin: 0 0 16px;
+  font-size: 1.6rem;
   font-weight: 600;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
-/* "Sharps", "Flats": a small label above each row of cards */
+/* "Sharps", "Flats": a small label above each row of cards, with a hairline running on to the edge */
 .key-row-title {
-  margin: 22px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 0 12px;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.key-row-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
 }
 
 .key-group-title + .key-row-title {
@@ -32,35 +46,78 @@
 
 .key-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* the whole card is clickable: the key name's link stretches over it, and the three page links sit on top */
+/* the whole card is clickable: the key name's link stretches over it, and the links for the minor forms sit on top */
 .key-card {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  column-gap: 14px;
-  padding: 16px;
+  column-gap: 16px;
+  padding: 14px 16px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
-  transition: background-color 0.2s ease;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
-.key-card:hover {
-  background: var(--bg-alt);
+.key-card:has(h4 a:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.key-card h4 a:focus-visible {
+  outline: none;
+}
+
+/* the notes of the scale or arpeggio on a small keyboard (drawn by miniKeyboard in scripts/diagrams.js): the keys
+   lit as on the key pages, a dot on the note it starts on, and the felt strip along the top */
+.mini-kb {
+  display: block;
+  width: 88px;
+  height: auto;
+}
+
+.mini-kb .w {
+  fill: var(--surface);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.mini-kb .b {
+  fill: var(--text);
+}
+
+.mini-kb .w.on {
+  fill: color-mix(in srgb, var(--accent) 26%, #fff); /* a shade stronger than on the key pages, to show at this size */
+}
+
+.mini-kb .b.on {
+  fill: var(--accent);
+}
+
+.mini-kb .felt {
+  fill: var(--accent);
+}
+
+.mini-kb .dot {
+  fill: var(--accent-ink);
+}
+
+.mini-kb .dot-light {
+  fill: #fff;
 }
 
 .key-text {
   display: grid;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
@@ -74,13 +131,14 @@
 .key-card h4 a::after {
   position: absolute;
   inset: 0;
-  border-radius: var(--radius);
+  border-radius: inherit;
   content: "";
 }
 
 .key-sig {
   margin: 0;
   font-size: 0.82rem;
+  line-height: 1.4;
   color: var(--muted);
 }
 
@@ -132,18 +190,45 @@
   background: var(--bg-alt);
 }
 
+/* a card lifts a little under the pointer */
+@media (hover: hover) {
+  .key-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key-card {
+    transition: none;
+  }
+
+  .key-card:hover {
+    transform: none;
+  }
+}
+
 /* Tablet */
 @media (min-width: 768px) {
   .key-grid {
     gap: 14px;
   }
 
+  .key-group + .key-group {
+    margin-top: 64px;
+  }
+
   .key-group-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 
   .key-card {
-    padding: 18px 20px;
+    padding: 16px 18px;
+  }
+
+  .mini-kb {
+    width: 96px;
   }
 }
 
@@ -151,11 +236,10 @@
 @media (min-width: 1024px) {
   .key-index {
     padding-inline: var(--gutter);
-    padding-bottom: 56px;
+    padding-bottom: 72px;
   }
 
   .key-grid {
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
     gap: 16px;
   }
 }

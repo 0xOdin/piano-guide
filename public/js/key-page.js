@@ -1,6 +1,8 @@
 // Key pages (scale, arpeggio, chord). The fingering at the top of the page is already in the HTML, written by
-// scripts/build.js. This script adds the interactive part underneath: sheet music drawn with VexFlow (loaded from a
-// CDN before this file) and keyboard diagrams with the keys and finger numbers marked.
+// scripts/build.js. This script adds the interactive part: the key signature beside the heading and the sheet music,
+// drawn with VexFlow (loaded from a CDN before this file), keyboard diagrams with the keys and finger numbers marked,
+// and the sound: the note chips under the heading and the Play button on the sheet music use the recorded piano
+// (piano-sound.js), lighting each key and note as it sounds.
 // The notes arrive as JSON in <script id="page-data">:
 //   { mode: "melodic", octaves: { 1: { notes, rh, lh }, 2: { ... } } }   scale and arpeggio
 //   { mode: "melodic", start, variants: { <start>: { name, octaves } } }    chromatic scale: one set of notes for each
@@ -62,9 +64,11 @@ function listenForOptions(onChange) {
   });
 }
 
-// A piano keyboard, starting at the C below the lowest note and running past the highest. The keys are plain
-// white and black like a real piano. The keys of the scale, arpeggio or chord are marked (class is-marked, coloured
-// in keys.css) and the finger number is written on each of them (when `showFingers` is on).
+// A piano keyboard, starting at the C below the lowest note and running past the highest, drawn like the homepage's:
+// the felt strip along the top, white keys with a slight edge at the front, black keys with a lighter top and a
+// shadow on the white keys beside them. The keys of the scale, arpeggio or chord are marked (class is-marked,
+// coloured in keys.css) and the finger number is written on each of them (when `showFingers` is on). Every key
+// carries its note (data-abs), so the Play button can light it.
 // marks: [{ abs, finger }], where abs is the semitone from middle C (0 = C4).
 function keyboardSVG(marks, showFingers, label) {
   const KW = 24, KH = 104, BW = 14, BH = 64;
@@ -77,6 +81,7 @@ function keyboardSVG(marks, showFingers, label) {
 
   let whites = "";
   let blacks = "";
+  let shades = "";
   let w = 0; // white keys drawn so far
   for (let s = start; s <= end; s++) {
     const pc = ((s % 12) + 12) % 12;
@@ -85,15 +90,111 @@ function keyboardSVG(marks, showFingers, label) {
     if (NATURAL_SEMIS.includes(pc)) {
       const x = w * KW;
       const octave = pc === 0 ? `<text class="octave" x="${x + KW / 2}" y="${KH - 8}">C${4 + Math.floor(s / 12)}</text>` : "";
-      whites += `<g class="white${m ? " is-marked" : ""}"><rect x="${x + 0.5}" y="-6" width="${KW - 1}" height="${KH + 5}" rx="3"/>${finger(x + KW / 2, KH - 30)}${octave}</g>`;
+      whites += `<g class="white${m ? " is-marked" : ""}" data-abs="${s}"><rect x="${x + 0.5}" y="-6" width="${KW - 1}" height="${KH + 5}" rx="3"/>`
+        + `<path class="lip" d="M${x + 1} ${KH - 4.5}h${KW - 2}v1.5h-${KW - 2}z"/>${finger(x + KW / 2, KH - 30)}${octave}</g>`;
       w++;
     } else {
       const x = w * KW - BW / 2; // a black key sits on the line between two white keys
-      blacks += `<g class="black${m ? " is-marked" : ""}"><rect x="${x}" y="-6" width="${BW}" height="${BH + 6}" rx="2"/>${finger(x + BW / 2, BH - 12)}</g>`;
+      shades += `<path class="shade" d="M${x + 1.5} 0h${BW}v${BH + 2}h-${BW}z"/>`;
+      blacks += `<g class="black${m ? " is-marked" : ""}" data-abs="${s}"><rect x="${x}" y="-6" width="${BW}" height="${BH + 6}" rx="2"/>`
+        + `<path class="face" d="M${x + 1.8} 0h${BW - 3.6}v${BH - 6}h-${BW - 3.6}z"/>${finger(x + BW / 2, BH - 12)}</g>`;
     }
   }
-  return `<svg class="kb" viewBox="0 0 ${w * KW} ${KH}" style="min-width:${w * MIN_KEY}px" role="img" aria-label="${label}">${whites}${blacks}</svg>`;
+  return `<svg class="kb" viewBox="0 0 ${w * KW} ${KH}" style="min-width:${w * MIN_KEY}px" role="img" aria-label="${label}">`
+    + `${whites}${shades}${blacks}<path class="felt" d="M0 0h${w * KW}v3.5H0z"/></svg>`;
 }
+
+/* =====================================================================================
+   The hero: the key signature beside the heading, and the notes to tap
+   ===================================================================================== */
+
+// The key signature on a small grand staff. The staves are only as long as the clef and signature need.
+function drawSignature() {
+  const el = $("hero-sig");
+  if (!el) return;
+  const sig = el.dataset.sig;
+  const staves = (width) => ["treble", "bass"].map((clef, i) => {
+    const stave = new Stave(24, i * 64, width).addClef(clef);
+    if (!["C", "Am"].includes(sig)) stave.addKeySignature(sig);
+    return stave;
+  });
+  const width = staves(400)[0].getNoteStartX() - 24 + 14; // the clef and signature, and a little room after them
+  const renderer = new Renderer(el, Renderer.Backends.SVG);
+  renderer.resize(width + 40, 150);
+  const ctx = renderer.getContext();
+  ctx.setFillStyle(INK);
+  ctx.setStrokeStyle(INK);
+  const [treble, bass] = staves(width);
+  [treble, bass].forEach((stave) => stave.setContext(ctx).draw());
+  [StaveConnector.type.BRACE, StaveConnector.type.SINGLE_LEFT, StaveConnector.type.SINGLE_RIGHT]
+    .forEach((type) => new StaveConnector(treble, bass).setType(type).setContext(ctx).draw());
+  fitSvg(el, width + 40, 150, el.getAttribute("aria-label"));
+  el.removeAttribute("aria-label"); // the drawing carries it now
+}
+
+// The note chips: each sounds when tapped
+function listenToChips() {
+  document.querySelectorAll(".note-chip").forEach((chip) => chip.addEventListener("click", () => {
+    playPiano(Number(chip.dataset.abs), { length: 0.9 });
+    chip.classList.add("is-sounding");
+    setTimeout(() => chip.classList.remove("is-sounding"), 350);
+  }));
+}
+
+/* =====================================================================================
+   Playing what the sheet music shows
+   ===================================================================================== */
+
+const STEP = 0.32; // seconds from one note of a scale or arpeggio to the next; each note stops as the next starts
+const player = { timers: [], damps: [], lit: [] };
+
+function setPlayButton(playing) {
+  const b = $("play-score");
+  b.classList.toggle("is-playing", playing);
+  b.querySelector("span").textContent = playing ? "Stop" : "Play";
+  document.documentElement.classList.toggle("score-playing", playing); // keys.css shows only the key sounding in red
+}
+
+function unlight() {
+  player.lit.forEach((el) => el.classList.remove("is-sounding"));
+  player.lit = [];
+}
+
+function stopPlaying() {
+  player.timers.forEach(clearTimeout);
+  player.timers = [];
+  player.damps.forEach((damp) => damp());
+  player.damps = [];
+  unlight();
+  setPlayButton(false);
+}
+
+// Plays `steps` in turn: [{ at, length, notes: [abs], light: [elements] }], `at` and `length` in seconds. Each step
+// sounds its notes together and lights its elements (keys and noteheads) until the next step.
+function playSteps(steps) {
+  stopPlaying();
+  setPlayButton(true);
+  steps.forEach((step) => player.timers.push(setTimeout(() => {
+    unlight();
+    player.damps = step.notes.map((abs) => playPiano(abs, { length: step.length }));
+    step.light().forEach((el) => {
+      el.classList.add("is-sounding");
+      player.lit.push(el);
+    });
+  }, step.at * 1000)));
+  const last = steps[steps.length - 1];
+  player.timers.push(setTimeout(() => {
+    unlight();
+    player.timers = [];
+    player.damps = [];
+    setPlayButton(false);
+  }, (last.at + Math.min(last.length, 0.8)) * 1000));
+}
+
+// a key on one hand's keyboard
+const keyEl = (hand, abs) => document.querySelector(`.kb-block[data-hand="${hand}"] [data-abs="${abs}"]`);
+// a note or chord in the sheet music, drawn by VexFlow
+const noteEl = (note) => (note && note.getSVGElement && note.getSVGElement()) || null;
 
 /* =====================================================================================
    Scale and arpeggio: a row of notes, one octave or two, one hand or both
@@ -124,6 +225,7 @@ function runMelodic() {
   const shiftOf = (hand) => (data.octaveShift && data.octaveShift[hand]) || 0;
   const handAbs = (hand, n) => (hand === "lh" ? n.abs - 12 * (4 - bassOctave()) : n.abs) + 12 * shiftOf(hand);
   const shownHands = () => (state.hands === "both" ? ["rh", "lh"] : [state.hands]);
+  let scoreNotes = {}; // the notes drawn in the sheet music, for each hand
 
   // the notes from `from` up to (not including) `to`, for one hand
   function buildNotes(hand, clef, baseOctave, showFingers, from, to) {
@@ -196,6 +298,7 @@ function runMelodic() {
     formatter.format(voices, jobs[0].stave.getNoteEndX() - startX - 16);
 
     voices.forEach((voice, k) => voice.draw(ctx, jobs[k].stave));
+    scoreNotes = Object.fromEntries(hands.map((hand, k) => [hand, jobs[k].notes]));
 
     if (both) {
       // join the two staves into a grand staff
@@ -215,7 +318,7 @@ function runMelodic() {
     $("keyboards").innerHTML = shownHands().map((hand) => {
       const side = hand === "rh" ? "Right hand" : "Left hand";
       const marks = v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i] }));
-      return `<div class="kb-block"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardSVG(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardSVG(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`)}</div></div>`;
     }).join("");
   }
 
@@ -243,7 +346,29 @@ function runMelodic() {
     setAriaPressed(state);
   }
 
+  // Play: up and back down, with the hands shown and the octaves chosen. Melodic minor comes down as the natural
+  // minor (data.down); those notes are not in the sheet music, which shows the way up, so only their keys light.
+  function play() {
+    const v = view();
+    const top = v.notes.length - 1;
+    const down = data.down && data.down[state.octaves];
+    const order = [...v.notes.keys(), ...[...v.notes.keys()].reverse().slice(1)];
+    playSteps(order.map((i, k) => {
+      const abs = k > top && down ? down[i] : v.notes[i].abs;
+      const written = abs === v.notes[i].abs;
+      const notes = shownHands().map((hand) => ({ hand, abs: handAbs(hand, { abs }) }));
+      return {
+        at: k * STEP,
+        length: k === order.length - 1 ? 1 : STEP,
+        notes: notes.map((n) => n.abs),
+        light: () => [...notes.map((n) => keyEl(n.hand, n.abs)), ...notes.map((n) => written && noteEl(scoreNotes[n.hand][i]))].filter(Boolean),
+      };
+    }));
+  }
+
+  $("play-score").addEventListener("click", () => ($("play-score").classList.contains("is-playing") ? stopPlaying() : play()));
   listenForOptions((key, value) => {
+    stopPlaying();
     state[key] = value;
     if (key === "start") chooseStart();
     render();
@@ -259,6 +384,7 @@ function runChord() {
   const state = { hands: "both", inv: 0 };
   const SIDE = { rh: "Right hand", lh: "Left hand" };
   let current = []; // the notes being shown, one entry per hand: { hand, notes, fingers }, each lowest note first
+  let scoreChords = {}; // the chord drawn in the sheet music, for each hand
 
   // Draws the chord as one whole note on a single stave, or on a grand staff when both hands are shown.
   function drawStaff(parts, label) {
@@ -299,6 +425,7 @@ function runChord() {
     voices.forEach((voice) => formatter.joinVoices([voice]));
     formatter.format(voices, Math.max(40, jobs[0].stave.getNoteEndX() - startX - 30));
     voices.forEach((voice, k) => voice.draw(ctx, jobs[k].stave));
+    scoreChords = Object.fromEntries(parts.map(({ hand }, k) => [hand, jobs[k].chord]));
 
     if (both) {
       [StaveConnector.type.BRACE, StaveConnector.type.SINGLE_LEFT, StaveConnector.type.BOLD_DOUBLE_RIGHT]
@@ -322,7 +449,7 @@ function runChord() {
     $("chord-keys").innerHTML = current.map(({ hand, notes, fingers }) => {
       const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i] }));
       const kbLabel = `${data.name} chord, ${inv.label.toLowerCase()}, ${SIDE[hand].toLowerCase()}, shown on the keyboard`;
-      return `<div class="kb-block"><span class="option-label">${SIDE[hand]}</span><div>${keyboardSVG(marks, true, kbLabel)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${SIDE[hand]}</span><div>${keyboardSVG(marks, true, kbLabel)}</div></div>`;
     }).join("");
 
     $("inv-seg").innerHTML = data.inversions.map((v, i) =>
@@ -330,12 +457,26 @@ function runChord() {
     setAriaPressed(state);
   }
 
+  // Play: the chord as shown, both hands together
+  function play() {
+    playSteps([{
+      at: 0,
+      length: 1.6,
+      notes: current.flatMap(({ notes }) => notes.map((n) => n.abs)),
+      light: () => current.flatMap(({ hand, notes }) => [...notes.map((n) => keyEl(hand, n.abs)), noteEl(scoreChords[hand])]).filter(Boolean),
+    }]);
+  }
+
+  $("play-score").addEventListener("click", () => ($("play-score").classList.contains("is-playing") ? stopPlaying() : play()));
   listenForOptions((key, value) => {
+    stopPlaying();
     state[key] = value;
     render();
   });
   render();
 }
 
+drawSignature();
+listenToChips();
 if (data.mode === "chord") runChord();
 else runMelodic();

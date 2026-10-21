@@ -15,6 +15,128 @@ main .page-hero h1 {
   line-height: 1.15;
 }
 
+/* The hero of a key page: the key large with what the page is for under it, the key signature beside it on a small
+   stave, then the notes as chips that sound when tapped */
+main .key-hero {
+  padding-block: 24px 18px;
+}
+
+.key-hero-head {
+  display: grid;
+  grid-template-columns: minmax(0, max-content) auto;
+  justify-content: start;
+  align-items: center;
+  gap: 16px 24px;
+  margin-bottom: 16px;
+}
+
+main .key-hero h1 {
+  margin: 0;
+  line-height: 1;
+}
+
+.h1-name {
+  display: block;
+  font-size: clamp(2rem, 8.4vw, 3.3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.h1-what {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 3.6vw, 1.2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--muted);
+}
+
+.sig-tile {
+  margin: 0;
+  padding: 6px 10px 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.sig-stave svg {
+  display: block;
+  width: auto;
+  height: 76px;
+  margin-inline: auto;
+}
+
+.sig-tile figcaption {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.note-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+.note-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 42px;
+  height: 50px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.05);
+  color: var(--text);
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.note-chip small {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* the note the scale or chord is built on */
+.note-chip.is-root {
+  background: var(--accent-light);
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+.note-chip.is-root small {
+  color: var(--accent-ink);
+}
+
+.note-chip.is-sounding {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(1px);
+}
+
+.note-chip.is-sounding small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 main .page-hero p {
   margin: 0;
   max-width: 68ch;
@@ -32,65 +154,116 @@ main .page-hero .hero-more + .hero-more {
   margin-top: 4px;
 }
 
-/* tabs that link to the key's other pages (same look as the key and type pills) */
+/* the tabs that link to the key's other pages: one segmented control, the current page raised out of it */
 .key-tabs {
   display: flex;
-  gap: 8px;
-  padding: 0 var(--pad) 14px;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--pad));
+  margin: 0 var(--pad) 18px;
+  padding: 4px;
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 14px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.key-tabs a,
-.key-tabs button {
+.key-tabs a {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.key-tabs a:hover {
+  color: var(--text);
+}
+
+.key-tabs a[aria-current="page"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.08), 0 3px 10px -4px rgba(28, 25, 23, 0.18);
+}
+
+/* a line after a minor key's three scale forms, before the arpeggio and the chord */
+.key-tabs .tab-divider {
+  flex: 0 0 1px;
+  height: 18px;
+  margin: 0 5px;
+  background: var(--line-strong);
+}
+
+.key-tabs .tab-divider.is-faint {
+  display: none;
+}
+
+/* phones: the tabs fill the width. A minor key's five don't fit on one line, so the arpeggio and the chord go on a
+   second line under the three scale forms, the line between them lying across. */
+@media (max-width: 559px) {
+  .key-tabs:not(.pills) {
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  .key-tabs a {
+    flex: 1 1 0;
+    padding: 0 6px;
+  }
+
+  .key-tabs .tab-divider {
+    flex: 0 0 calc(100% - 16px);
+    height: 1px;
+    margin: 3px 8px;
+  }
+}
+
+/* the chromatic page: "Start on" and the twelve buttons, as pills */
+.key-tabs.pills {
+  gap: 6px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--pad) 18px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.key-tabs.pills button {
+  flex: 0 0 auto;
   min-width: 44px;
   height: 38px;
-  padding: 0 18px;
+  padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
   color: var(--text);
-  font-family: inherit;
-  font-size: 0.88rem;
+  font: inherit;
+  font-size: 0.86rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
 }
 
-.key-tabs a:hover,
-.key-tabs button:hover {
-  background: var(--bg-alt);
+.key-tabs.pills button:hover {
+  border-color: var(--line-strong);
 }
 
-.key-tabs a[aria-current="page"],
-.key-tabs button[aria-pressed="true"] {
+.key-tabs.pills button[aria-pressed="true"] {
   background: var(--text);
   border-color: var(--text);
   color: #fff;
 }
 
-/* the lines between the tabs: clear after a minor key's three scale forms, faint everywhere else */
-.key-tabs .tab-divider {
-  flex: 0 0 2px;
-  align-self: center;
-  height: 26px;
-  margin: 0 8px;
-  border-radius: 1px;
-  background: rgba(18, 19, 22, 0.45);
-}
-
-.key-tabs .tab-divider.is-faint {
-  flex-basis: 1px;
-  height: 16px;
-  margin: 0 3px;
-  background: rgba(18, 19, 22, 0.22);
-}
-
-/* the chromatic page: "Start on" and the twelve buttons use the tab bar's look */
 .tabs-label {
   flex: 0 0 auto;
   align-self: center;
@@ -209,10 +382,18 @@ main .page-hero .hero-more + .hero-more {
   font-variant-numeric: tabular-nums;
 }
 
-/* the thumb, so the points where it goes under or the hand moves are easy to spot */
+.finger-grid thead th:not(:first-child) {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* the thumb, on a felt disc, so the points where it goes under or the hand moves are easy to spot */
 .finger-grid td.thumb {
   font-weight: 700;
   color: var(--accent-ink);
+  background: radial-gradient(circle, var(--accent-light) 0 15px, transparent 15.5px);
 }
 
 /* the chord page: root position and the inversions, one table each */
@@ -226,6 +407,74 @@ main .page-hero .hero-more + .hero-more {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+/* Play, on the sheet music card: the one felt button of the card. It turns to Stop while playing. */
+.play-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 1px 2px rgba(150, 38, 34, 0.25), 0 6px 14px -6px rgba(150, 38, 34, 0.5);
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.play-score svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.play-score .stop-icon,
+.play-score.is-playing .play-icon {
+  display: none;
+}
+
+.play-score.is-playing .stop-icon {
+  display: block;
+}
+
+.play-score.is-playing {
+  background: var(--text);
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.2);
+}
+
+.play-score:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .play-score:hover {
+    background: var(--accent-ink);
+  }
+
+  .play-score.is-playing:hover {
+    background: #000;
+  }
+
+  .note-chip:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
+  }
+
+  .note-chip.is-root:hover {
+    border-color: transparent;
+  }
+}
+
+/* while playing: the note sounding now lights up in the sheet music (the note drawn by VexFlow) */
+.score .vf-stavenote.is-sounding {
+  fill: var(--accent);
+  stroke: var(--accent);
 }
 
 /* the sheet music and keyboard sections sit close together; the last one leaves room before the footer */
@@ -329,6 +578,44 @@ main .practice-card .options-row>.option {
   fill: #fff;
 }
 
+/* drawn like a real keyboard (keyboardSVG in key-page.js): the felt strip above the keys, a slight edge at the front
+   of each white key, a lighter top on the black keys and their shadow on the white keys beside them */
+.kb .felt {
+  fill: var(--accent);
+}
+
+.kb .lip {
+  fill: rgba(28, 25, 23, 0.06);
+}
+
+.kb .shade {
+  fill: rgba(28, 25, 23, 0.14);
+}
+
+.kb .face {
+  fill: rgba(255, 255, 255, 0.1);
+}
+
+/* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music. The black keys
+   of the scale go back to black meanwhile, so only the key sounding is red. */
+.kb .is-sounding {
+  transform: translateY(1.5px);
+}
+
+.kb .white.is-sounding rect,
+.kb .black.is-sounding rect {
+  fill: var(--accent);
+}
+
+.score-playing .kb .black.is-marked:not(.is-sounding) rect {
+  fill: var(--text);
+}
+
+.kb .is-sounding .finger,
+.kb .is-sounding .octave {
+  fill: #fff;
+}
+
 /* The chord page and the arpeggio page (on a desktop): the sheet music and the keyboard card in one row instead of
    one above the other. Both are stacked on a phone. */
 .practice-pair {
@@ -341,9 +628,28 @@ main .practice-card .options-row>.option {
 
 /* Tablet */
 @media (min-width: 768px) {
-  .key-tabs {
+  .key-tabs a {
+    padding: 0 18px;
+    font-size: 0.88rem;
+  }
+
+  .key-tabs.pills {
     flex-wrap: wrap;
     overflow: visible;
+  }
+
+  .key-hero-head {
+    gap: 16px 36px;
+  }
+
+  .sig-stave svg {
+    height: 92px;
+  }
+
+  .note-chip {
+    min-width: 50px;
+    height: 54px;
+    padding: 0 10px;
   }
 
   .fingering-card,
@@ -393,9 +699,14 @@ main .practice-card .options-row>.option {
 /* Desktop */
 @media (min-width: 1024px) {
 
-  .key-tabs,
-  .fingering {
+  .fingering,
+  .key-tabs.pills {
     padding-inline: var(--gutter);
+  }
+
+  .key-tabs {
+    max-width: calc(100% - 2 * var(--gutter));
+    margin-inline: var(--gutter);
   }
 
   .practice-pair {

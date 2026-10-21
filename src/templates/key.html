@@ -1,12 +1,14 @@
 ---
 styles: page chords keys
-scripts: vexflow key-page
+scripts: vexflow piano-sound key-page
 ---
-        <section class="page-hero">
+        <section class="page-hero key-hero">
             <nav class="crumbs" aria-label="Breadcrumb">
                 <a href="{{sectionUrl}}">{{sectionName}}</a> <span aria-hidden="true">›</span> <a href="{{keyUrl}}">{{keyName}}</a>
             </nav>
-            <h1>{{heading}}</h1>
+            <div class="key-hero-head">
+                <h1>{{heading}}</h1>{{heroSig}}
+            </div>{{heroNotes}}
             <p>{{intro}}</p>{{heroExtra}}
         </section>
 
