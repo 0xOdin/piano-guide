@@ -22,7 +22,15 @@ npm start       # serve the last build
 ```
 
 Needs Node.js 20 or newer. Set `SITE_URL` when building for the live site, so canonical links and the sitemap point
-at the right address: `SITE_URL=https://your-domain.com npm run build`. Then upload the contents of `dist/`.
+at the right address: `SITE_URL=https://your-domain.com npm run build`. Then upload the contents of `dist/`. If the
+site lives in a folder of its address, set `BASE_PATH` to that folder as well, and every link on the site starts with
+it: `BASE_PATH=/piano-test npm run build`. Without it the build is just as before.
+
+### Publishing on GitHub Pages
+
+Every push to `main` builds the site and publishes it at https://0xodin.github.io/piano-test/
+(`.github/workflows/pages.yml`, which sets both `SITE_URL` and `BASE_PATH` from the repository's Pages address). On
+GitHub, the repository's Settings → Pages → Source must be "GitHub Actions".
 
 ## How it is organised
 

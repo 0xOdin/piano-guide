@@ -32,19 +32,28 @@
 // people with JavaScript off) see it. The sheet music and keyboard are added in the browser by public/js/key-page.js.
 //
 // Set SITE_URL to your real address before you publish (SITE_URL=https://... npm run build): it goes into the
-// canonical links and the sitemap.
+// canonical links and the sitemap. If the site lives in a folder of that address, as GitHub Pages puts a project
+// (https://you.github.io/piano-test/), set BASE_PATH to the folder too (BASE_PATH=/piano-test): it goes in front of
+// every link to a page or file on the site, in the pages, their data and the stylesheets. Without it, nothing changes.
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const diagrams = require("./diagrams.js");
 
 const SITE_URL = (process.env.SITE_URL || "https://example.com").replace(/\/$/, "");
+const BASE_PATH = (process.env.BASE_PATH || "").replace(/\/+$/, "").replace(/^(?=[^/])/, "/"); // "" or "/piano-test"
 const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "src");
 const PUBLIC = path.join(ROOT, "public");
 const DIST = path.join(ROOT, "dist");
 
 /* ---------- Pages and the layout ---------- */
+
+// Puts BASE_PATH in front of the site's own links: href, src and action attributes that start with one /, and the
+// "url" fields of the page data the scripts read (the chords and keyboard pages link to key pages with them)
+const withBase = (html) => !BASE_PATH ? html : html
+  .replace(/(href|src|action)="\/(?!\/)/g, `$1="${BASE_PATH}/`)
+  .replace(/"url":"\/(?!\/)/g, `"url":"${BASE_PATH}/`);
 
 // The menu in the header and the footer: [nav id, url, label]
 const NAV = [
@@ -100,7 +109,7 @@ function addPage(url, out, { file, meta, body }, vars = {}) {
     scripts: ["main", ...words(meta.scripts)].map((n) => `    <script src="${SCRIPT_URLS[n] || `/js/${n}.js`}"></script>`).join("\n"),
     year: new Date().getFullYear(),
   }, "src/layout.html");
-  pages.push({ url, out, html, title: meta.title, description: meta.description, sitemap: meta.sitemap !== "no" });
+  pages.push({ url, out, html: withBase(html), title: meta.title, description: meta.description, sitemap: meta.sitemap !== "no" });
 }
 
 /* ---------- Loading the music data ---------- */
@@ -994,6 +1003,14 @@ for (const rel of fs.readdirSync(path.join(SRC, "pages"), { recursive: true }).s
 fs.rmSync(DIST, { recursive: true, force: true });
 fs.cpSync(PUBLIC, DIST, { recursive: true, filter: (src) => path.basename(src) !== ".DS_Store" });
 
+// the stylesheets' pictures (url(/assets/...)) need the folder too
+if (BASE_PATH) {
+  for (const name of fs.readdirSync(path.join(DIST, "css"))) {
+    const file = path.join(DIST, "css", name);
+    fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace(/url\((["']?)\/(?!\/)/g, `url($1${BASE_PATH}/`));
+  }
+}
+
 for (const page of pages) {
   const file = path.join(DIST, page.out);
   if (fs.existsSync(file)) throw new Error(`two pages write ${page.out}`);
@@ -1010,10 +1027,12 @@ ${listed.map((p) => `  <url><loc>${SITE_URL}${p.url}</loc></url>`).join("\n")}
 
 /* ---------- Checking the links ---------- */
 
-// Every href="/..." and src="/..." must lead to a file in /dist/ (a folder link needs its index.html).
+// Every href="/..." and src="/..." must lead to a file in /dist/ (a folder link needs its index.html). With BASE_PATH
+// the links start with it, and the rest is looked up in /dist/.
 const broken = [];
+const ownLink = new RegExp(`(?:href|src)="${BASE_PATH.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(\\/(?!\\/)[^"#?]*)`, "g");
 for (const page of pages) {
-  for (const [, link] of page.html.matchAll(/(?:href|src)="(\/(?!\/)[^"#?]*)/g)) {
+  for (const [, link] of page.html.matchAll(ownLink)) {
     const file = path.join(DIST, decodeURI(link));
     const ok = link.endsWith("/") ? fs.existsSync(path.join(file, "index.html"))
       : fs.existsSync(file) && fs.statSync(file).isFile();
