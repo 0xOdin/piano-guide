@@ -282,6 +282,20 @@ a.key-badge:active {
   transform: scale(0.94);
 }
 
+/* a small label over a heading */
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow-brass {
+  color: var(--brass);
+}
+
 /* Buttons: one main button per view (felt), the rest quiet */
 .btn {
   display: inline-flex;

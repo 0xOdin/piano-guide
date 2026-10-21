@@ -3,9 +3,10 @@ title: Piano Chords: Notes, Inversions and Fingerings | PianoGuide
 description: Piano chords in every key: major, minor, diminished, augmented, suspended and seventh chords, with notes, inversions and fingerings.
 nav: chords
 styles: page chords piano
-scripts: vexflow chords-data piano-keys chords
+scripts: vexflow chords-data piano-sound piano-keys chords
 ---
         <section class="page-hero">
+            <p class="eyebrow">Every chord on every root</p>
             <h1>Chords</h1>
             <p>Pick a root note and a chord type to see it written out and laid on the keyboard. Numbers show the finger to use, from 1 (thumb) to 5 (little finger).</p>
         </section>
@@ -21,10 +22,16 @@ scripts: vexflow chords-data piano-keys chords
         </div>
 
         <section class="practice">
-            <div class="practice-card">
-                <h2 id="chord-title"></h2>
+            <div class="practice-card chord-viewer" id="chord-viewer">
+                <div class="card-head">
+                    <h2 id="chord-title"></h2>
+                    <button type="button" class="play-score" id="play-chord">
+                        <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+                        <span>Play</span>
+                    </button>
+                </div>
                 <p class="scale-alt" id="chord-meta"></p>
-                <ul class="scale-notes" id="chord-notes" aria-label="Notes, lowest first"></ul>
+                <ul class="note-chips" id="chord-notes" aria-label="Notes, lowest first, tap one to hear it"></ul>
 
                 <div class="options">
                     <div class="option">

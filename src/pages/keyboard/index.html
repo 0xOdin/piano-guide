@@ -5,6 +5,7 @@ styles: page piano keyboard
 scripts: chords-data note-names piano-sound keyboard
 ---
         <section class="page-hero">
+            <p class="eyebrow">Play and look up</p>
             <h1>Keyboard</h1>
             <p>Click or tap the keys, or play with your computer keyboard. The notes you pick are named below, and you can light up any scale, arpeggio or chord with its fingering.</p>
         </section>
@@ -42,18 +43,16 @@ scripts: chords-data note-names piano-sound keyboard
                     </div>
                 </div>
 
-                <div class="piano-case piano-frame">
+                <div class="piano-case kb-case">
+                    <span class="eyebrow eyebrow-brass">On the keys</span>
+                    <div class="kb-readout" id="readout" aria-live="polite"></div>
                     <div class="piano-scroll">
                         <div class="piano" id="piano" role="group" aria-label="Piano keyboard, C4 to C6"></div>
                     </div>
-                </div>
-
-                <div class="kb-bar">
-                    <div class="kb-readout" id="readout" aria-live="polite"></div>
                     <div class="kb-actions">
-                        <button type="button" class="kb-btn is-primary" id="play-btn">▶ Play</button>
-                        <button type="button" class="kb-btn" id="clear-btn">Clear</button>
-                        <button type="button" class="kb-btn" id="mute-btn" aria-pressed="false">Sound on</button>
+                        <button type="button" class="case-btn is-primary" id="play-btn">▶ Play</button>
+                        <button type="button" class="case-btn" id="clear-btn">Clear</button>
+                        <button type="button" class="case-btn" id="mute-btn" aria-pressed="false">Sound on</button>
                     </div>
                 </div>
 

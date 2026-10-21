@@ -48,36 +48,46 @@
   outline-offset: 2px;
 }
 
-/* the readout and the buttons under the keyboard */
-.kb-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+/* The keys in their ebony case (piano.css), as on the homepage: what is played or shown above them, the buttons
+   under them */
+.kb-case {
+  padding: 20px 14px 14px;
 }
 
 .kb-readout {
   display: grid;
-  gap: 2px;
-  min-height: 52px;
+  align-content: start;
+  gap: 4px;
+  min-height: 72px;
+  margin: 8px 0 16px;
 }
 
 .kb-name {
-  font-size: 1.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5.6vw, 2.1rem);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .kb-detail {
-  font-size: 0.88rem;
-  color: var(--muted);
+  font-size: 0.9rem;
+  color: var(--ebony-muted);
+}
+
+.kb-case .piano-scroll {
+  margin-bottom: 0;
 }
 
 .kb-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 14px;
 }
 
+/* the quiet buttons, used by the Practice page */
 .kb-btn {
   height: 40px;
   padding: 0 16px;
@@ -168,10 +178,8 @@
     gap: 18px 28px;
   }
 
-  .kb-bar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+  .kb-case {
+    padding: 24px 22px 18px;
   }
 }
 

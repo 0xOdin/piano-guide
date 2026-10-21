@@ -1,36 +1,10 @@
-// Diagrams for the theory pages, drawn at build time as inline SVG (no JavaScript in the browser). The colours come
-// from the site's CSS: the keyboard uses the .kb styles in chords.css, the circle the .cof styles in theory.css.
+// Diagrams drawn at build time as inline SVG (no JavaScript in the browser): the mini keyboards on the list cards and
+// the circle of fifths. The colours come from the site's CSS: .mini-kb in lists.css, .cof in theory.css.
 // Used by scripts/build.js.
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const NATURAL_SEMIS = [0, 2, 4, 5, 7, 9, 11]; // semitone of C D E F G A B
-
-/* ---------- A small keyboard ---------- */
-
-// `whiteKeys` white keys starting on C. `marks` is a Map from semitone (0 = the first C) to { label, root }: those
-// keys are filled in with the label written on them, and the root a darker colour.
-function keyboard({ whiteKeys, marks, label }) {
-  const KW = 26, KH = 104, BW = 16, BH = 64;
-  let whites = "";
-  let blacks = "";
-  let w = 0; // white keys drawn so far
-  for (let s = 0; w < whiteKeys; s++) {
-    const m = marks.get(s);
-    const cls = (m ? " on" : "") + (m && m.root ? " root" : "");
-    if (NATURAL_SEMIS.includes(s % 12)) {
-      const x = w * KW;
-      const text = m ? `<text class="note" x="${x + KW / 2}" y="${KH - 14}">${esc(m.label)}</text>` : "";
-      whites += `<g class="white${cls}"><rect x="${x + 0.5}" y="-6" width="${KW - 1}" height="${KH + 5}" rx="3"/>${text}</g>`;
-      w++;
-    } else if (w < whiteKeys) {
-      const x = w * KW - BW / 2; // a black key sits on the line between two white keys
-      const text = m ? `<text class="note" x="${x + BW / 2}" y="${BH - 10}">${esc(m.label)}</text>` : "";
-      blacks += `<g class="black${cls}"><rect x="${x}" y="-6" width="${BW}" height="${BH + 6}" rx="2"/>${text}</g>`;
-    }
-  }
-  return `<svg class="kb" viewBox="0 0 ${whiteKeys * KW} ${KH}" role="img" aria-label="${esc(label)}">${whites}${blacks}</svg>`;
-}
 
 /* ---------- A mini keyboard for the list cards ---------- */
 
@@ -113,4 +87,4 @@ function circleOfFifths(slots) {
 </svg>`;
 }
 
-module.exports = { keyboard, miniKeyboard, circleOfFifths };
+module.exports = { miniKeyboard, circleOfFifths };

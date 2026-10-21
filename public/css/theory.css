@@ -1,5 +1,5 @@
 /* Theory pages css: /theory/, intervals, circle of fifths. The page hero and breadcrumb come from page.css; the
-   keyboard diagrams on the intervals page use the .kb styles in chords.css. */
+   keyboards on the intervals page and their case from piano.css. */
 
 /* Base (phones) */
 
@@ -18,13 +18,27 @@
   padding: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
-  transition: background-color 0.2s ease;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
-.theory-card:hover {
-  background: var(--bg-alt);
+/* a card lifts a little under the pointer */
+@media (hover: hover) {
+  .theory-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.theory-card:has(h2 a:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theory-card h2 a:focus-visible {
+  outline: none;
 }
 
 .theory-card img {
@@ -45,7 +59,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: var(--radius);
+  border-radius: inherit;
 }
 
 .theory-card p {
@@ -133,10 +147,12 @@
 }
 
 .interval-card {
+  display: flex;
+  flex-direction: column;
   padding: 16px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
 }
 
@@ -171,15 +187,35 @@
   color: var(--muted);
 }
 
-/* note names written on the marked keys */
-.kb .note {
-  font-size: 11px;
-  fill: var(--text);
+/* the two notes on the keyboard, in the piano's ebony case, and the button that plays them (intervals.js). The case
+   sits at the foot of the card, so the keyboards line up along a row of cards. */
+.interval-keys {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding: 10px;
+  border-radius: 14px;
 }
 
-.kb .black .note,
-.kb .root .note {
-  fill: #fff;
+.interval-keys .piano-static {
+  min-width: 0;
+  aspect-ratio: var(--whites) / 4.4;
+}
+
+.interval-keys .pkey {
+  padding-bottom: 7px;
+}
+
+.interval-keys .pkey.white.is-shown .pkey-name {
+  font-size: 0.74rem;
+  color: var(--accent-ink);
+}
+
+.interval-hear {
+  justify-self: end;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 0.8rem;
 }
 
 /* The circle of fifths */

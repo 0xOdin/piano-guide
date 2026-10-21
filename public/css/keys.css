@@ -78,65 +78,6 @@ main .key-hero h1 {
   color: var(--muted);
 }
 
-.note-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 16px;
-}
-
-.note-chip {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  min-width: 42px;
-  height: 50px;
-  padding: 0 8px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.05);
-  color: var(--text);
-  font: inherit;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.1;
-  cursor: pointer;
-  transition: transform 0.15s var(--ease), background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
-}
-
-.note-chip small {
-  font-family: var(--font-body);
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--muted);
-}
-
-/* the note the scale or chord is built on */
-.note-chip.is-root {
-  background: var(--accent-light);
-  border-color: transparent;
-  color: var(--accent-ink);
-}
-
-.note-chip.is-root small {
-  color: var(--accent-ink);
-}
-
-.note-chip.is-sounding {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  transform: translateY(1px);
-}
-
-.note-chip.is-sounding small {
-  color: rgba(255, 255, 255, 0.82);
-}
-
 main .page-hero p {
   margin: 0;
   max-width: 68ch;
@@ -409,68 +350,6 @@ main .page-hero .hero-more + .hero-more {
   letter-spacing: -0.01em;
 }
 
-/* Play, on the sheet music card: the one felt button of the card. It turns to Stop while playing. */
-.play-score {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 38px;
-  padding: 0 16px 0 13px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 1px 2px rgba(150, 38, 34, 0.25), 0 6px 14px -6px rgba(150, 38, 34, 0.5);
-  color: #fff;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
-}
-
-.play-score svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
-}
-
-.play-score .stop-icon,
-.play-score.is-playing .play-icon {
-  display: none;
-}
-
-.play-score.is-playing .stop-icon {
-  display: block;
-}
-
-.play-score.is-playing {
-  background: var(--text);
-  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.2);
-}
-
-.play-score:active {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) {
-  .play-score:hover {
-    background: var(--accent-ink);
-  }
-
-  .play-score.is-playing:hover {
-    background: #000;
-  }
-
-  .note-chip:hover {
-    border-color: var(--line-strong);
-    transform: translateY(-1px);
-  }
-
-  .note-chip.is-root:hover {
-    border-color: transparent;
-  }
-}
-
 /* while playing: the note sounding now lights up in the sheet music (the note drawn by VexFlow) */
 .score .vf-stavenote.is-sounding {
   fill: var(--accent);
@@ -558,26 +437,6 @@ main .practice-card .options-row>.option {
   overflow-x: auto;
 }
 
-/* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music. The black keys
-   of the scale go back to black meanwhile, so only the key sounding is red. */
-.piano-static .pkey.is-sounding {
-  transform: translateY(2px);
-}
-
-.piano-static .pkey.white.is-sounding,
-.piano-static .pkey.black.is-sounding {
-  background: var(--accent);
-  color: #fff;
-}
-
-.piano-static .pkey.white.is-sounding .pkey-name {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.score-playing .piano-static .pkey.black.is-shown:not(.is-sounding) {
-  background: var(--text);
-}
-
 /* The chord page and the arpeggio page (on a desktop): the sheet music and the keyboard card in one row instead of
    one above the other. Both are stacked on a phone. */
 .practice-pair {
@@ -608,11 +467,6 @@ main .practice-card .options-row>.option {
     height: 92px;
   }
 
-  .note-chip {
-    min-width: 50px;
-    height: 54px;
-    padding: 0 10px;
-  }
 
   .fingering-card,
   main .practice>.practice-card {

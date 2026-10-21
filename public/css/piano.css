@@ -55,6 +55,53 @@
   outline-color: var(--ebony-text);
 }
 
+/* buttons on the case: outlined in a faint light line; the main one filled */
+.case-btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(250, 250, 249, 0.2);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ebony-text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.case-btn.is-primary {
+  background: var(--ebony-text);
+  border-color: var(--ebony-text);
+  color: var(--text);
+}
+
+.case-btn[aria-pressed="true"] {
+  color: var(--ebony-muted);
+}
+
+.case-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.case-btn:focus-visible {
+  outline-color: var(--ebony-text);
+}
+
+@media (hover: hover) {
+  .case-btn:hover:not(:disabled) {
+    background: rgba(250, 250, 249, 0.08);
+    border-color: rgba(250, 250, 249, 0.34);
+  }
+
+  .case-btn.is-primary:hover:not(:disabled) {
+    background: #fff;
+    border-color: #fff;
+  }
+}
+
 /* the keys: white keys side by side, black keys placed on top by the page's script */
 .piano-scroll {
   overflow-x: auto;
@@ -96,6 +143,7 @@
 
 .pkey.white {
   flex: 1;
+  min-width: 0; /* every white key the same width, whatever is written on it */
   margin-right: -1px; /* neighbours share one border */
   background: var(--surface);
   border: 1px solid rgba(18, 19, 22, 0.22);
@@ -179,6 +227,26 @@
 .piano-static .pkey.white .pkey-name {
   font-size: 0.66rem;
   color: var(--muted);
+}
+
+/* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music (key pages). The
+   black keys of the scale go back to black meanwhile, so only the key sounding is red. */
+.piano-static .pkey.is-sounding {
+  transform: translateY(2px);
+}
+
+.piano-static .pkey.white.is-sounding,
+.piano-static .pkey.black.is-sounding {
+  background: var(--accent);
+  color: #fff;
+}
+
+.piano-static .pkey.white.is-sounding .pkey-name {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.score-playing .piano-static .pkey.black.is-shown:not(.is-sounding) {
+  background: var(--text);
 }
 
 /* Desktop */

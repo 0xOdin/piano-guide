@@ -1,6 +1,7 @@
-// Piano chords page. Drawn with VexFlow (loaded from a CDN before this file) plus a keyboard diagram.
-// Top of the page: an interactive viewer (pick a root and a chord type, then hand and inversion).
-// Bottom of the page: every chord type on the chosen root, written out for reference.
+// Piano chords page. Drawn with VexFlow (loaded from a CDN before this file) plus a keyboard (piano-keys.js).
+// Top of the page: an interactive viewer (pick a root and a chord type, then hand and inversion). Play sounds the
+// chord on the recorded piano (piano-sound.js) and the note chips sound one note each.
+// Bottom of the page: every chord type on the chosen root, written out for reference; a card opens it in the viewer.
 // The address keeps the choice (/chords/?root=c-sharp&type=minor), so a chord can be linked to directly.
 const { Renderer, Stave, StaveNote, Voice, Formatter, Barline, Accidental } = Vex.Flow;
 
@@ -110,7 +111,9 @@ function renderViewer() {
   }
   $("chord-meta").textContent = meta;
 
-  $("chord-notes").innerHTML = notes.map((n) => `<li>${n.name}<small>${n.label}</small></li>`).join("");
+  $("chord-notes").innerHTML = notes.map((n) =>
+    `<li><button type="button" class="note-chip${n.root ? " is-root" : ""}" data-abs="${n.abs}" aria-label="${n.name}">${n.name}<small aria-hidden="true">${n.label}</small></button></li>`).join("");
+  current = notes;
 
   $("inv-seg").innerHTML = tones.map((_, i) =>
     `<button type="button" data-v="${i}">${["Root", "1st", "2nd", "3rd"][i]}</button>`).join("");
@@ -134,6 +137,7 @@ function renderViewer() {
     $("key-link").textContent = `${keyPage.name}: both hands, scale and arpeggio`;
   }
 
+  markCurrentCard();
   document.querySelectorAll("#root-tabs button").forEach((b, i) => b.setAttribute("aria-pressed", String(i === state.root)));
   document.querySelectorAll("#type-tabs button").forEach((b, i) => b.setAttribute("aria-pressed", String(i === state.type)));
   document.querySelectorAll(".seg").forEach((seg) =>
@@ -156,8 +160,8 @@ function renderList() {
         ${CHORD_TYPES.map((t, i) => [t, i]).filter(([t]) => t.group === group).map(([t, i]) => {
           const names = spellChord(root, t).map((n) => n.name);
           return `
-        <article class="scale-card chord-card">
-          <h3>${root.name} ${t.name}</h3>
+        <article class="scale-card chord-card" data-t="${i}">
+          <h3><button type="button" class="chord-open" data-t="${i}">${root.name} ${t.name}</button></h3>
           <div class="score chord-score" data-t="${i}"></div>
           <p class="fingering-line"><strong>Symbol:</strong> ${chordSymbol(root, t)}</p>
           <p class="fingering-line"><strong>Notes:</strong> ${names.join(" ")}</p>
@@ -171,6 +175,28 @@ function renderList() {
     const t = CHORD_TYPES[Number(el.dataset.t)];
     drawStaff(el, voiceChord(spellChord(root, t), 0, "rh"), "rh", `${root.name} ${t.name}`);
   });
+  markCurrentCard();
+}
+
+// the card of the chord type in the viewer is picked out
+function markCurrentCard() {
+  document.querySelectorAll("#chord-list .chord-card").forEach((card) =>
+    card.classList.toggle("is-current", Number(card.dataset.t) === state.type));
+}
+
+/* ---------- Sound ---------- */
+
+let current = []; // the notes in the viewer, lowest first
+let releaseTimer = null;
+
+// Play: the chord in the viewer, all its notes together, its keys pressed down while it sounds
+function playChord() {
+  const keys = current.map((n) => document.querySelector(`#chord-keys [data-abs="${n.abs}"]`)).filter(Boolean);
+  current.forEach((n) => playPiano(n.abs, { length: 1.6 }));
+  document.querySelectorAll("#chord-keys .is-sounding").forEach((el) => el.classList.remove("is-sounding"));
+  keys.forEach((el) => el.classList.add("is-sounding"));
+  clearTimeout(releaseTimer);
+  releaseTimer = setTimeout(() => keys.forEach((el) => el.classList.remove("is-sounding")), 1000);
 }
 
 /* ---------- Page setup ---------- */
@@ -197,6 +223,28 @@ $("type-tabs").addEventListener("click", (e) => {
   if (!b) return;
   state.type = Number(b.dataset.i);
   renderViewer();
+});
+
+$("play-chord").addEventListener("click", playChord);
+
+// a note chip sounds its note
+$("chord-notes").addEventListener("click", (e) => {
+  const chip = e.target.closest(".note-chip");
+  if (!chip) return;
+  playPiano(Number(chip.dataset.abs), { length: 0.9 });
+  chip.classList.add("is-sounding");
+  setTimeout(() => chip.classList.remove("is-sounding"), 350);
+});
+
+// a card in the list opens its chord in the viewer
+$("chord-list").addEventListener("click", (e) => {
+  const b = e.target.closest(".chord-open");
+  if (!b) return;
+  state.type = Number(b.dataset.t);
+  renderViewer();
+  saveToAddress();
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  $("chord-viewer").scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
 });
 
 // every option group (.seg) has data-key="hands" | "inv"

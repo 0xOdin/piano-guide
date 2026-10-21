@@ -33,17 +33,21 @@
   gap: 3px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   background: var(--surface);
+  box-shadow: var(--shadow);
   color: var(--text);
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 
 .pr-drills strong {
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .pr-drills span {
@@ -52,13 +56,23 @@
   color: var(--muted);
 }
 
-.pr-drills button:hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .pr-drills button:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  .pr-drills button[aria-pressed="true"]:hover {
+    border-color: var(--text);
+    transform: none;
+  }
 }
 
+/* the drill chosen: lacquered ebony, like the piano's case */
 .pr-drills button[aria-pressed="true"] {
   border-color: var(--text);
-  background: var(--text);
+  background: linear-gradient(180deg, #2b2623 0%, #1c1917 60%);
   color: #fff;
 }
 
@@ -253,12 +267,13 @@
   justify-content: center;
   gap: 2px;
   min-width: 32px; /* eight fit across a phone */
-  height: 42px;
+  height: 44px;
   padding: 0 5px;
   border: 1px dashed var(--line-strong);
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 700;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .pr-slot.has-label {
@@ -267,6 +282,8 @@
 }
 
 .pr-slot-label {
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 0.66rem;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -466,6 +483,18 @@
 .pr-actions .kb-btn {
   height: 42px;
   padding: 0 20px;
+}
+
+/* the next step is the page's one felt button */
+.pr-actions .kb-btn.is-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 1px 2px rgba(150, 38, 34, 0.25), 0 6px 14px -6px rgba(150, 38, 34, 0.5);
+}
+
+.pr-actions .kb-btn.is-primary:hover:not(:disabled) {
+  background: var(--accent-ink);
+  opacity: 1;
 }
 
 .pr-actions .pr-link {

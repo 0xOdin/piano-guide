@@ -1,91 +1,8 @@
-/* Chords page css, and the keyboard diagram also used by the key pages. The page hero, tabs, practice card, option
-   buttons and score come from page.css. */
+/* Chords page css. The page hero, tabs, practice card, option buttons, note chips, Play button and score come from
+   page.css, the keyboard and its case from piano.css. */
 
 /* Base */
 
-/* keyboard diagram */
-.kb {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.kb rect {
-  transition: fill 0.15s ease;
-}
-
-.kb g {
-  transition: transform 0.1s ease;
-}
-
-.kb text {
-  font-family: var(--font-body);
-  font-weight: 700;
-  text-anchor: middle;
-  pointer-events: none;
-  user-select: none;
-}
-
-.kb .white rect {
-  fill: var(--surface);
-  stroke: rgba(18, 19, 22, 0.3);
-}
-
-.kb .black rect {
-  fill: var(--text);
-  stroke: var(--text);
-}
-
-.kb .white.on rect {
-  fill: var(--accent-light);
-}
-
-.kb .black.on rect {
-  fill: var(--accent);
-}
-
-.kb .on.root rect {
-  fill: var(--accent-ink);
-}
-
-.kb .finger {
-  font-size: 12px;
-  fill: var(--text);
-}
-
-.kb .black .finger,
-.kb .root .finger {
-  fill: #fff;
-}
-
-.kb .octave {
-  font-size: 8px;
-  font-weight: 400;
-  fill: var(--muted);
-}
-
-.kb .on .octave {
-  fill: var(--text);
-}
-
-.kb .root .octave {
-  fill: #fff;
-}
-
-/* note names with their place in the formula underneath */
-.scale-notes li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 5px 12px;
-  line-height: 1.2;
-}
-
-.scale-notes li small {
-  font-size: 0.66rem;
-  font-weight: 400;
-  opacity: 0.8;
-}
 
 .tab-break {
   margin-left: 10px;
@@ -122,12 +39,96 @@
   color: var(--muted);
 }
 
+/* the viewer: the chord's name large, Play beside it (.play-score and .note-chip in page.css) */
+.chord-viewer {
+  scroll-margin-top: 84px; /* a card below opens its chord here: keep the title clear of the sticky header */
+}
+
+.chord-viewer .card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 4px;
+}
+
+.chord-viewer h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 6vw, 2.3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.chord-viewer .note-chips {
+  margin-top: 12px;
+}
+
+/* the chords on the root: each card opens its chord in the viewer above; the one shown there is picked out */
+.chord-card {
+  position: relative;
+  border-radius: 14px;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.chord-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chord-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.chord-open:focus-visible {
+  outline: none;
+}
+
+.chord-card:has(.chord-open:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chord-card.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow);
+}
+
 .chord-card .score svg {
   max-width: 170px;
 }
 
 .chord-card .score {
   margin-bottom: 8px;
+}
+
+@media (hover: hover) {
+  .chord-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .chord-card.is-current:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow-lift);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chord-card,
+  .chord-card:hover {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* the link to the key page, under the fingering, when the chord is a major or minor triad (.go-link in page.css) */
@@ -149,7 +150,7 @@
   padding: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
 }
 

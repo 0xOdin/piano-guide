@@ -1,20 +1,6 @@
 /* The homepage. The keys of its keyboard and their case come from piano.css, the circle of fifths from theory.css,
    the colours, buttons and fade-in from main.css. */
 
-/* a small label over a heading */
-.eyebrow {
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.eyebrow-brass {
-  color: var(--brass);
-}
-
 /* Base (phones) */
 
 /* The hero: what the site is, and a keyboard to play */
@@ -108,24 +94,6 @@
 .home-play-actions {
   display: flex;
   gap: 6px;
-}
-
-.play-btn {
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid rgba(250, 250, 249, 0.2);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--ebony-text);
-  font: inherit;
-  font-size: 0.84rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
-}
-
-.play-btn:focus-visible {
-  outline-color: var(--ebony-text);
 }
 
 /* Three ways in: a large card for looking things up, two smaller ones beside it */
@@ -343,11 +311,6 @@
 }
 
 @media (hover: hover) {
-  .play-btn:hover {
-    background: rgba(250, 250, 249, 0.08);
-    border-color: rgba(250, 250, 249, 0.34);
-  }
-
   .way-small:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lift);

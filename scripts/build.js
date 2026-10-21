@@ -125,6 +125,8 @@ function loadScript(file, names) {
 }
 
 const { MAJOR_SCALES, spellScale } = loadScript(path.join(SRC, "data", "scales-data.js"), ["MAJOR_SCALES", "spellScale"]);
+// the keyboards on the intervals page are drawn by the same code as the key pages' (public/js/piano-keys.js)
+const { pianoKeysHTML } = loadScript(path.join(PUBLIC, "js", "piano-keys.js"), ["pianoKeysHTML"]);
 const { CHORD_ROOTS, CHORD_TYPES, spellChord, voiceChord } =
   loadScript(path.join(PUBLIC, "js", "chords-data.js"), ["CHORD_ROOTS", "CHORD_TYPES", "spellChord", "voiceChord"]);
 const KEYS = require(path.join(SRC, "data", "keys-data.js"));
@@ -948,15 +950,20 @@ const INTERVALS = [
   [12, "Octave", "P8", "C", "the same note, eight letters higher"],
 ];
 
+// Each card: the name, its short name, and the two notes on the keyboard (C4 to D5) in the piano's ebony case, with
+// a button that plays them one after the other and then together (public/js/intervals.js).
 const intervalCards = INTERVALS.map(([semis, name, short, upper, note]) => {
-  const marks = new Map([[0, { label: "C", root: true }], [semis, { label: upper }]]);
+  const marks = [{ abs: 0, name: "C" }, { abs: semis, name: upper }];
   return `                <li class="interval-card">
                     <div class="interval-head">
                         <h3>${esc(name)}</h3>
                         <span class="interval-short">${esc(short)}</span>
                     </div>
                     <p class="interval-meta">${semis} semitone${semis === 1 ? "" : "s"} · C to ${esc(upper)}${note ? ` · ${esc(note)}` : ""}</p>
-                    ${diagrams.keyboard({ whiteKeys: 9, marks, label: `${name}: C and ${upper} on the keyboard` })}
+                    <div class="piano-case interval-keys">
+                        ${pianoKeysHTML({ from: 0, to: 14, marks, label: `${name}: C and ${upper} on the keyboard` })}
+                        <button type="button" class="case-btn interval-hear" data-notes="0 ${semis}">▶ Hear it</button>
+                    </div>
                 </li>`;
 }).join("\n");
 
