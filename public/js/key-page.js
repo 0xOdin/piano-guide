@@ -2,7 +2,7 @@
 // scripts/build.js. This script adds the interactive part: the key signature beside the heading and the sheet music,
 // drawn with VexFlow (loaded from a CDN before this file), keyboard diagrams with the keys and finger numbers marked,
 // and the sound: the note chips under the heading and the Play button on the sheet music use the recorded piano
-// (piano-sound.js), lighting each key and note as it sounds.
+// (piano-sound.js), lighting each key and note as it sounds. The keyboards are drawn by piano-keys.js.
 // The notes arrive as JSON in <script id="page-data">:
 //   { mode: "melodic", octaves: { 1: { notes, rh, lh }, 2: { ... } } }   scale and arpeggio
 //   { mode: "melodic", start, variants: { <start>: { name, octaves } } }    chromatic scale: one set of notes for each
@@ -64,44 +64,16 @@ function listenForOptions(onChange) {
   });
 }
 
-// A piano keyboard, starting at the C below the lowest note and running past the highest, drawn like the homepage's:
-// the felt strip along the top, white keys with a slight edge at the front, black keys with a lighter top and a
-// shadow on the white keys beside them. The keys of the scale, arpeggio or chord are marked (class is-marked,
-// coloured in keys.css) and the finger number is written on each of them (when `showFingers` is on). Every key
-// carries its note (data-abs), so the Play button can light it.
+// A keyboard (piano-keys.js, the same keys as the homepage's), starting at the C below the lowest note and running
+// past the highest: at least two octaves, ending on a white key. The keys of the scale, arpeggio or chord are lit and
+// the finger number is written on each of them (when `showFingers` is on).
 // marks: [{ abs, finger }], where abs is the semitone from middle C (0 = C4).
-function keyboardSVG(marks, showFingers, label) {
-  const KW = 24, KH = 104, BW = 14, BH = 64;
-  const MIN_KEY = 18; // narrowest a white key is drawn, in px; wider keyboards scroll sideways on a phone
+function keyboardFor(marks, showFingers, label) {
   const all = marks.map((m) => m.abs);
-  const start = Math.floor(Math.min(...all) / 12) * 12;
-  let end = Math.max(start + 23, Math.max(...all)); // at least two octaves
-  while (!NATURAL_SEMIS.includes(((end % 12) + 12) % 12)) end++; // finish on a white key
-  const byKey = new Map(marks.map((m) => [m.abs, m]));
-
-  let whites = "";
-  let blacks = "";
-  let shades = "";
-  let w = 0; // white keys drawn so far
-  for (let s = start; s <= end; s++) {
-    const pc = ((s % 12) + 12) % 12;
-    const m = byKey.get(s);
-    const finger = (x, y) => (m && showFingers ? `<text class="finger" x="${x}" y="${y}">${m.finger}</text>` : "");
-    if (NATURAL_SEMIS.includes(pc)) {
-      const x = w * KW;
-      const octave = pc === 0 ? `<text class="octave" x="${x + KW / 2}" y="${KH - 8}">C${4 + Math.floor(s / 12)}</text>` : "";
-      whites += `<g class="white${m ? " is-marked" : ""}" data-abs="${s}"><rect x="${x + 0.5}" y="-6" width="${KW - 1}" height="${KH + 5}" rx="3"/>`
-        + `<path class="lip" d="M${x + 1} ${KH - 4.5}h${KW - 2}v1.5h-${KW - 2}z"/>${finger(x + KW / 2, KH - 30)}${octave}</g>`;
-      w++;
-    } else {
-      const x = w * KW - BW / 2; // a black key sits on the line between two white keys
-      shades += `<path class="shade" d="M${x + 1.5} 0h${BW}v${BH + 2}h-${BW}z"/>`;
-      blacks += `<g class="black${m ? " is-marked" : ""}" data-abs="${s}"><rect x="${x}" y="-6" width="${BW}" height="${BH + 6}" rx="2"/>`
-        + `<path class="face" d="M${x + 1.8} 0h${BW - 3.6}v${BH - 6}h-${BW - 3.6}z"/>${finger(x + BW / 2, BH - 12)}</g>`;
-    }
-  }
-  return `<svg class="kb" viewBox="0 0 ${w * KW} ${KH}" style="min-width:${w * MIN_KEY}px" role="img" aria-label="${label}">`
-    + `${whites}${shades}${blacks}<path class="felt" d="M0 0h${w * KW}v3.5H0z"/></svg>`;
+  const from = Math.floor(Math.min(...all) / 12) * 12;
+  let to = Math.max(from + 23, Math.max(...all));
+  while (!NATURAL_SEMIS.includes(((to % 12) + 12) % 12)) to++; // finish on a white key
+  return pianoKeysHTML({ from, to, marks, showFingers, label });
 }
 
 /* =====================================================================================
@@ -318,7 +290,7 @@ function runMelodic() {
     $("keyboards").innerHTML = shownHands().map((hand) => {
       const side = hand === "rh" ? "Right hand" : "Left hand";
       const marks = v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i] }));
-      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardSVG(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardFor(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`)}</div></div>`;
     }).join("");
   }
 
@@ -449,7 +421,7 @@ function runChord() {
     $("chord-keys").innerHTML = current.map(({ hand, notes, fingers }) => {
       const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i] }));
       const kbLabel = `${data.name} chord, ${inv.label.toLowerCase()}, ${SIDE[hand].toLowerCase()}, shown on the keyboard`;
-      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${SIDE[hand]}</span><div>${keyboardSVG(marks, true, kbLabel)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${SIDE[hand]}</span><div>${keyboardFor(marks, true, kbLabel)}</div></div>`;
     }).join("");
 
     $("inv-seg").innerHTML = data.inversions.map((v, i) =>

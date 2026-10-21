@@ -1,5 +1,5 @@
-/* The homepage. The keys of its keyboard come from keyboard.css, the circle of fifths from theory.css, the colours,
-   buttons and fade-in from main.css. */
+/* The homepage. The keys of its keyboard and their case come from piano.css, the circle of fifths from theory.css,
+   the colours, buttons and fade-in from main.css. */
 
 /* a small label over a heading */
 .eyebrow {
@@ -52,23 +52,9 @@
   flex: 1 1 auto;
 }
 
-/* The keyboard, set in lacquered ebony like the case of a piano: the light catches its top edge */
+/* The keyboard, in its lacquered ebony case (.piano-case in piano.css) */
 .home-play {
-  position: relative;
   padding: 22px 18px 16px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, #2b2623 0%, #1c1917 34%, #161311 100%);
-  color: var(--ebony-text);
-  box-shadow: 0 2px 6px rgba(28, 25, 23, 0.16), 0 32px 64px -30px rgba(28, 25, 23, 0.6);
-}
-
-.home-play::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  pointer-events: none;
 }
 
 .home-play-readout {

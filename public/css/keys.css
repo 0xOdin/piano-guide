@@ -538,10 +538,10 @@ main .practice-card .options-row>.option {
   margin-inline: auto;
 }
 
-/* the keyboard diagrams: one per hand, the right hand above the left, on every screen size */
+/* the keyboards (piano-keys.js), in the card's ebony case (piano.css): one per hand, the right hand above the left */
 .kb-blocks {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .kb-block {
@@ -550,7 +550,7 @@ main .practice-card .options-row>.option {
 
 .kb-block .option-label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 /* a wide keyboard (two octaves) scrolls sideways on a phone instead of shrinking the keys */
@@ -558,62 +558,24 @@ main .practice-card .options-row>.option {
   overflow-x: auto;
 }
 
-/* The keys are plain white and black like a real piano. The keys of the scale, arpeggio or chord are marked:
-   white keys turn beige, black keys a darker brown, and the finger number sits on each of them. These rules
-   replace the chords.css colours. */
-.kb .white.is-marked rect {
-  fill: var(--accent-light);
-}
-
-.kb .black.is-marked rect {
-  fill: var(--accent);
-}
-
-.kb .white.is-marked .finger,
-.kb .white.is-marked .octave {
-  fill: var(--text);
-}
-
-.kb .black.is-marked .finger {
-  fill: #fff;
-}
-
-/* drawn like a real keyboard (keyboardSVG in key-page.js): the felt strip above the keys, a slight edge at the front
-   of each white key, a lighter top on the black keys and their shadow on the white keys beside them */
-.kb .felt {
-  fill: var(--accent);
-}
-
-.kb .lip {
-  fill: rgba(28, 25, 23, 0.06);
-}
-
-.kb .shade {
-  fill: rgba(28, 25, 23, 0.14);
-}
-
-.kb .face {
-  fill: rgba(255, 255, 255, 0.1);
-}
-
 /* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music. The black keys
    of the scale go back to black meanwhile, so only the key sounding is red. */
-.kb .is-sounding {
-  transform: translateY(1.5px);
+.piano-static .pkey.is-sounding {
+  transform: translateY(2px);
 }
 
-.kb .white.is-sounding rect,
-.kb .black.is-sounding rect {
-  fill: var(--accent);
+.piano-static .pkey.white.is-sounding,
+.piano-static .pkey.black.is-sounding {
+  background: var(--accent);
+  color: #fff;
 }
 
-.score-playing .kb .black.is-marked:not(.is-sounding) rect {
-  fill: var(--text);
+.piano-static .pkey.white.is-sounding .pkey-name {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.kb .is-sounding .finger,
-.kb .is-sounding .octave {
-  fill: #fff;
+.score-playing .piano-static .pkey.black.is-shown:not(.is-sounding) {
+  background: var(--text);
 }
 
 /* The chord page and the arpeggio page (on a desktop): the sheet music and the keyboard card in one row instead of
@@ -781,7 +743,7 @@ main .practice-card .options-row>.option {
 
   #keyboards>.kb-block+.kb-block {
     padding-left: 28px;
-    border-left: 1px solid var(--line);
+    border-left: 1px solid rgba(250, 250, 249, 0.12);
   }
 }
 
@@ -799,7 +761,7 @@ main .practice-card .options-row>.option {
 
 .practice-pair-chord .kb-block {
   width: 100%;
-  max-width: 720px;
+  max-width: 500px;
   margin-inline: auto;
 }
 

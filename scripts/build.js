@@ -346,7 +346,7 @@ const melodicSections = () => `
         </section>
 
         <section class="practice">
-          <div class="practice-card">
+          <div class="practice-card piano-case">
             <div class="card-head">
               <h2>On the keyboard</h2>${octaveSeg()}
             </div>
@@ -392,7 +392,7 @@ const chordViewer = () => `
           </section>
 
           <section class="practice">
-            <div class="practice-card">
+            <div class="practice-card piano-case">
               <div class="card-head">
                 <h2>On the keyboard</h2>
               </div>

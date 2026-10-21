@@ -76,34 +76,12 @@ function drawStaff(el, notes, hand, label) {
 
 /* ---------- Keyboard diagram ---------- */
 
-// Two octaves of keys: C4 to B5 for the right hand, C3 to B4 for the left. The notes of the chord are filled in,
-// with the finger number on each one and the root a darker colour.
-function keyboardSVG(notes, fingers, hand, label) {
-  const KW = 24, KH = 120, BW = 14, BH = 74;
-  const start = hand === "lh" ? -12 : 0;
-  const marks = new Map(notes.map((n, i) => [n.abs, { finger: fingers[i], root: n.root }]));
-
-  let whites = "";
-  let blacks = "";
-  let w = 0; // white keys drawn so far
-  for (let k = 0; k < 24; k++) {
-    const s = start + k;
-    const pc = ((s % 12) + 12) % 12;
-    const m = marks.get(s);
-    const cls = (m ? " on" : "") + (m && m.root ? " root" : "");
-    if (NATURAL_SEMIS.includes(pc)) {
-      const x = w * KW;
-      const finger = m ? `<text class="finger" x="${x + KW / 2}" y="${KH - 34}">${m.finger}</text>` : "";
-      const octave = pc === 0 ? `<text class="octave" x="${x + KW / 2}" y="${KH - 8}">C${4 + Math.floor(s / 12)}</text>` : "";
-      whites += `<g class="white${cls}" data-abs="${s}"><rect x="${x + 0.5}" y="-6" width="${KW - 1}" height="${KH + 5}" rx="3"/>${finger}${octave}</g>`;
-      w++;
-    } else {
-      const x = w * KW - BW / 2; // a black key sits on the line between two white keys
-      const finger = m ? `<text class="finger" x="${x + BW / 2}" y="${BH - 14}">${m.finger}</text>` : "";
-      blacks += `<g class="black${cls}" data-abs="${s}"><rect x="${x}" y="-6" width="${BW}" height="${BH + 6}" rx="2"/>${finger}</g>`;
-    }
-  }
-  return `<svg class="kb" viewBox="0 0 ${w * KW} ${KH}" role="img" aria-label="${label}">${whites}${blacks}</svg>`;
+// Two octaves of keys (piano-keys.js, the same keys as the homepage's): C4 to B5 for the right hand, C3 to B4 for the
+// left. The notes of the chord are lit, with the finger number on each one.
+function keyboardHTML(notes, fingers, hand, label) {
+  const from = hand === "lh" ? -12 : 0;
+  const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i] }));
+  return pianoKeysHTML({ from, to: from + 23, marks, label });
 }
 
 /* ---------- Viewer ---------- */
@@ -139,7 +117,7 @@ function renderViewer() {
 
   const label = `${title}, ${INVERSION_NAMES[state.inv].toLowerCase()}, ${state.hands === "rh" ? "right" : "left"} hand`;
   drawStaff($("chord-score"), notes, state.hands, label);
-  $("chord-keys").innerHTML = keyboardSVG(notes, fingers, state.hands, `${label}, shown on the keyboard`);
+  $("chord-keys").innerHTML = keyboardHTML(notes, fingers, state.hands, `${label}, shown on the keyboard`);
 
   const handName = state.hands === "rh" ? "Right hand" : "Left hand";
   const bassText = state.inv === 0 ? bass : `${bass} (written ${symbol}/${bass})`;
