@@ -15,7 +15,7 @@ const DEFAULTS = {
   drill: "scales", // scales | chords | key (chords in a key) | name
   answer: "play", // play (on the page or MIDI) | listen (the microphone) | type | self (play it, then look)
   keys: "all", // all, "0" to "5" (at most that many sharps or flats), or one key's slug
-  scaleForms: ["major", "natural", "harmonic"],
+  scaleForms: ["major", "natural", "harmonic", "melodic"],
   chordTypes: ["major", "minor"],
   roots: "all", // all | white
   inversions: "off",
@@ -31,6 +31,7 @@ const DEFAULTS = {
 };
 const DRILLS = ["scales", "chords", "key", "name"];
 const STORE = "pianoguide-practice";
+const VERSION = 2; // what the saved options were made by: 2 has melodic minor among the default scales
 
 const settings = { ...DEFAULTS };
 try {
@@ -38,6 +39,9 @@ try {
   for (const k of Object.keys(DEFAULTS)) {
     if (k in saved && Array.isArray(saved[k]) === Array.isArray(DEFAULTS[k]) && typeof saved[k] === typeof DEFAULTS[k]) settings[k] = saved[k];
   }
+  // saved before melodic minor joined the default scales: the old default becomes the new one, once. Scales of your
+  // own choosing stay as they are.
+  if ((saved.version || 1) < 2 && settings.scaleForms.join() === "major,natural,harmonic") settings.scaleForms = [...DEFAULTS.scaleForms];
 } catch (e) {
   // no storage here (a private window): the defaults
 }
@@ -47,7 +51,7 @@ if (!DRILLS.includes(settings.drill)) settings.drill = DEFAULTS.drill;
 
 function save() {
   try {
-    localStorage.setItem(STORE, JSON.stringify(settings));
+    localStorage.setItem(STORE, JSON.stringify({ ...settings, version: VERSION }));
   } catch (e) {
     // not kept, which is fine
   }
