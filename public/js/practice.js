@@ -25,6 +25,7 @@ const DEFAULTS = {
   minorForm: "natural", // the scale a minor key's chords are made from
   nameWhat: ["chords", "intervals", "scales"],
   nameHow: "both", // see | hear | both
+  hand: "mixed", // mixed (each question picks one) | rh | lh: the hand to play with
   autoNext: "on",
   sound: "on",
   midiSound: "off", // play the MIDI keyboard's notes here too (for a keyboard without a sound of its own)
@@ -102,15 +103,17 @@ function renderPiano() {
     el.classList.toggle("is-shown", mark === "shown");
     el.classList.toggle("is-down", down.has(abs));
     el.setAttribute("aria-pressed", String(picked.has(abs)));
-    el.querySelector(".pkey-finger").textContent = mark === "wrong" ? "✕" : "";
+    el.querySelector(".pkey-finger").textContent = mark === "wrong" ? "✕" : m && m.finger ? m.finger : "";
     el.querySelector(".pkey-name").textContent = m && m.name ? m.name : pcOf(abs) === 0 ? withOctave(abs) : "";
   });
   $("kb-octave").textContent = withOctave(octave);
 }
 
-// lights the notes of an answer, named as the answer spells them
-function showNotes(notes, mark, withNames = true) {
-  for (const n of notes) if (onKeyboard(n.abs)) marks.set(n.abs, { mark, name: withNames ? n.name : "" });
+// lights the notes of an answer, named as the answer spells them, with the finger for each one when given
+function showNotes(notes, mark, withNames = true, fingers = null) {
+  notes.forEach((n, i) => {
+    if (onKeyboard(n.abs)) marks.set(n.abs, { mark, name: withNames ? n.name : "", finger: fingers ? fingers[i] : "" });
+  });
 }
 
 // On a narrow screen the keyboard scrolls sideways: bring these notes into the middle of it
@@ -122,6 +125,14 @@ function bringIntoView(notes) {
   const last = keyEls.get(Math.max(...shown.map((n) => n.abs)));
   box.scrollTo({ left: (first.offsetLeft + last.offsetLeft + last.offsetWidth) / 2 - box.clientWidth / 2 });
 }
+
+const HAND_NAMES = { rh: "Right hand", lh: "Left hand" };
+// the hand is said for an answer played on a piano, not a typed one
+const handShown = () => !!q.hand && settings.answer !== "type";
+// the fingers for the question's notes with that hand: a scale or one chord (not all the chords of a key)
+const answerFingers = () => (!handShown() ? null
+  : q.kind === "sequence" ? q.fingers[q.hand]
+  : q.kind === "chord" ? chordFingers(q.chord, q.hand) : null);
 
 // the notes a question is about
 const questionNotes = () => (q.kind === "sequence" || q.kind === "choice" ? q.notes
@@ -184,6 +195,7 @@ let mistakes = 0;
 let typed = null; // the last typed answer, marked: [{ name, mark }]
 let chosen = -1; // the answer picked ("Name it")
 let lastId = null;
+let lastHands = []; // the hands of the last two questions, newest first
 let nextTimer = null;
 let refocus = false; // put the cursor back in the answer box for the next question
 
@@ -202,6 +214,10 @@ function newQuestion() {
     if (q.id !== lastId) break;
   }
   lastId = q.id;
+  // the hand to play it with: the one chosen, or either at random, but never three times running ("Name it" has none)
+  q.hand = settings.drill === "name" ? null : settings.hand !== "mixed" ? settings.hand
+    : lastHands[0] && lastHands[0] === lastHands[1] ? (lastHands[0] === "rh" ? "lh" : "rh") : pick(["rh", "lh"]);
+  if (q.hand) lastHands = [q.hand, lastHands[0]];
   startAnswer();
   if (q.kind === "choice" && settings.nameHow !== "see") playTimers.push(setTimeout(playQuestion, 250));
 }
@@ -243,15 +259,16 @@ function finish(right) {
   status = right ? "right" : "shown";
   marks.clear();
   picked.clear();
-  if (q.kind === "sequence") showNotes(q.notes, right ? "right" : "shown");
-  if (q.kind === "chord") showNotes(q.chord.notes, right ? "right" : "shown");
+  const fingers = answerFingers();
+  if (q.kind === "sequence") showNotes(q.notes, right ? "right" : "shown", true, fingers);
+  if (q.kind === "chord") showNotes(q.chord.notes, right ? "right" : "shown", true, fingers);
   if (q.kind === "choice") showNotes(q.notes, right ? "right" : "shown");
   if (q.kind === "chord-seq") step = q.chords.length;
   const notes = (list) => list.map((n) => n.name).join(" ");
-  const answer = q.kind === "sequence" ? notes(q.notes)
+  const answer = (q.kind === "sequence" ? notes(q.notes)
     : q.kind === "chord" ? `${q.chord.symbol}: ${notes(q.chord.notes)}`
     : q.kind === "chord-seq" ? q.chords.map((c) => c.symbol).join(" ")
-    : q.reveal;
+    : q.reveal) + (fingers ? ` · ${HAND_NAMES[q.hand]}: ${fingers.join(" ")}` : "");
   if (right) {
     const slips = mistakes ? ` (${plural(mistakes, "wrong try")} on the way)` : "";
     say(`Right! ${answer}${slips}`, "good");
@@ -417,6 +434,11 @@ function render() {
     ? { see: "Look at the keys", hear: "Listen", both: "Look and listen" }[settings.nameHow]
     : ASK[kind][settings.answer];
   $("title").textContent = q.title;
+  $("hand").hidden = !handShown();
+  if (handShown()) {
+    $("hand").className = `pr-hand is-${q.hand}`;
+    $("hand-name").textContent = HAND_NAMES[q.hand];
+  }
   $("sub").textContent = q.sub || "";
   $("sub").hidden = !q.sub;
 
@@ -524,9 +546,10 @@ function summary() {
     : /^\d$/.test(settings.keys) ? `up to ${settings.keys === "0" ? "no" : settings.keys} sharps or flats`
     : (KEYS.find((k) => k.slug === settings.keys) || { name: "all keys" }).name;
   const typeNames = Object.fromEntries(CHORD_TYPES.map((t) => [t.name, t.tab]));
-  if (settings.drill === "scales") return `${list(settings.scaleForms, FORM_NAMES)} · ${keyText}`;
-  if (settings.drill === "chords") return `${list(settings.chordTypes, typeNames)} · ${settings.roots === "white" ? "white-key roots" : "any root"}${settings.inversions === "on" ? " · inversions" : ""}`;
-  if (settings.drill === "key") return `${settings.keyMode === "all" ? "all seven" : "one chord"} · ${settings.keySize === "4" ? "7th chords" : "triads"} · ${keyText}`;
+  const handText = { mixed: "either hand", rh: "right hand", lh: "left hand" }[settings.hand];
+  if (settings.drill === "scales") return `${list(settings.scaleForms, FORM_NAMES)} · ${keyText} · ${handText}`;
+  if (settings.drill === "chords") return `${list(settings.chordTypes, typeNames)} · ${settings.roots === "white" ? "white-key roots" : "any root"}${settings.inversions === "on" ? " · inversions" : ""} · ${handText}`;
+  if (settings.drill === "key") return `${settings.keyMode === "all" ? "all seven" : "one chord"} · ${settings.keySize === "4" ? "7th chords" : "triads"} · ${keyText} · ${handText}`;
   return list(settings.nameWhat, {}) + (settings.nameWhat.includes("chords") ? ` · ${list(settings.chordTypes, typeNames)}` : "");
 }
 

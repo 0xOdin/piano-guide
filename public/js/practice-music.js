@@ -1,7 +1,7 @@
 // The music behind the practice page (/practice/): making the questions, reading typed answers, the chords of a key
 // and checking what was played. No page code here: practice.js asks for a question, shows it and checks the answers
 // with these functions. Uses LETTER_NAMES, NATURAL_SEMIS, accidentalText, CHORD_ROOTS, CHORD_TYPES, INVERSION_NAMES,
-// spellTone, spellChord and voiceChord from chords-data.js.
+// FINGERING, spellTone, spellChord and voiceChord from chords-data.js.
 //
 // Notes are { name, abs }: `abs` is the semitone, 0 = middle C, as everywhere on the site. Only the note's place in
 // the octave counts when an answer is played (any C is a C), but a typed answer must spell every note as the answer
@@ -202,15 +202,21 @@ function scaleQuestion(KEYS, s) {
   let options = keysFor(KEYS, s.keys).flatMap((key) => formsOf(key).filter((f) => s.scaleForms.includes(f)).map((form) => ({ key, form })));
   if (!options.length) options = keysFor(KEYS, s.keys).flatMap((key) => formsOf(key).map((form) => ({ key, form })));
   const { key, form } = pick(options);
+  const scale = scaleOf(key, form);
   return {
     kind: "sequence",
     id: `${key.slug}:${form}`,
     title: scaleName(key, form),
     sub: "",
-    notes: scaleOf(key, form).notes,
+    notes: scale.notes,
+    fingers: { rh: scale.rh, lh: scale.lh }, // one finger for each note, going up
     key, form,
   };
 }
+
+// The usual fingering for a chord with one hand (chords-data.js), lowest note first, or null for a chord size it
+// doesn't cover
+const chordFingers = (chord, hand) => (FINGERING[chord.notes.length] && FINGERING[chord.notes.length][hand][chord.inv]) || null;
 
 function chordQuestion(s) {
   const chord = randomChord(s);

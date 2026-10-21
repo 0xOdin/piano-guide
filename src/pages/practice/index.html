@@ -44,6 +44,15 @@ scripts: chords-data practice-music listen piano-sound practice
                     <details class="pr-options">
                         <summary><span class="pr-options-label">Settings</span><span class="pr-summary" id="options-summary"></span></summary>
                         <div class="pr-option-grid">
+                            <div class="pr-option" data-for="scales chords key">
+                                <span class="option-label">Which hand</span>
+                                <div class="seg" data-setting="hand" role="group" aria-label="Which hand">
+                                    <button type="button" data-v="mixed">Mixed</button>
+                                    <button type="button" data-v="rh">Right</button>
+                                    <button type="button" data-v="lh">Left</button>
+                                </div>
+                                <span class="pr-hint">Mixed: each question says which hand to play with.</span>
+                            </div>
                             <div class="pr-option" data-for="scales name">
                                 <span class="option-label">Which scales</span>
                                 <div class="chips" data-setting="scaleForms" role="group" aria-label="Which scales">
@@ -134,7 +143,10 @@ scripts: chords-data practice-music listen piano-sound practice
 
                 <div class="pr-question">
                     <p class="pr-ask" id="ask"></p>
-                    <h2 class="pr-title" id="title"></h2>
+                    <div class="pr-title-row">
+                        <h2 class="pr-title" id="title"></h2>
+                        <span class="pr-hand" id="hand" hidden><span class="pr-hand-mark" aria-hidden="true"></span><span id="hand-name"></span></span>
+                    </div>
                     <p class="pr-sub" id="sub"></p>
                 </div>
 

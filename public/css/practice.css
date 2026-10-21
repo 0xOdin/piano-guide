@@ -237,6 +237,14 @@
   color: var(--accent-ink);
 }
 
+/* the question, and beside it the hand to play it with */
+.pr-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
 .practice-card .pr-title {
   margin: 0;
   font-size: clamp(2.1rem, 9vw, 3.2rem);
@@ -248,6 +256,61 @@
 .pr-sub {
   margin: 8px 0 0;
   color: var(--muted);
+}
+
+/* "Left hand" in ebony, "Right hand" in felt red, so the two are told apart at a glance; the mark is a small L or R */
+.pr-hand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 5px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pr-hand[hidden] {
+  display: none;
+}
+
+.pr-hand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.78rem;
+}
+
+.pr-hand.is-lh {
+  background: var(--text);
+  color: var(--ebony-text);
+}
+
+.pr-hand.is-lh .pr-hand-mark {
+  background: var(--ebony-text);
+  color: var(--text);
+}
+
+.pr-hand.is-lh .pr-hand-mark::before {
+  content: "L";
+}
+
+.pr-hand.is-rh {
+  background: var(--accent-light);
+  color: var(--accent-ink);
+}
+
+.pr-hand.is-rh .pr-hand-mark {
+  background: var(--accent);
+  color: #fff;
+}
+
+.pr-hand.is-rh .pr-hand-mark::before {
+  content: "R";
 }
 
 /* the answer so far: one box per note or chord */
