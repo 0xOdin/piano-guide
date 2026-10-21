@@ -127,51 +127,12 @@ const questionNotes = () => (q.kind === "sequence" || q.kind === "choice" ? q.no
 
 /* ---------- Sound ---------- */
 
-let audio = null;
-function getAudio() {
-  if (!audio) {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = ctx.createGain();
-    master.gain.value = 0.6;
-    const limiter = ctx.createDynamicsCompressor(); // keeps big chords from distorting
-    master.connect(limiter).connect(ctx.destination);
-    audio = { ctx, master };
-  }
-  if (audio.ctx.state === "suspended") audio.ctx.resume();
-  return audio;
-}
-
-// A soft, piano-like tone (the same as the keyboard page's). `hold`: keep sounding until the returned function is
-// called, for a MIDI key held down. While the microphone listens, it is told to ignore the page's own sound.
-function sound(abs, { delay = 0, length = 1.8, hold = false } = {}) {
+// The piano's sound (piano-sound.js). `hold`: keep sounding until the returned function is called, for a MIDI key
+// held down. While the microphone listens, it is told to ignore the page's own sound.
+function sound(abs, { delay = 0, length = 0.8, hold = false } = {}) {
   if (settings.sound === "off") return () => {};
-  if (listener) listener.quiet(delay + (hold ? 6 : length) + 0.3);
-  const { ctx, master } = getAudio();
-  const t = ctx.currentTime + delay;
-  const freq = 261.63 * Math.pow(2, abs / 12); // 261.63 Hz = middle C
-  const env = ctx.createGain();
-  env.gain.setValueAtTime(0.0001, t);
-  env.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
-  env.gain.exponentialRampToValueAtTime(0.0001, t + (hold ? 6 : length));
-  env.connect(master);
-  const oscs = [["triangle", 1, 1], ["sine", 2, 0.25]].map(([type, mult, level]) => {
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq * mult;
-    g.gain.value = level;
-    osc.connect(g).connect(env);
-    osc.start(t);
-    osc.stop(t + (hold ? 6 : length) + 0.05);
-    return osc;
-  });
-  return () => {
-    const now = ctx.currentTime;
-    env.gain.cancelScheduledValues(now);
-    env.gain.setValueAtTime(Math.max(env.gain.value, 0.0001), now);
-    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-    oscs.forEach((o) => o.stop(now + 0.3));
-  };
+  if (listener) listener.quiet(delay + (hold ? 6 : length) + 0.6);
+  return playPiano(abs, { delay, length, hold });
 }
 
 let playTimers = [];
@@ -191,7 +152,7 @@ function flash(abs, delay, length) {
 function playNotes(notes, { together = false, start = 0 } = {}) {
   notes.forEach((n, i) => {
     const delay = start + (together ? 0 : i * 0.32);
-    sound(n.abs, { delay, length: together ? 2 : 1 });
+    sound(n.abs, { delay, length: together ? 1.2 : 0.32 }); // each note of a scale stops as the next one starts
     flash(n.abs, delay, together ? 0.6 : 0.28);
   });
   return together ? 1 : notes.length * 0.32;
@@ -209,7 +170,7 @@ function playAnswer() {
   if (q.kind === "choice") return playQuestion();
   if (q.kind === "sequence") return playNotes(q.notes);
   if (q.kind === "chord") return playNotes(q.chord.notes, { together: true });
-  q.chords.forEach((c, i) => playNotes(c.notes, { together: true, start: i * 1.1 }));
+  q.chords.forEach((c, i) => playNotes(c.notes, { together: true, start: i * 1.3 }));
 }
 
 /* ---------- The question ---------- */
@@ -516,18 +477,17 @@ function render() {
   $("type-input").placeholder = PLACEHOLDER[kind] || "";
   $("type-input").disabled = !asking;
 
-  // the buttons
-  const chords = onPage && chordKind();
-  $("check-btn").hidden = !(chords && asking);
-  $("clear-btn").hidden = !(chords && asking);
-  $("clear-btn").disabled = picked.size === 0;
+  // the buttons: one main button for the next step (Check, Show answer or Next question), and small links
+  const action = mainAction();
+  $("main-btn").hidden = !action;
+  $("main-btn").textContent = action ? action.label : "";
+  $("main-btn").disabled = !!action && action.label === "Check" && picked.size < 2;
   $("hear-btn").hidden = q.kind !== "choice" && asking;
-  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Play the answer" : settings.nameHow === "see" ? "▶ Play it" : "▶ Play again";
-  $("reveal-btn").hidden = !asking || q.kind === "choice";
-  $("reveal-btn").textContent = settings.answer === "self" ? "Check" : "Show answer";
-  $("reveal-btn").classList.toggle("is-primary", settings.answer === "self");
-  $("next-btn").textContent = asking ? "Skip" : "Next";
-  $("next-btn").classList.toggle("is-primary", !asking);
+  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : settings.nameHow === "see" ? "▶ Hear it" : "▶ Hear it again";
+  $("reveal-btn").hidden = !asking || q.kind === "choice" || (action && action.label === "Show answer");
+  $("clear-btn").hidden = !(asking && onPage && chordKind() && picked.size);
+  $("skip-btn").hidden = !asking;
+  $("answer-hint").textContent = ANSWER_HINTS[settings.answer];
 
   // MIDI and the computer keys for playing, the microphone for listening
   $("midi-row").hidden = !onPage;
@@ -539,7 +499,23 @@ function render() {
   renderPiano();
 }
 
-// one line under "Options" that says what is chosen
+// The main button: Check (chords on the screen keys), Show answer (self-check), Next question (once answered), or
+// nothing while the page waits for notes
+function mainAction() {
+  if (status !== "asking") return { label: "Next question", run: newQuestion };
+  if (settings.answer === "self" && q.kind !== "choice") return { label: "Show answer", run: () => finish(false) };
+  if (settings.answer === "play" && settings.drill !== "name" && chordKind()) return { label: "Check", run: checkPicked };
+  return null;
+}
+
+const ANSWER_HINTS = {
+  play: "Tap the keys below, or use your computer keys or a MIDI keyboard.",
+  listen: "Play your own piano: the page listens through the microphone.",
+  type: "Write the note names, like C E G or F# A C#.",
+  self: "Play it on any piano, then press Show answer to check yourself.",
+};
+
+// one line under "Settings" that says what is chosen
 function summary() {
   const list = (arr, names) => arr.map((v) => names[v] || v).join(", ");
   const keyText = settings.keys === "all" ? "all keys"
@@ -750,7 +726,7 @@ $("keys-select").addEventListener("change", (e) => {
 
 // a key sounds as soon as it is pressed (pointerdown); `click` is for the keyboard (Enter or Space on a focused key)
 function pressKey(abs, from) {
-  sound(abs, { length: 1.2 });
+  sound(abs);
   playedNote(abs, from);
   if (q.kind === "sequence" || !answeringChord(from)) { // not picked for a chord: it lights up for a moment
     down.add(abs);
@@ -794,7 +770,10 @@ $("type-input").addEventListener("input", () => {
   }
 });
 
-$("check-btn").addEventListener("click", checkPicked);
+$("main-btn").addEventListener("click", () => {
+  const action = mainAction();
+  if (action) action.run();
+});
 $("clear-btn").addEventListener("click", () => {
   picked.clear();
   marks.clear();
@@ -803,7 +782,7 @@ $("clear-btn").addEventListener("click", () => {
 });
 $("hear-btn").addEventListener("click", () => (status === "asking" ? playQuestion() : playAnswer()));
 $("reveal-btn").addEventListener("click", () => finish(false));
-$("next-btn").addEventListener("click", newQuestion);
+$("skip-btn").addEventListener("click", newQuestion);
 $("midi-btn").addEventListener("click", startMidi);
 $("midi-sound").addEventListener("click", () => {
   settings.midiSound = settings.midiSound === "on" ? "off" : "on";

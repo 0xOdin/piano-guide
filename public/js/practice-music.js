@@ -335,13 +335,37 @@ function checkPlayedChord(absList, chord) {
 
 // What the microphone hears ([{ midi, strength }], from listen.js) against a chord: every note of the chord is there,
 // and nothing else is nearly as loud as the quietest of them. Piano strings ring with their overtones, so a faint
-// extra note is let through.
+// extra note is let through, and three things overtones do are allowed for:
+//  - a bass note well below the rest rings with overtones that are other notes: its 5th, 7th, 9th and 10th (two
+//    octaves and a 3rd, a minor 7th, a 9th), when faint, are neither notes of the chord nor wrong notes. A strong one
+//    is taken as played (a C2's 5th overtone is the E4 of the chord above it)
+//  - anything more than two octaves above the lowest note the hands play is taken for an overtone
+//  - a low root's third overtone is the chord's 5th (C3's is G4), and taking the overtones out takes that 5th with it:
+//    when the root is heard, a plain 5th counts as heard, unless a ♭5 or ♯5 is heard instead (they tell chords apart)
+const BASS_OVERTONES = [5, 7, 9, 10];
+const HANDS_SPAN = 24; // semitones above the lowest note the hands play
+const FAINT = 0.5; // a bass overtone weaker than this, compared with the strongest note, is only an overtone
 function heardChord(heard, chord) {
+  if (!heard.length) return false;
   const want = pcsOf(chord.notes);
-  const inChord = heard.filter((n) => want.has(pcOf(n.midi)));
-  if (new Set(inChord.map((n) => pcOf(n.midi))).size !== want.size) return false;
-  const quietest = Math.min(...[...want].map((p) => Math.max(...inChord.filter((n) => pcOf(n.midi) === p).map((n) => n.strength))));
-  return !heard.some((n) => !want.has(pcOf(n.midi)) && n.strength > quietest * 0.5);
+  const bass = heard.reduce((low, n) => (n.midi < low.midi ? n : low));
+  const isBass = want.has(pcOf(bass.midi)) && heard.every((n) => n === bass || n.midi >= bass.midi + 12);
+  const overtoneOfBass = (n) => isBass && n !== bass && n.strength < FAINT
+    && BASS_OVERTONES.some((h) => Math.abs(Math.pow(2, (n.midi - bass.midi) / 12) / h - 1) < 0.03);
+  const upper = heard.filter((n) => !(isBass && n === bass) && !overtoneOfBass(n));
+  const floor = upper.length ? Math.min(...upper.map((n) => n.midi)) : bass.midi;
+  const played = upper.filter((n) => n.midi <= floor + HANDS_SPAN).concat(isBass ? [bass] : []);
+
+  const inChord = played.filter((n) => want.has(pcOf(n.midi)));
+  const found = new Set(inChord.map((n) => pcOf(n.midi)));
+  const root = chord.root.pc;
+  const fifth = chord.type.tones.some(([, semis]) => semis === 7) ? pcOf(root + 7) : null;
+  const altered = played.some((n) => [pcOf(root + 6), pcOf(root + 8)].includes(pcOf(n.midi)));
+  if (fifth !== null && found.has(root) && !altered) found.add(fifth);
+  if (found.size !== want.size) return false;
+  const loudest = (p) => Math.max(0, ...inChord.filter((n) => pcOf(n.midi) === p).map((n) => n.strength));
+  const quietest = Math.min(...[...want].map(loudest).filter((v) => v > 0));
+  return !played.some((n) => !want.has(pcOf(n.midi)) && n.strength > quietest * 0.5);
 }
 
 // Typed notes against the answer. Each typed note is "right", "spelling" (the right key, spelled another way) or

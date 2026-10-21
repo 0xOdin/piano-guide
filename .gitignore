@@ -3,3 +3,6 @@ dist/
 
 node_modules/
 .DS_Store
+
+# the original piano recordings (University of Iowa, about 300 MB): scripts/make-sounds.js makes the site sounds from them
+recordings/

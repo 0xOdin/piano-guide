@@ -3,7 +3,7 @@
 //    names the selected keys together with any computer keys held down: a note, an interval or a chord.
 //  - "Show" lights up a scale, arpeggio or chord of any key with its fingering. The notes and fingers come from
 //    <script id="keyboard-data">, written by scripts/build.js from the same data as the key pages.
-//  - The sound is made in the browser (Web Audio API); Mute turns it off.
+//  - The sound is a recorded piano (piano-sound.js); Mute turns it off.
 // Uses CHORD_ROOTS, CHORD_TYPES, INVERSION_NAMES, spellTone and spellChord from chords-data.js.
 
 const $ = (id) => document.getElementById(id);
@@ -28,51 +28,11 @@ let playTimers = [];
 
 /* ---------- Sound ---------- */
 
-let audio = null;
-function getAudio() {
-  if (!audio) {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = ctx.createGain();
-    master.gain.value = 0.6;
-    const limiter = ctx.createDynamicsCompressor(); // keeps big chords from distorting
-    master.connect(limiter).connect(ctx.destination);
-    audio = { ctx, master };
-  }
-  if (audio.ctx.state === "suspended") audio.ctx.resume();
-  return audio;
-}
-
-// A soft, piano-like tone: a triangle wave with a quieter sine an octave above, fading away like a struck string.
-// `hold`: keep sounding (slowly fading) until the returned function is called, for a computer key held down.
-function sound(abs, { delay = 0, length = 1.8, hold = false } = {}) {
+// The piano's sound (piano-sound.js). `hold`: keep sounding until the returned function is called, for a computer
+// key held down.
+function sound(abs, { delay = 0, length = 0.8, hold = false } = {}) {
   if (state.muted) return () => {};
-  const { ctx, master } = getAudio();
-  const t = ctx.currentTime + delay;
-  const freq = 261.63 * Math.pow(2, abs / 12); // 261.63 Hz = middle C
-  const env = ctx.createGain();
-  env.gain.setValueAtTime(0.0001, t);
-  env.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
-  env.gain.exponentialRampToValueAtTime(0.0001, t + (hold ? 6 : length));
-  env.connect(master);
-  const oscs = [["triangle", 1, 1], ["sine", 2, 0.22]].map(([type, multiple, level]) => {
-    const osc = ctx.createOscillator();
-    osc.type = type;
-    osc.frequency.value = freq * multiple;
-    const g = ctx.createGain();
-    g.gain.value = level;
-    osc.connect(g).connect(env);
-    osc.start(t);
-    if (!hold) osc.stop(t + length + 0.05);
-    return osc;
-  });
-  if (!hold) return () => {};
-  return () => {
-    const now = ctx.currentTime;
-    env.gain.cancelScheduledValues(now);
-    env.gain.setValueAtTime(Math.max(env.gain.value, 0.0001), now);
-    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-    oscs.forEach((osc) => osc.stop(now + 0.2));
-  };
+  return playPiano(abs, { delay, length, hold });
 }
 
 /* ---------- Naming the notes pressed ---------- */
@@ -245,7 +205,7 @@ function playAll() {
   const together = !show || state.show === "chord";
   notes.forEach((abs, i) => {
     const delay = together ? 0 : i * 0.32;
-    sound(abs, { delay, length: together ? 2.2 : 1 });
+    sound(abs, { delay, length: together ? 1.2 : 0.32 }); // each note of a scale stops as the next one starts
     flash(abs, delay, together ? 0.6 : 0.28);
   });
 }

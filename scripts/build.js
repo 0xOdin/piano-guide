@@ -33,7 +33,7 @@
 //
 // Set SITE_URL to your real address before you publish (SITE_URL=https://... npm run build): it goes into the
 // canonical links and the sitemap. If the site lives in a folder of that address, as GitHub Pages puts a project
-// (https://you.github.io/piano-test/), set BASE_PATH to the folder too (BASE_PATH=/piano-test): it goes in front of
+// (https://you.github.io/piano-guide/), set BASE_PATH to the folder too (BASE_PATH=/piano-guide): it goes in front of
 // every link to a page or file on the site, in the pages, their data and the stylesheets. Without it, nothing changes.
 const fs = require("fs");
 const path = require("path");
@@ -41,7 +41,7 @@ const vm = require("vm");
 const diagrams = require("./diagrams.js");
 
 const SITE_URL = (process.env.SITE_URL || "https://example.com").replace(/\/$/, "");
-const BASE_PATH = (process.env.BASE_PATH || "").replace(/\/+$/, "").replace(/^(?=[^/])/, "/"); // "" or "/piano-test"
+const BASE_PATH = (process.env.BASE_PATH || "").replace(/\/+$/, "").replace(/^(?=[^/])/, "/"); // "" or "/piano-guide"
 const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "src");
 const PUBLIC = path.join(ROOT, "public");

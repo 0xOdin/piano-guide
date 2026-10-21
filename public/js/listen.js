@@ -31,8 +31,6 @@ async function connectMidi(onNote, onDevices) {
 
 /* ---------- Pitch and loudness ---------- */
 
-const freqOf = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
-
 function rms(samples, from = 0) {
   let sum = 0;
   for (let i = from; i < samples.length; i++) sum += samples[i] * samples[i];
@@ -187,10 +185,12 @@ function salience(peaks, binHz, f0) {
 }
 
 // The notes in a spectrum's peaks, strongest first: [{ midi, strength, power }], strength 1 for the strongest and
-// power how strong it is in itself. Finds the strongest note, takes its overtones out of the peaks, and repeats while
+// power how strong it is in itself. `cents`: how far this piano's tuning is from A = 440 Hz (see Tuning). Finds the strongest note, takes its overtones out of the peaks, and repeats while
 // something clear is left (Klapuri's iterative method, simplified). A note only counts if its own pitch, not just its
 // overtones, can be heard.
-function findNotes(spectrum, binHz) {
+function findNotes(spectrum, binHz, cents = 0) {
+  const shift = Math.pow(2, cents / 1200);
+  const freqOf = (midi) => 440 * Math.pow(2, (midi - 69) / 12) * shift; // the notes as this piano plays them
   const peaks = Float64Array.from(spectrum); // the overtones are taken out of a copy
   const found = [];
   const tried = new Set();
@@ -244,9 +244,48 @@ function findNotes(spectrum, binHz) {
 
 // The notes sounding together in the newest samples (a 170 ms stretch is enough). Works best on chords in the middle
 // of the keyboard: a low bass note's overtones can pass for notes of their own (a C's fifth overtone is an E).
-function detectNotes(samples, sampleRate) {
+// `tuning` (a Tuning) learns from the sound how this piano is tuned, unless `learn` is false (while the page itself
+// plays, as it is tuned to A = 440 Hz exactly).
+function detectNotes(samples, sampleRate, tuning = null, learn = true) {
   const { mag, binHz } = magnitudes(samples, sampleRate, 8192);
-  return findNotes(peaksOf(whiten(mag, binHz)), binHz);
+  if (tuning && learn) tuning.feed(mag, binHz);
+  return findNotes(peaksOf(whiten(mag, binHz)), binHz, tuning ? tuning.cents : 0);
+}
+
+/* ---------- The piano's tuning ---------- */
+
+// How far, in cents (hundredths of a semitone), the piano sits from A = 440 Hz. A piano at home may be out by a
+// quarter of a semitone or more, which would put its notes between the ones listened for. Every clear peak between
+// 100 and 1200 Hz (mostly the notes' own pitches and octaves) votes for how far it is from the nearest semitone. The
+// votes go round a circle, as 49 cents sharp is next to 49 cents flat, and fade away slowly, so the tuning settles
+// within a few readings and then follows the piano.
+class Tuning {
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.cents = 0;
+  }
+
+  feed(mag, binHz) {
+    const lo = Math.ceil(100 / binHz);
+    const hi = Math.min(mag.length - 2, Math.floor(1200 / binHz));
+    let loudest = 0;
+    for (let k = lo; k <= hi; k++) loudest = Math.max(loudest, mag[k]);
+    if (!loudest) return;
+    this.x *= 0.9;
+    this.y *= 0.9;
+    for (let k = lo; k <= hi; k++) {
+      if (mag[k] < loudest * 0.2 || mag[k] < mag[k - 1] || mag[k] < mag[k + 1]) continue;
+      // the peak's own frequency, between the bins: a parabola through the peak and its neighbours (in decibels)
+      const [a, b, c] = [mag[k - 1], mag[k], mag[k + 1]].map((v) => Math.log(v + 1e-12));
+      const f = (k + (a - c) / (2 * (a - 2 * b + c) || 1)) * binHz;
+      const away = (1200 * Math.log2(f / 440)) % 100; // cents from the nearest semitone below, then either side
+      const angle = (2 * Math.PI * away) / 100;
+      this.x += mag[k] * Math.cos(angle);
+      this.y += mag[k] * Math.sin(angle);
+    }
+    this.cents = (Math.atan2(this.y, this.x) * 100) / (2 * Math.PI);
+  }
 }
 
 /* ---------- One note after another ---------- */
@@ -315,6 +354,7 @@ class Listener {
     this.ctx.createMediaStreamSource(this.stream).connect(this.analyser);
     this.buffer = new Float32Array(this.analyser.fftSize);
     this.room = new RoomLevel();
+    this.tuning = new Tuning();
     this.strikes = new StrikeFinder();
     this.lastReading = 0;
     this.timer = setInterval(() => this.tick(), 20);
@@ -340,7 +380,7 @@ class Listener {
     const now = performance.now();
     if (now - this.lastReading < 60) return;
     this.lastReading = now;
-    const notes = loud ? detectNotes(this.buffer, this.ctx.sampleRate) : [];
+    const notes = loud ? detectNotes(this.buffer, this.ctx.sampleRate, this.tuning, now >= this.deafUntil) : [];
     // the strike finder hears the page's own sounds too, so it knows what is already ringing; they just don't count
     const strikes = this.strikes.feed(notes, now / 1000);
     if (now < this.deafUntil) return;

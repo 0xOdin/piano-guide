@@ -18,8 +18,60 @@
   display: none !important;
 }
 
+/* what to practise: four cards, each saying what it asks */
 .pr-drills {
-  padding-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pr-drills button {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pr-drills strong {
+  font-size: 0.95rem;
+}
+
+.pr-drills span {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.pr-drills button:hover {
+  border-color: var(--line-strong);
+}
+
+.pr-drills button[aria-pressed="true"] {
+  border-color: var(--text);
+  background: var(--text);
+  color: #fff;
+}
+
+.pr-drills button[aria-pressed="true"] span {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* a short line saying what a choice does */
+.pr-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 /* what to answer with, and the options under it. The column may shrink below the summary's one long line. */
@@ -46,6 +98,13 @@
   flex: 1;
   padding: 0 4px;
   font-size: 0.8rem;
+}
+
+/* the four ways to answer: two by two on a phone, so each name fits on one line */
+.pr-mode [data-setting="answer"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
 }
 
 .pr-options summary {
@@ -394,10 +453,26 @@
   }
 }
 
+/* the main button for the next step, and small links beside it */
 .pr-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 10px 18px;
+  margin-bottom: 18px;
+}
+
+.pr-actions .kb-btn {
+  height: 42px;
+  padding: 0 20px;
+}
+
+.pr-actions .pr-link {
+  font-size: 0.88rem;
+}
+
+.pr-actions .pr-link:disabled {
+  opacity: 0.4;
 }
 
 /* MIDI */
@@ -535,6 +610,11 @@
     font-size: 0.84rem;
   }
 
+  .pr-mode [data-setting="answer"] {
+    display: inline-flex;
+    gap: 0;
+  }
+
   .pr-listen {
     padding: 18px 20px;
   }
@@ -565,8 +645,13 @@
 /* Desktop */
 @media (min-width: 1024px) {
   /* as wide as the keyboard (880px) plus the card's padding, like the keyboard page */
-  .pr-card {
+  .pr-card,
+  .pr-drills {
     max-width: 952px;
+  }
+
+  .pr-drills {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .pr-option-grid {
