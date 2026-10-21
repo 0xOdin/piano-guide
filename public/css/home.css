@@ -80,22 +80,6 @@
   background: var(--accent);
 }
 
-.home-play-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 16px;
-  margin-top: 14px;
-  font-size: 0.84rem;
-  color: var(--ebony-muted);
-}
-
-.home-play-actions {
-  display: flex;
-  gap: 6px;
-}
-
 /* Three ways in: a large card for looking things up, two smaller ones beside it */
 .home-ways {
   display: grid;

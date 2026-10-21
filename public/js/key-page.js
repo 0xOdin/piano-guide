@@ -1,7 +1,7 @@
 // Key pages (scale, arpeggio, chord). The fingering at the top of the page is already in the HTML, written by
 // scripts/build.js. This script adds the interactive part: the key signature beside the heading and the sheet music,
 // drawn with VexFlow (loaded from a CDN before this file), keyboard diagrams with the keys and finger numbers marked,
-// and the sound: the note chips under the heading and the Play button on the sheet music use the recorded piano
+// and the sound: the note chips under the heading and the Play button on the keyboard card use the recorded piano
 // (piano-sound.js), lighting each key and note as it sounds. The keyboards are drawn by piano-keys.js.
 // The notes arrive as JSON in <script id="page-data">:
 //   { mode: "melodic", octaves: { 1: { notes, rh, lh }, 2: { ... } } }   scale and arpeggio
@@ -114,7 +114,7 @@ function listenToChips() {
 }
 
 /* =====================================================================================
-   Playing what the sheet music shows
+   Playing what the keyboards show (the Play button at the foot of the keyboard card)
    ===================================================================================== */
 
 const STEP = 0.32; // seconds from one note of a scale or arpeggio to the next; each note stops as the next starts

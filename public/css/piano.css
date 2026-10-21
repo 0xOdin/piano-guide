@@ -102,6 +102,63 @@
   }
 }
 
+/* the foot of a case: a short line on the left, the buttons on the right (as on the homepage) */
+.case-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 14px;
+  font-size: 0.84rem;
+  color: var(--ebony-muted);
+}
+
+/* the line takes what room is left and wraps, so the buttons stay on the right beside it; with less room than that,
+   the buttons go under it, still on the right */
+.case-foot > span:first-child:not(:only-child) {
+  flex: 1 1 10rem;
+}
+
+.case-actions,
+.case-foot > :last-child {
+  margin-left: auto;
+}
+
+.case-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Play (key pages, chords): plays what the keyboard shows, and turns to Stop while it plays */
+.case-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 12px;
+}
+
+.case-play svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+.case-play .stop-icon,
+.case-play.is-playing .play-icon {
+  display: none;
+}
+
+.case-play.is-playing .stop-icon {
+  display: block;
+}
+
+.case-play.is-playing {
+  background: transparent;
+  border-color: rgba(250, 250, 249, 0.34);
+  color: var(--ebony-text);
+}
+
 /* the keys: white keys side by side, black keys placed on top by the page's script */
 .piano-scroll {
   overflow-x: auto;

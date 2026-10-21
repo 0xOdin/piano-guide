@@ -151,58 +151,7 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-/* Play, on the sheet music card: the one felt button of the card. It turns to Stop while playing. */
-.play-score {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 38px;
-  padding: 0 16px 0 13px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 1px 2px rgba(150, 38, 34, 0.25), 0 6px 14px -6px rgba(150, 38, 34, 0.5);
-  color: #fff;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
-}
-
-.play-score svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
-}
-
-.play-score .stop-icon,
-.play-score.is-playing .play-icon {
-  display: none;
-}
-
-.play-score.is-playing .stop-icon {
-  display: block;
-}
-
-.play-score.is-playing {
-  background: var(--text);
-  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.2);
-}
-
-.play-score:active {
-  transform: scale(0.97);
-}
-
 @media (hover: hover) {
-  .play-score:hover {
-    background: var(--accent-ink);
-  }
-
-  .play-score.is-playing:hover {
-    background: #000;
-  }
-
   .note-chip:hover {
     border-color: var(--line-strong);
     transform: translateY(-1px);

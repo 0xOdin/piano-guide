@@ -304,22 +304,26 @@ function chordFingering(inversions) {
 
 /* ---------- The sheet music and keyboard sections (filled in by js/key-page.js) ---------- */
 
-// Plays what the sheet music shows on the recorded piano, lighting each key as it sounds (key-page.js). Pressed
-// again while playing, it stops.
-const playButton = (indent) => `
-${indent}<button type="button" class="play-score" id="play-score">
-${indent}  <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
-${indent}  <svg class="stop-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
-${indent}  <span>Play</span>
-${indent}</button>`;
+// The foot of the keyboard case: a line saying what Play does, and Play itself, which plays what the keyboards show
+// on the recorded piano, lighting each key and note as it sounds (key-page.js). Pressed again while playing, it stops.
+const playFoot = (hint, indent) => `
+${indent}<div class="case-foot">
+${indent}  <span>${hint}</span>
+${indent}  <button type="button" class="case-btn is-primary case-play" id="play-score">
+${indent}    <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+${indent}    <svg class="stop-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
+${indent}    <span>Play</span>
+${indent}  </button>
+${indent}</div>`;
+const UP_AND_DOWN = "Plays up and back down, with the hands and octaves shown.";
 
 // Scale and arpeggio: the sheet music card (hands, octaves, fingering) and the keyboard card, which shows the
 // same notes and finger numbers on a keyboard.
-const melodicSections = () => `
+const melodicSections = (hint = UP_AND_DOWN) => `
         <section class="practice">
           <div class="practice-card">
             <div class="card-head">
-              <h2>Sheet music</h2>${playButton("              ")}
+              <h2>Sheet music</h2>
             </div>
 
             <div class="options options-row">
@@ -353,7 +357,7 @@ const melodicSections = () => `
               <h2>On the keyboard</h2>${octaveSeg()}
             </div>
 
-            <div class="kb-blocks" id="keyboards"></div>
+            <div class="kb-blocks" id="keyboards"></div>${playFoot(hint, "            ")}
           </div>
         </section>`;
 
@@ -371,7 +375,7 @@ const chordViewer = () => `
           <section class="practice">
             <div class="practice-card">
               <div class="card-head">
-                <h2>Sheet music</h2>${playButton("                ")}
+                <h2>Sheet music</h2>
               </div>
 
               <div class="options">
@@ -399,7 +403,7 @@ const chordViewer = () => `
                 <h2>On the keyboard</h2>
               </div>
 
-              <div class="kb-blocks" id="chord-keys"></div>
+              <div class="kb-blocks" id="chord-keys"></div>${playFoot("Plays the chord with the hands shown.", "              ")}
             </div>
           </section>
         </div>`;
@@ -469,7 +473,7 @@ function scalePage(form) {
         heading: `${cap(name)} scale fingering`,
         intro: `The ${name} scale has ${key.signature}${raised}. Play one octave going up with the right hand on ${list(one.rh)} and the left hand on ${list(one.lh)}${back}`,
         fingering: melodicFingering(d, form === "melodic" ? MELODIC_MINOR_CAPTION : MELODIC_CAPTION),
-        viewer: scaleViewer(),
+        viewer: scaleViewer(form === "melodic" ? "Plays up, then back down as the natural minor." : UP_AND_DOWN),
         hero: keyHero(key, scaleDegrees(one.notes), `notes of the ${name} scale`),
         // melodic minor comes down as the natural minor: the notes the Play button plays on the way down
         data: { mode: "melodic", name, keySig: key.keySig, octaves: d, octaveShift: key.octaveShift || {},

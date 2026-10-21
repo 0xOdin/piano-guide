@@ -23,13 +23,7 @@ scripts: vexflow chords-data piano-sound piano-keys chords
 
         <section class="practice">
             <div class="practice-card chord-viewer" id="chord-viewer">
-                <div class="card-head">
-                    <h2 id="chord-title"></h2>
-                    <button type="button" class="play-score" id="play-chord">
-                        <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
-                        <span>Play</span>
-                    </button>
-                </div>
+                <h2 id="chord-title"></h2>
                 <p class="scale-alt" id="chord-meta"></p>
                 <ul class="note-chips" id="chord-notes" aria-label="Notes, lowest first, tap one to hear it"></ul>
 
@@ -49,7 +43,15 @@ scripts: vexflow chords-data piano-sound piano-keys chords
 
                 <div class="chord-visuals">
                     <div class="score chord-score" id="chord-score"></div>
-                    <div class="chord-keys piano-case" id="chord-keys"></div>
+                    <div class="chord-keys piano-case">
+                        <div id="chord-keys"></div>
+                        <div class="case-foot">
+                            <button type="button" class="case-btn is-primary case-play" id="play-chord">
+                                <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+                                <span>Play</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="practice-foot">

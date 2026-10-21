@@ -39,22 +39,13 @@
   color: var(--muted);
 }
 
-/* the viewer: the chord's name large, Play beside it (.play-score and .note-chip in page.css) */
+/* the viewer: the chord's name large (.note-chip in page.css; Play, at the foot of the keyboard, in piano.css) */
 .chord-viewer {
   scroll-margin-top: 84px; /* a card below opens its chord here: keep the title clear of the sticky header */
 }
 
-.chord-viewer .card-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 16px;
-  margin-bottom: 4px;
-}
-
 .chord-viewer h2 {
-  margin: 0;
+  margin: 0 0 4px;
   font-size: clamp(1.7rem, 6vw, 2.3rem);
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -62,6 +53,10 @@
 
 .chord-viewer .note-chips {
   margin-top: 12px;
+}
+
+.chord-keys .case-foot {
+  margin-top: 10px;
 }
 
 /* the chords on the root: each card opens its chord in the viewer above; the one shown there is picked out */
