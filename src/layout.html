@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <meta name="description" content="{{description}}">
+    <meta name="theme-color" content="#FAFAF9">
     <link rel="canonical" href="{{canonical}}">
+    <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+    <script>document.documentElement.classList.add("js")</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
@@ -15,7 +18,7 @@
 
 <body>
     <header>
-        <a href="/" class="logo">Piano<span class="logo-accent">Guide</span></a>
+        <a href="/" class="logo"><svg class="logo-mark" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1C1917"/><rect x="4" y="4.6" width="16" height="1.8" rx=".5" fill="#B3302D"/><rect x="4" y="7.4" width="16" height="12.6" rx="1.5" fill="#FAFAF9"/><path d="M9.33 7.4v12.6M14.67 7.4v12.6" stroke="#1C1917" stroke-width=".9"/><rect x="7.6" y="7.4" width="3.4" height="7.4" rx=".6" fill="#1C1917"/><rect x="12.9" y="7.4" width="3.4" height="7.4" rx=".6" fill="#1C1917"/></svg><span>PianoGuide</span></a>
 
         <nav class="header-links" aria-label="Main navigation">
             <ul>
@@ -38,17 +41,21 @@
     </main>
 
     <footer>
-        <div class="footer-brand">
-            <a href="/" class="logo">PianoGuide</a>
-            <p>A clear and practical reference for piano.</p>
-        </div>
-        <nav aria-label="Footer navigation">
-            <ul>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <a href="/" class="logo"><svg class="logo-mark" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1C1917"/><rect x="4" y="4.6" width="16" height="1.8" rx=".5" fill="#B3302D"/><rect x="4" y="7.4" width="16" height="12.6" rx="1.5" fill="#FAFAF9"/><path d="M9.33 7.4v12.6M14.67 7.4v12.6" stroke="#1C1917" stroke-width=".9"/><rect x="7.6" y="7.4" width="3.4" height="7.4" rx=".6" fill="#1C1917"/><rect x="12.9" y="7.4" width="3.4" height="7.4" rx=".6" fill="#1C1917"/></svg><span>PianoGuide</span></a>
+                <p>Scales, chords and arpeggios in every key, and a place to practise them.</p>
+            </div>
+            <nav aria-label="Footer navigation">
+                <ul>
 {{footerNav}}
-            </ul>
-        </nav>
+                <li><a href="/keyboard/">Keyboard</a></li>
+                </ul>
+            </nav>
+        </div>
         <div class="footer-bottom">
             <p>&copy; {{year}} PianoGuide</p>
+            <p>Piano sound: recordings of a Steinway by the University of Iowa Electronic Music Studios</p>
         </div>
     </footer>
 

@@ -1,0 +1,460 @@
+/* The homepage. The keys of its keyboard come from keyboard.css, the circle of fifths from theory.css, the colours,
+   buttons and fade-in from main.css. */
+
+/* a small label over a heading */
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow-brass {
+  color: var(--brass);
+}
+
+/* Base (phones) */
+
+/* The hero: what the site is, and a keyboard to play */
+.home-hero {
+  display: grid;
+  gap: 32px;
+  padding: 36px var(--pad) 40px;
+}
+
+.home-hero h1 {
+  max-width: 15ch;
+  margin: 12px 0 16px;
+  font-size: clamp(2.2rem, 9vw, 3.9rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.home-lede {
+  max-width: 42ch;
+  margin: 0 0 28px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.home-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-ctas .btn {
+  flex: 1 1 auto;
+}
+
+/* The keyboard, set in lacquered ebony like the case of a piano: the light catches its top edge */
+.home-play {
+  position: relative;
+  padding: 22px 18px 16px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #2b2623 0%, #1c1917 34%, #161311 100%);
+  color: var(--ebony-text);
+  box-shadow: 0 2px 6px rgba(28, 25, 23, 0.16), 0 32px 64px -30px rgba(28, 25, 23, 0.6);
+}
+
+.home-play::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  pointer-events: none;
+}
+
+.home-play-readout {
+  display: grid;
+  gap: 4px;
+  min-height: 92px;
+  margin-bottom: 18px;
+}
+
+.home-play-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 6vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.home-play-detail {
+  font-size: 0.9rem;
+  color: var(--ebony-muted);
+}
+
+/* the keys: as many white keys as fit the screen (home.js), at real piano proportions */
+.home-play .piano {
+  min-width: 0;
+  max-width: none;
+  aspect-ratio: var(--whites, 10) / 5.4;
+}
+
+/* keys held down: a felt tint on the white keys, the felt itself on the black ones */
+.home-play .pkey.white.is-selected {
+  background: var(--accent-light);
+  color: var(--accent-ink);
+}
+
+.home-play .pkey.black.is-selected {
+  background: var(--accent);
+}
+
+.home-play-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 14px;
+  font-size: 0.84rem;
+  color: var(--ebony-muted);
+}
+
+.home-play-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.play-btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(250, 250, 249, 0.2);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ebony-text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.play-btn:focus-visible {
+  outline-color: var(--ebony-text);
+}
+
+/* Three ways in: a large card for looking things up, two smaller ones beside it */
+.home-ways {
+  display: grid;
+  gap: 14px;
+  padding: 40px var(--pad) 48px;
+}
+
+.way {
+  position: relative;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.way h2 {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.way p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* the whole small card opens its page */
+.way-small h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.way-go {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.way-go::after,
+.way-links a::after {
+  content: " \203A";
+}
+
+.way-links {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.way-links a {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  transition: background-color 0.2s var(--ease);
+}
+
+.way-links a::after {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.way-icon {
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+}
+
+.way-links strong {
+  font-size: 0.98rem;
+}
+
+.way-links span:not(.way-icon) {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* Pick a key: the circle of fifths (wide screens), or a row of keys (phones) */
+.home-keys {
+  display: grid;
+  gap: 28px;
+  padding: 8px var(--pad) 56px;
+}
+
+.home-keys h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.7rem, 6vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.home-keys-text > p {
+  max-width: 42ch;
+  margin: 0 0 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.home-keys-circle {
+  display: none;
+}
+
+.home-badges {
+  margin-top: 24px;
+}
+
+.home-badges ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home-badges-label {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.home-badges ul + .home-badges-label {
+  margin-top: 18px;
+}
+
+/* My piano: a band of ebony with a level meter, as on the practice page */
+.home-listen {
+  padding: 0 var(--pad) 64px;
+}
+
+.home-listen-card {
+  display: grid;
+  gap: 32px;
+  padding: 32px 24px;
+  border-radius: 24px;
+  background: var(--text);
+  color: var(--ebony-text);
+}
+
+.home-listen h2 {
+  max-width: 18ch;
+  margin: 10px 0 12px;
+  font-size: clamp(1.6rem, 6vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.home-listen p:not(.eyebrow) {
+  max-width: 46ch;
+  margin: 0 0 24px;
+  line-height: 1.6;
+  color: var(--ebony-muted);
+}
+
+.btn-light {
+  background: var(--ebony-text);
+  color: var(--text);
+}
+
+.btn-light:focus-visible {
+  outline-color: var(--ebony-text);
+}
+
+.home-meter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 120px;
+}
+
+.home-meter span {
+  flex: 1;
+  max-width: 7px;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--brass);
+  transform: scaleY(var(--h));
+  animation: home-meter 3.2s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+
+@keyframes home-meter {
+  50% {
+    transform: scaleY(calc(var(--h) * 0.45));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-meter span {
+    animation: none;
+  }
+}
+
+@media (hover: hover) {
+  .play-btn:hover {
+    background: rgba(250, 250, 249, 0.08);
+    border-color: rgba(250, 250, 249, 0.34);
+  }
+
+  .way-small:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .way-links a:hover {
+    background: var(--bg-alt);
+  }
+
+  .btn-light:hover {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+}
+
+/* Wider phones and tablets: the circle instead of the rows of keys */
+@media (min-width: 640px) {
+  .home-keys {
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    align-items: center;
+    gap: 40px;
+  }
+
+  .home-keys-circle {
+    display: block;
+  }
+
+  .home-badges {
+    display: none;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .home-hero {
+    padding: 56px var(--pad) 48px;
+  }
+
+  .home-ctas .btn {
+    flex: none;
+  }
+
+  .home-play {
+    padding: 26px 24px 18px;
+  }
+
+  .home-ways {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 18px;
+    padding: 56px var(--pad) 64px;
+  }
+
+  .way-big {
+    grid-row: span 2;
+    padding: 28px;
+  }
+
+  .home-listen-card {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: center;
+    padding: 48px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    align-items: center;
+    gap: 64px;
+    padding: 80px var(--gutter) 64px;
+  }
+
+  .home-ways {
+    gap: 20px;
+    padding: 64px var(--gutter) 80px;
+  }
+
+  .way-big {
+    padding: 32px;
+  }
+
+  .home-keys {
+    grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+    gap: 72px;
+    padding: 0 var(--gutter) 88px;
+  }
+
+  .home-listen {
+    padding: 0 var(--gutter) 88px;
+  }
+
+  .home-listen-card {
+    padding: 56px 64px;
+  }
+}

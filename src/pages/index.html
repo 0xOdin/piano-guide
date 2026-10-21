@@ -1,80 +1,93 @@
 ---
 title: PianoGuide: Piano Scales, Chords and Fingering
-description: A clear and practical piano reference: scales, chords and arpeggios in every key, with fingering, sheet music and keyboard diagrams.
+description: Every piano scale, chord and arpeggio in every key, with fingering, sheet music and keyboard diagrams, and a practice page that can listen to your own piano.
+styles: keyboard theory home
+scripts: chords-data note-names piano-sound home
 ---
-        <section class="hero">
-            <span>PIANO REFERENCE</span>
-            <h1>Everything you need to know about piano.</h1>
-            <p>Explore scales, chords, fingerings, theory, and more with clear explanations and practical references.</p>
-            <div class="hero-links">
-                <a href="/scales/">Browse Scales</a>
-                <a href="/chords/">Chord Explorer</a>
-            </div>
-            <img class="hero-img" src="/assets/images/hero-keys.svg" alt="" width="600" height="480">
-        </section>
-
-        <section class="explore">
-            <div class="section-header">
-                <h2>Explore Piano</h2>
-                <p>Browse the essential piano topics and tools.</p>
-            </div>
-
-            <ul class="explore-cards">
-                <li class="explore-card">
-                    <span class="card-icon"><img src="/assets/icons/scales.svg" alt="" width="20" height="20"></span>
-                    <h3><a href="/scales/">Scales</a></h3>
-                    <p>Major, minor, and chromatic scales with fingering for both hands.</p>
-                </li>
-                <li class="explore-card">
-                    <span class="card-icon"><img src="/assets/icons/arpeggio.svg" alt="" width="20" height="20"></span>
-                    <h3><a href="/arpeggios/">Arpeggios</a></h3>
-                    <p>Every major and minor arpeggio, one or two octaves.</p>
-                </li>
-                <li class="explore-card">
-                    <span class="card-icon"><img src="/assets/icons/chords.svg" alt="" width="20" height="20"></span>
-                    <h3><a href="/chords/">Chords</a></h3>
-                    <p>Find and understand piano chords, inversions, and formulas.</p>
-                </li>
-                <li class="explore-card">
-                    <span class="card-icon"><img src="/assets/icons/theory.svg" alt="" width="20" height="20"></span>
-                    <h3><a href="/theory/">Theory</a></h3>
-                    <p>Intervals and the circle of fifths, shown on the keyboard.</p>
-                </li>
-                <li class="explore-card">
-                    <span class="card-icon"><img src="/assets/icons/practice.svg" alt="" width="20" height="20"></span>
-                    <h3><a href="/practice/">Practice</a></h3>
-                    <p>Random scales and chords to play, write out or name.</p>
-                </li>
-            </ul>
-        </section>
-
-        <section class="key-picker">
-            <div class="section-header">
-                <h2>Pick a Key</h2>
-                <p>Jump straight to a key's scale, arpeggio, and chord, in the order you learn them.</p>
-            </div>
-
-            <div class="picker-rows">
-                <h3 class="picker-label" id="picker-major">Major</h3>
-                <ul class="picker-keys" aria-labelledby="picker-major">
-{{majorBadges}}
-                </ul>
-                <h3 class="picker-label" id="picker-minor">Minor</h3>
-                <ul class="picker-keys" aria-labelledby="picker-minor">
-{{minorBadges}}
-                </ul>
-            </div>
-        </section>
-
-        <section class="keyboard">
-            <div class="keyboard-card">
-                <div class="keyboard-header">
-                    <div>
-                        <h2>Try the Interactive Keyboard</h2>
-                        <p>Play notes, chords and scales. See fingerings and hear the sound.</p>
-                    </div>
-                    <a class="keyboard-btn" href="/keyboard/">Open Keyboard</a>
+        <section class="home-hero">
+            <div class="home-hero-text">
+                <p class="eyebrow">Piano reference and practice</p>
+                <h1>Every scale, chord and arpeggio, with the fingering.</h1>
+                <p class="home-lede">Look up any key, hear it on a real piano, then practise it until your hands know it.</p>
+                <div class="home-ctas">
+                    <a class="btn btn-primary" href="/practice/">Start practising</a>
+                    <a class="btn btn-quiet" href="/scales/">Browse scales</a>
                 </div>
-                <div class="keyboard-keys" aria-hidden="true"></div>
+            </div>
+
+            <div class="home-play">
+                <div class="home-play-readout" aria-live="polite">
+                    <span class="eyebrow eyebrow-brass">Now playing</span>
+                    <strong class="home-play-name" id="hero-name">C major chord</strong>
+                    <span class="home-play-detail" id="hero-detail">C E G · root position</span>
+                </div>
+                <div class="piano" id="hero-piano" role="group" aria-label="Piano keyboard"></div>
+                <div class="home-play-foot">
+                    <span id="hero-hint">Tap the keys to make your own chord.</span>
+                    <span class="home-play-actions">
+                        <button type="button" class="play-btn" id="hero-hear">▶ Hear it</button>
+                        <button type="button" class="play-btn" id="hero-clear">Clear</button>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <div class="key-strip" aria-hidden="true"></div>
+
+        <section class="home-ways reveal">
+            <div class="way way-big">
+                <h2>Look it up</h2>
+                <p>Every major and minor key, with fingering for both hands, sheet music and the keys lit up.</p>
+                <ul class="way-links">
+                    <li><a href="/scales/"><span class="way-icon"><img src="/assets/icons/scales.svg" alt="" width="18" height="18"></span><strong>Scales</strong><span>Major, minor and chromatic</span></a></li>
+                    <li><a href="/arpeggios/"><span class="way-icon"><img src="/assets/icons/arpeggio.svg" alt="" width="18" height="18"></span><strong>Arpeggios</strong><span>One or two octaves</span></a></li>
+                    <li><a href="/chords/"><span class="way-icon"><img src="/assets/icons/chords.svg" alt="" width="18" height="18"></span><strong>Chords</strong><span>Every chord on every root</span></a></li>
+                    <li><a href="/theory/"><span class="way-icon"><img src="/assets/icons/theory.svg" alt="" width="18" height="18"></span><strong>Theory</strong><span>Intervals and the circle of fifths</span></a></li>
+                </ul>
+            </div>
+            <div class="way way-small">
+                <h2><a href="/practice/">Practise</a></h2>
+                <p>Get a random scale or chord, play it, and see what you got right. It works with your own piano too.</p>
+                <span class="way-go" aria-hidden="true">Start practising</span>
+            </div>
+            <div class="way way-small">
+                <h2><a href="/keyboard/">Keyboard</a></h2>
+                <p>Two octaves with a real piano sound. Light up any scale, arpeggio or chord with its fingering.</p>
+                <span class="way-go" aria-hidden="true">Open the keyboard</span>
+            </div>
+        </section>
+
+        <section class="home-keys reveal">
+            <div class="home-keys-circle">
+{{circleOfFifths}}
+            </div>
+            <div class="home-keys-text">
+                <h2>Pick a key</h2>
+                <p>Major keys go round the outside, with their relative minors inside. Each step clockwise adds a sharp, and each step back adds a flat.</p>
+                <a class="text-link" href="/theory/circle-of-fifths/">How the circle of fifths works</a>
+                <div class="home-badges">
+                    <h3 class="home-badges-label" id="badges-major">Major</h3>
+                    <ul aria-labelledby="badges-major">
+{{majorBadges}}
+                    </ul>
+                    <h3 class="home-badges-label" id="badges-minor">Minor</h3>
+                    <ul aria-labelledby="badges-minor">
+{{minorBadges}}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-listen reveal">
+            <div class="home-listen-card">
+                <div>
+                    <p class="eyebrow eyebrow-brass">My piano</p>
+                    <h2>Play your own piano. The page listens.</h2>
+                    <p>In Practice, choose My piano and play what you're asked on any piano. The page hears it through your microphone and tells you if it was right. Nothing is recorded or sent anywhere.</p>
+                    <a class="btn btn-light" href="/practice/">Try it in Practice</a>
+                </div>
+                <div class="home-meter" aria-hidden="true">
+                    <span style="--h:.30;--d:-.2s"></span><span style="--h:.52;--d:-1.1s"></span><span style="--h:.78;--d:-.6s"></span><span style="--h:.46;--d:-1.8s"></span><span style="--h:.90;--d:-.3s"></span><span style="--h:.62;--d:-2.2s"></span><span style="--h:.38;--d:-1.4s"></span><span style="--h:.70;--d:-.9s"></span><span style="--h:1;--d:-2.6s"></span><span style="--h:.58;--d:-.5s"></span><span style="--h:.84;--d:-1.6s"></span><span style="--h:.42;--d:-2.0s"></span><span style="--h:.66;--d:-.1s"></span><span style="--h:.94;--d:-1.2s"></span><span style="--h:.50;--d:-2.4s"></span><span style="--h:.74;--d:-.7s"></span><span style="--h:.36;--d:-1.9s"></span><span style="--h:.60;--d:-.4s"></span><span style="--h:.82;--d:-2.8s"></span><span style="--h:.44;--d:-1.0s"></span><span style="--h:.28;--d:-2.1s"></span>
+                </div>
             </div>
         </section>
