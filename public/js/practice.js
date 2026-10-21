@@ -81,7 +81,7 @@ function drawPiano() {
     // a black key sits on the line between two white keys
     const style = black ? ` style="left:${(whites * w - w * 0.31).toFixed(3)}%;width:${(w * 0.62).toFixed(3)}%"` : "";
     html += `<button type="button" class="pkey ${black ? "black" : "white"}" data-abs="${abs}" aria-label="${withOctave(abs)}" aria-pressed="false"${style}>`
-      + `<span class="pkey-finger"></span><span class="pkey-name"></span><span class="pkey-hint" aria-hidden="true"></span></button>`;
+      + `<span class="pkey-finger"></span><span class="pkey-name"></span></button>`;
     if (!black) whites++;
   }
   $("piano").innerHTML = html;
@@ -100,8 +100,6 @@ function renderPiano() {
     el.setAttribute("aria-pressed", String(picked.has(abs)));
     el.querySelector(".pkey-finger").textContent = mark === "wrong" ? "✕" : "";
     el.querySelector(".pkey-name").textContent = m && m.name ? m.name : pcOf(abs) === 0 ? withOctave(abs) : "";
-    const i = abs - octave;
-    el.querySelector(".pkey-hint").textContent = i >= 0 && i < COMPUTER_KEYS.length ? COMPUTER_KEYS[i].toUpperCase() : "";
   });
   $("kb-octave").textContent = withOctave(octave);
 }

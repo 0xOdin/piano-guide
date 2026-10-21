@@ -151,20 +151,6 @@
   display: none;
 }
 
-/* the computer key for each piano key: only where there is a keyboard to type on */
-.pkey-hint {
-  display: none;
-  font-size: 0.6rem;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0.45;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .pkey-hint:not(:empty) {
-    display: block;
-  }
-}
 
 /* the readout and the buttons under the keyboard */
 .kb-bar {

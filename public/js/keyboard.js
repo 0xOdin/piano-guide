@@ -110,7 +110,7 @@ function drawPiano() {
     // a black key sits on the line between two white keys
     const style = black ? ` style="left:${(whites * w - w * 0.31).toFixed(3)}%;width:${(w * 0.62).toFixed(3)}%"` : "";
     html += `<button type="button" class="pkey ${black ? "black" : "white"}" data-abs="${abs}" aria-label="${withOctave(abs)}" aria-pressed="false"${style}>`
-      + `<span class="pkey-finger"></span><span class="pkey-name"></span><span class="pkey-hint" aria-hidden="true"></span></button>`;
+      + `<span class="pkey-finger"></span><span class="pkey-name"></span></button>`;
     if (!black) whites++;
   }
   $("piano").innerHTML = html;
@@ -133,8 +133,6 @@ function render() {
     el.querySelector(".pkey-name").textContent = s ? s.name
       : isSelected || down.has(abs) ? noteName(abs)
       : pc(abs) === 0 ? withOctave(abs) : "";
-    const i = abs - state.octave;
-    el.querySelector(".pkey-hint").textContent = i >= 0 && i < COMPUTER_KEYS.length ? COMPUTER_KEYS[i].toUpperCase() : "";
   });
 
   // the readout: what is pressed, or else what is shown
