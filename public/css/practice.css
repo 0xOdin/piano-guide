@@ -172,6 +172,7 @@
 
 .pr-option {
   display: grid;
+  align-content: start; /* a taller neighbour (one with a hint under it) doesn't stretch the buttons */
   gap: 8px;
   justify-items: start;
   min-width: 0;
