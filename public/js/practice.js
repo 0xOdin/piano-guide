@@ -595,10 +595,14 @@ function renderMidiSound() {
 let listener = null;
 let micHits = 0; // readings in a row that heard the right chord
 let lastHeardSaid = 0;
+let lastPlayed = 0; // when the microphone last heard a key struck (a steady hum or tone doesn't count)
+let idleTimer = null;
+const MIC_IDLE = 5 * 60 * 1000; // the microphone goes off after this long without hearing anything played
 
 // a key struck on the piano: the next note of a scale moves it on; a different note is only mentioned if it was
 // clear, as a faint one may be an overtone of a note still ringing
 function onMicStrike(strike) {
+  lastPlayed = performance.now();
   const abs = strike.midi - 60;
   if (onKeyboard(abs)) {
     down.add(abs);
@@ -629,8 +633,10 @@ function onMicChord(notes) {
   }
 }
 
-// Only ever started by the "Allow the microphone" button, after the page has said what it is for. Nothing is
-// remembered: on the next visit, or after Stop, the page asks again.
+// Only ever started by the "Allow the microphone" button, after the page has said what it is for. It is never left
+// on: it goes off with Stop, when "My piano" is left, when the page is hidden (another tab or app, the screen
+// locked) or closed, and after five minutes without hearing anything played. Nothing is remembered: each time, the
+// page asks again with its button before it listens.
 async function startListening() {
   $("mic-error").textContent = "";
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -657,23 +663,39 @@ async function startListening() {
   } finally {
     $("mic-allow").disabled = false;
   }
-  // the person may have left "Listening" while the browser was asking
-  if (!wantsMic()) {
+  // the person may have left "Listening", or the page, while the browser was asking
+  if (!wantsMic() || document.hidden) {
     l.stop();
     return;
   }
   listener = l;
+  lastPlayed = performance.now();
+  idleTimer = setInterval(() => {
+    if (performance.now() - lastPlayed > MIC_IDLE) stopListening("The microphone went off after five minutes without hearing you play. Allow it again to carry on.");
+  }, 15000);
   say("");
   render();
 }
 
-function stopListening() {
+// `why` (optional): said under the Allow button when the microphone went off by itself
+function stopListening(why) {
   if (listener) listener.stop();
   listener = null;
+  clearInterval(idleTimer);
+  idleTimer = null;
   micHits = 0;
   $("mic-level").style.width = "0";
+  $("mic-error").textContent = typeof why === "string" ? why : "";
   render();
 }
+
+// another tab or app, the screen locked, or the page closed: the microphone goes off, and is asked for again
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && listener) stopListening("The microphone went off when you left the page. Allow it again to carry on.");
+});
+window.addEventListener("pagehide", () => {
+  if (listener) stopListening();
+});
 
 /* ---------- Page setup ---------- */
 
@@ -792,7 +814,7 @@ $("midi-sound").addEventListener("click", () => {
   renderMidiSound();
 });
 $("mic-allow").addEventListener("click", startListening);
-$("mic-stop").addEventListener("click", stopListening);
+$("mic-stop").addEventListener("click", () => stopListening());
 
 // the computer keys, Enter, and 1 to 4 for "Name it"
 document.addEventListener("keydown", (e) => {
