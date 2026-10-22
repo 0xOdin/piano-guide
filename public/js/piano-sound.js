@@ -1,6 +1,8 @@
 // The piano's sound on the site: a recording of a real Steinway for every key from C2 to C6, made by
-// scripts/make-sounds.js into /assets/piano/ (36.m4a ... 84.m4a, by MIDI number). The recordings, about 1.4 MB in all,
-// are fetched once the page has loaded, the middle of the keyboard first. Until a note's recording is ready, or if the
+// scripts/make-sounds.js into /assets/piano/ (36.m4a ... 84.m4a, by MIDI number). The recordings are about 1.4 MB in
+// all, so they come in two parts: the octave from middle C (where most first notes are) once the page has loaded and
+// is idle, and the rest when the visitor first does something on the page (a click, a tap, a key), the middle of the
+// keyboard first. A page only read never fetches more than that octave. Until a note's recording is ready, or if the
 // browser can't play it, a soft made-up tone stands in. Notes beyond C2 to C6 use the nearest recording, played faster
 // or slower. Used by keyboard.js and practice.js.
 //
@@ -13,15 +15,18 @@ const PIANO_LOWEST = 36; // C2
 const PIANO_HIGHEST = 84; // C6
 const piano = { ctx: null, master: null, files: new Map(), buffers: new Map() };
 
-// Fetched and unpacked as soon as the page is ready, so the first key pressed already sounds like a piano. An
-// offline audio context unpacks them: unlike the one that plays, it needs no click first, and what it unpacks can be
-// played by any context.
-function fetchPianoSounds() {
+// Fetched and unpacked ahead of the first note, so it already sounds like a piano. An offline audio context unpacks
+// them: unlike the one that plays, it needs no click first, and what it unpacks can be played by any context.
+// `which` (optional) picks the notes (MIDI numbers); each is only fetched once.
+let unpacker = null;
+function fetchPianoSounds(which = null) {
   const Offline = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-  if (!Offline || piano.files.size) return;
-  const unpacker = new Offline(1, 1, 44100);
+  if (!Offline) return;
+  unpacker = unpacker || new Offline(1, 1, 44100);
   const notes = [];
-  for (let midi = PIANO_LOWEST; midi <= PIANO_HIGHEST; midi++) notes.push(midi);
+  for (let midi = PIANO_LOWEST; midi <= PIANO_HIGHEST; midi++) {
+    if (!piano.files.has(midi) && (!which || which.includes(midi))) notes.push(midi);
+  }
   notes.sort((a, b) => Math.abs(a - 66) - Math.abs(b - 66));
   for (const midi of notes) {
     const file = fetch(new URL(`${midi}.m4a`, PIANO_FOLDER))
@@ -32,8 +37,20 @@ function fetchPianoSounds() {
     piano.files.set(midi, file);
   }
 }
-if (document.readyState === "complete") fetchPianoSounds();
-else window.addEventListener("load", fetchPianoSounds);
+
+const MIDDLE_OCTAVE = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]; // C4 to C5
+const whenIdle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 1000));
+const saveData = navigator.connection && navigator.connection.saveData; // the visitor asked to use less data
+if (!saveData) {
+  if (document.readyState === "complete") whenIdle(() => fetchPianoSounds(MIDDLE_OCTAVE));
+  else window.addEventListener("load", () => whenIdle(() => fetchPianoSounds(MIDDLE_OCTAVE)));
+}
+const fetchTheRest = () => {
+  ["pointerup", "keydown"].forEach((type) => window.removeEventListener(type, fetchTheRest, true));
+  fetchPianoSounds();
+};
+// pointerup, not pointerdown: a finger that only scrolls the page lifts with pointercancel, and fetches nothing
+["pointerup", "keydown"].forEach((type) => window.addEventListener(type, fetchTheRest, { capture: true, passive: true }));
 
 // The audio itself is set up on the first note: browsers only allow sound after a click or a key
 function pianoAudio() {

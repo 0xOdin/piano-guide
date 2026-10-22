@@ -1,8 +1,8 @@
 // Checks the built site's music (npm run check, after npm run build): every key page's data against its own
-// fingering table, note chips and key signature, against the Keyboard page's data and the fingering charts, and the
-// fingering against a few rules (thumb under going up in the right hand, cross over in the left, no finger twice in a
-// row, no thumb on a black key in the middle of a scale or arpeggio, except where every note is black). It exits with
-// an error, and lists what is wrong, if anything disagrees.
+// fingering table, note chips and key signature, against the Keyboard page's data and every row of the scale and
+// arpeggio fingering charts (one octave and two), and the fingering against a few rules (thumb under going up in the
+// right hand, cross over in the left, no finger twice in a row, no thumb on a black key in the middle of a scale or
+// arpeggio, except where every note is black). It exits with an error, and lists what is wrong, if anything disagrees.
 const fs = require("fs");
 const path = require("path");
 const dist = process.argv[2] || path.join(__dirname, "..", "dist");
@@ -133,6 +133,22 @@ for (const k of keyboard) {
   if (!row) { warn("scale chart", `no row for ${k.slug}`); continue; }
   const fingers = [...row[0].matchAll(/<span class="oct-1">([\s\S]*?)<\/span>\s*<span class="oct-2">/g)].map((m) => [...m[1].matchAll(/class="f[^"]*">(\d)</g)].map((x) => Number(x[1])).join(""));
   if (fingers.length >= 2 && (fingers[0] !== major.rh.join("") || fingers[1] !== major.lh.join(""))) warn("scale chart", `${k.slug}: ${fingers.join(" / ")} vs ${major.rh.join("")} / ${major.lh.join("")}`);
+  if (!new RegExp(`href="/keys/${k.slug}/arpeggio/"`).test(charts.arpeggios)) warn("arpeggio chart", `no row for ${k.slug}`);
+}
+// every row of both charts against the page it links to, for one octave and for two
+const digits = (s) => [...s.matchAll(/class="f[^"]*">(\d)</g)].map((x) => x[1]).join("");
+for (const [name, chart] of Object.entries(charts)) {
+  for (const row of chart.matchAll(/<th scope="row"><a href="(\/keys\/[^"]+)">[\s\S]*?<\/tr>/g)) {
+    const data = json(read(path.join(row[1].slice(1), "index.html")), "page-data");
+    for (const hand of row[0].matchAll(/<abbr title="(Right|Left) hand">[\s\S]*?(?=<abbr|<\/td>)/g)) {
+      const h = hand[1] === "Right" ? "rh" : "lh";
+      const [one, two] = hand[0].split('<span class="oct-2">');
+      [[1, one], [2, two]].forEach(([n, part]) => {
+        const want = data.octaves[n][h].join("");
+        if (digits(part || "") !== want) warn(`${name} chart`, `${row[1]} ${h} ${n} octave${n > 1 ? "s" : ""}: ${digits(part || "")} vs ${want}`);
+      });
+    }
+  }
 }
 console.log(`${pagesChecked} key pages checked: ${problems.length ? `${problems.length} problem(s)` : "all agree"}`);
 if (problems.length) {
