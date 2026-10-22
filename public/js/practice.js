@@ -483,6 +483,11 @@ function render() {
     $("hand").className = `pr-hand is-${q.hand}`;
     $("hand-name").textContent = HAND_NAMES[q.hand];
   }
+  $("inversion").hidden = !q.inversion;
+  if (q.inversion) {
+    $("inversion-name").textContent = q.inversion.name;
+    $("inversion-bass").textContent = `${q.inversion.bass} at the bottom`;
+  }
   $("sub").textContent = q.sub || "";
   $("sub").hidden = !q.sub;
 
