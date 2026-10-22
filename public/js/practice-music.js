@@ -228,9 +228,9 @@ function chordQuestion(s) {
     kind: "chord",
     id: `${chord.symbol}:${chord.inv}`,
     title: chord.written,
-    sub: chord.name,
-    // with inversions on, which one to play is said beside the chord, with the note that goes at the bottom
-    inversion: s.inversions === "on" ? { name: INVERSION_NAMES[chord.inv], bass: chord.notes[0].name } : null,
+    // with inversions on, the line under it says which one, and the note at the bottom that the slash names
+    sub: chord.name + (s.inversions !== "on" ? "" : chord.inv
+      ? ` · ${INVERSION_NAMES[chord.inv].toLowerCase()}, ${chord.notes[0].name} at the bottom` : " · root position"),
     chord,
   };
 }

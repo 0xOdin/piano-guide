@@ -353,35 +353,6 @@
   color: #fff;
 }
 
-/* the inversion to play, beside the chord: its name, and the note that goes at the bottom */
-.pr-inversion {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px;
-  border: 1.5px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.pr-inversion[hidden] {
-  display: none;
-}
-
-.pr-inversion strong {
-  font-weight: 700;
-}
-
-.pr-inversion span {
-  padding-left: 8px;
-  border-left: 1px solid var(--line-strong);
-  color: var(--muted);
-  font-weight: 600;
-}
-
 .pr-hand.is-rh .pr-hand-mark::before {
   content: "R";
 }
