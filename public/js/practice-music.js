@@ -374,11 +374,10 @@ function heardChord(heard, chord) {
   return !played.some((n) => !want.has(pcOf(n.midi)) && n.strength > quietest * 0.5);
 }
 
-// Typed notes against the answer. Each typed note is "right", "spelling" (the right key, spelled another way) or
-// "wrong". `ordered`: they must come in the answer's order (a scale: 7 notes, or 8 with the root again at the top);
-// otherwise any order, except that `bassFirst` wants the answer's lowest note first (an inversion).
+// Typed notes against a chord's notes, in any order, except that `bassFirst` wants the answer's lowest note first (an
+// inversion). Each typed note is "right", "spelling" (the right key, spelled another way) or "wrong".
 // -> { error } when a word is not a note, else { marks: [{ name, mark }], missing, bassWrong, right }
-function checkTypedNotes(text, answer, { ordered = false, bassFirst = false } = {}) {
+function checkTypedNotes(text, answer, { bassFirst = false } = {}) {
   const typed = [];
   for (const w of words(text)) {
     const n = readNote(w);
@@ -386,23 +385,36 @@ function checkTypedNotes(text, answer, { ordered = false, bassFirst = false } = 
     typed.push(n);
   }
   if (!typed.length) return { error: "Write the notes first." };
-  const markOf = (n, want) => (!want ? "wrong" : n.name === want.name ? "right" : n.pc === pcOf(want.abs) ? "spelling" : "wrong");
-  let marks;
-  let missing;
-  if (ordered) {
-    const want = answer.slice(0, typed.length > 7 ? 8 : 7);
-    marks = typed.map((n, i) => ({ name: n.name, mark: markOf(n, want[i]) }));
-    missing = Math.max(0, 7 - typed.length);
-  } else {
-    const names = answer.map((n) => n.name);
-    marks = typed.map((n) => {
-      if (names.includes(n.name)) return { name: n.name, mark: "right" };
-      return { name: n.name, mark: answer.some((a) => pcOf(a.abs) === n.pc) ? "spelling" : "wrong" };
-    });
-    missing = names.filter((name) => !typed.some((n) => n.name === name)).length;
-  }
+  const names = answer.map((n) => n.name);
+  const marks = typed.map((n) => {
+    if (names.includes(n.name)) return { name: n.name, mark: "right" };
+    return { name: n.name, mark: answer.some((a) => pcOf(a.abs) === n.pc) ? "spelling" : "wrong" };
+  });
+  const missing = names.filter((name) => !typed.some((n) => n.name === name)).length;
   const bassWrong = bassFirst && typed[0].name !== answer[0].name;
   return { marks, missing, bassWrong, right: missing === 0 && !bassWrong && marks.every((m) => m.mark === "right") };
+}
+
+// The next part of a scale's notes, or of a key's chords, typed in order: each word against the next one still to
+// write (`want`: the notes { name, abs } or chords left, `kind`: "notes" or "chords"). Each is "right", "spelling" (the
+// right key or chord, spelled another way: A♯ for B♭) or "wrong". -> { error } or { marks: [{ name, mark }] }
+function checkTypedInOrder(text, want, kind) {
+  const marks = [];
+  for (const [i, w] of words(text).entries()) {
+    const target = want[i];
+    if (kind === "notes") {
+      const n = readNote(w);
+      if (!n) return { error: `“${w}” isn't a note name. Write notes like C, F♯ or Bb.` };
+      marks.push({ name: n.name, mark: !target ? "wrong" : n.name === target.name ? "right" : n.pc === pcOf(target.abs) ? "spelling" : "wrong" });
+    } else {
+      const c = readChord(w);
+      if (!c) return { error: `“${w}” isn't a chord name. Write chords like C, Dm, F♯dim or B♭maj7.` };
+      const t = target ? checkTypedChord(c, target) : {};
+      marks.push({ name: c.symbol, mark: t.right ? "right" : t.spelling ? "spelling" : "wrong" });
+    }
+  }
+  if (!marks.length) return { error: kind === "notes" ? "Write the notes first." : "Write the chords first." };
+  return { marks };
 }
 
 // A typed chord name ("Gm") against the answer: { right, spelling } (spelling: the right chord, its root spelled
@@ -410,21 +422,4 @@ function checkTypedNotes(text, answer, { ordered = false, bassFirst = false } = 
 function checkTypedChord(c, chord) {
   const sameType = c.type === chord.type;
   return { right: sameType && c.root.name === chord.root.name, spelling: sameType && c.root.pc === chord.root.pc && c.root.name !== chord.root.name };
-}
-
-// Typed chord names for every chord of a key, in order -> { error } or { marks: [{ name, mark }], missing, right }
-function checkTypedChords(text, chords) {
-  const typed = [];
-  for (const w of words(text)) {
-    const c = readChord(w);
-    if (!c) return { error: `“${w}” isn't a chord name. Write chords like C, Dm, F♯dim or B♭maj7.` };
-    typed.push(c);
-  }
-  if (!typed.length) return { error: "Write the chords first." };
-  const marks = typed.map((c, i) => {
-    const r = chords[i] ? checkTypedChord(c, chords[i]) : {};
-    return { name: c.symbol, mark: r.right ? "right" : r.spelling ? "spelling" : "wrong" };
-  });
-  const missing = Math.max(0, chords.length - typed.length);
-  return { marks, missing, right: missing === 0 && marks.every((m) => m.mark === "right") };
 }

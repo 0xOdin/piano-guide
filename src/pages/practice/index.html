@@ -22,14 +22,19 @@ scripts: chords-data practice-music listen piano-sound practice
             <div class="practice-card pr-card">
                 <div class="pr-bar">
                     <div class="option pr-mode" data-for="scales chords key">
-                        <span class="option-label" id="answer-label">Answer on</span>
+                        <span class="option-label" id="answer-label">Answer by</span>
                         <div class="seg" data-setting="answer" role="group" aria-labelledby="answer-label">
-                            <button type="button" data-v="play">Screen keys</button>
-                            <button type="button" data-v="listen">My piano</button>
-                            <button type="button" data-v="type">Typing</button>
-                            <button type="button" data-v="self">Self-check</button>
+                            <button type="button" data-v="play">Playing</button>
+                            <button type="button" data-v="type">Typing or self-check</button>
                         </div>
                         <p class="pr-hint" id="answer-hint"></p>
+                        <div class="pr-sub-option" id="listen-option">
+                            <span class="option-label" id="listen-label">Your own piano</span>
+                            <div class="seg" data-setting="listen" role="group" aria-labelledby="listen-label">
+                                <button type="button" data-v="off">Off</button>
+                                <button type="button" data-v="on">Listen</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="option pr-mode" data-for="name">
                         <span class="option-label" id="show-label">Show it as</span>

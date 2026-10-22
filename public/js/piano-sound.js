@@ -6,7 +6,7 @@
 //
 // playPiano(abs, { delay, length, hold }) plays a note (abs: semitones from middle C) `delay` seconds from now, damps it
 // after `length` seconds as a key let go without the pedal, and returns a function that damps it at once (for a key
-// that is let go). With `hold` it rings until that function is called.
+// that is let go), or cancels it if it hasn't started yet. With `hold` it rings until that function is called.
 
 const PIANO_FOLDER = new URL("../assets/piano/", document.currentScript.src); // works in any folder of the site
 const PIANO_LOWEST = 36; // C2
@@ -104,5 +104,13 @@ function playPiano(abs, { delay = 0, length = 0.8, hold = false } = {}) {
     if (from !== null) damp(t + length);
     else sources.forEach((s) => s.stop(t + length + 0.05)); // the made-up tone has faded by then
   }
-  return () => damp(Math.max(ctx.currentTime, t));
+  // let go: damped now, or if it hasn't started yet, it never sounds
+  return () => {
+    if (ctx.currentTime < t) {
+      sources.forEach((s) => s.stop());
+      env.disconnect();
+    } else {
+      damp(ctx.currentTime);
+    }
+  };
 }

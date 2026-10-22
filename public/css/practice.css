@@ -136,11 +136,33 @@
   font-size: 0.8rem;
 }
 
-/* the four ways to answer: two by two on a phone, so each name fits on one line */
+/* the two ways to answer, side by side */
 .pr-mode [data-setting="answer"] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 3px;
+}
+
+/* under Playing: your own piano, heard through the microphone, as well as the keys here */
+.pr-sub-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 2px;
+}
+
+.pr-sub-option[hidden] {
+  display: none;
+}
+
+.pr-mode .pr-sub-option .seg {
+  display: inline-flex;
+}
+
+.pr-mode .pr-sub-option .seg button {
+  flex: none;
+  padding: 0 14px;
 }
 
 .pr-options summary {
@@ -359,6 +381,12 @@
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* a note or chord typed but not yet checked */
+.pr-slot.is-typed {
+  border-style: solid;
+  border-color: var(--line-strong);
 }
 
 .pr-slot.has-label {

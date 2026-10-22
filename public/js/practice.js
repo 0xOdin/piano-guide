@@ -1,7 +1,8 @@
 // The practice page (/practice/): a random scale, chord or chord of a key to play or write out, or something to name.
-// Answers come from the keys on the page (click, tap or the computer keys) or a MIDI keyboard ("Playing"), a real
-// piano heard through the microphone ("Listening", listen.js), or are typed. The microphone only starts when the
-// person allows it on the page, every time. The questions, and reading and checking the answers, are in
+// Two ways to answer: "Play" (the keys on the page, by click, tap or the computer keys, a MIDI keyboard, and, when
+// "Your own piano" is on, a real piano heard through the microphone, listen.js), or "Type or self-check" (write the
+// notes, or play it anywhere and show the answer). The microphone only starts when the person allows it on the page,
+// every time. The questions, and reading and checking the answers, are in
 // practice-music.js.
 // The keyboard data (every key's scales) is written into the page by scripts/build.js.
 
@@ -13,7 +14,8 @@ const KEYS = JSON.parse($("keys-data").textContent);
 // The options are kept in this browser between visits, and the drill is also in the address (?drill=chords)
 const DEFAULTS = {
   drill: "scales", // scales | chords | key (chords in a key) | name
-  answer: "play", // play (on the page or MIDI) | listen (the microphone) | type | self (play it, then look)
+  answer: "play", // play (the page's keys or MIDI, and the microphone when listen is on) | type (write it, or show the answer)
+  listen: "off", // on: the microphone listens to your own piano too (it still asks first)
   keys: "all", // all, "0" to "5" (at most that many sharps or flats), or one key's slug
   scaleForms: ["major", "natural", "harmonic", "melodic"],
   chordTypes: ["major", "minor"],
@@ -32,7 +34,7 @@ const DEFAULTS = {
 };
 const DRILLS = ["scales", "chords", "key", "name"];
 const STORE = "pianoguide-practice";
-const VERSION = 2; // what the saved options were made by: 2 has melodic minor among the default scales
+const VERSION = 3; // what the saved options were made by: 2 has melodic minor among the default scales, 3 two ways to answer
 
 const settings = { ...DEFAULTS };
 try {
@@ -43,6 +45,10 @@ try {
   // saved before melodic minor joined the default scales: the old default becomes the new one, once. Scales of your
   // own choosing stay as they are.
   if ((saved.version || 1) < 2 && settings.scaleForms.join() === "major,natural,harmonic") settings.scaleForms = [...DEFAULTS.scaleForms];
+  // there used to be four ways to answer: "My piano" is now Play with your own piano on, "Self-check" is Type
+  if (settings.answer === "listen") settings.listen = "on";
+  if (settings.answer === "self") settings.answer = "type";
+  if (!["play", "type"].includes(settings.answer)) settings.answer = "play";
 } catch (e) {
   // no storage here (a private window): the defaults
 }
@@ -127,8 +133,8 @@ function bringIntoView(notes) {
 }
 
 const HAND_NAMES = { rh: "Right hand", lh: "Left hand" };
-// the hand is said for an answer played on a piano, not a typed one
-const handShown = () => !!q.hand && settings.answer !== "type";
+// the hand to play with (an answer that is typed may be played on a piano and checked too)
+const handShown = () => !!q.hand;
 // the fingers for the question's notes with that hand: a scale or one chord (not all the chords of a key)
 const answerFingers = () => (!handShown() ? null
   : q.kind === "sequence" ? q.fingers[q.hand]
@@ -149,9 +155,12 @@ function sound(abs, { delay = 0, length = 0.8, hold = false } = {}) {
 }
 
 let playTimers = [];
+let playingNotes = []; // lets go of the notes played by the page, so a sound started again begins on its own
 function stopPlaying() {
   playTimers.forEach(clearTimeout);
   playTimers = [];
+  playingNotes.forEach((letGo) => letGo());
+  playingNotes = [];
   down.clear();
 }
 
@@ -165,7 +174,7 @@ function flash(abs, delay, length) {
 function playNotes(notes, { together = false, start = 0 } = {}) {
   notes.forEach((n, i) => {
     const delay = start + (together ? 0 : i * 0.32);
-    sound(n.abs, { delay, length: together ? 1.2 : 0.32 }); // each note of a scale stops as the next one starts
+    playingNotes.push(sound(n.abs, { delay, length: together ? 1.2 : 0.32 })); // each note of a scale stops as the next one starts
     flash(n.abs, delay, together ? 0.6 : 0.28);
   });
   return together ? 1 : notes.length * 0.32;
@@ -199,11 +208,11 @@ let lastHands = []; // the hands of the last two questions, newest first
 let nextTimer = null;
 let refocus = false; // put the cursor back in the answer box for the next question
 
-// answered on a piano and checked by the page: on its keys or MIDI ("play"), or heard ("listen")
-const playing = () => settings.drill !== "name" && (settings.answer === "play" || settings.answer === "listen");
-const wantsMic = () => settings.drill !== "name" && settings.answer === "listen";
-// where answers come from: the microphone when listening, otherwise the page's keys, the computer keys and MIDI
-const answersFrom = (from) => playing() && (from === "mic") === wantsMic();
+// answered on a piano and checked by the page: its keys, the computer keys or MIDI, and your own piano when listening
+const playing = () => settings.drill !== "name" && settings.answer === "play";
+const wantsMic = () => playing() && settings.listen === "on";
+// where answers come from: the page's keys, the computer keys and MIDI, and the microphone when it is wanted
+const answersFrom = (from) => playing() && (from !== "mic" || wantsMic());
 const chordKind = () => q && (q.kind === "chord" || q.kind === "chord-seq");
 const answeringChord = (from) => answersFrom(from) && status === "asking" && chordKind();
 const currentChord = () => (q.kind === "chord-seq" ? q.chords[step] : q.chord);
@@ -353,15 +362,50 @@ function checkPicked() {
 
 /* ---------- Answering by typing ---------- */
 
+// A scale, or the chords of a key, can be written a part at a time. The right ones at the start are kept: they fill
+// their boxes for good and leave the text box, so the rest can be written after them (Enter after the first chord
+// saves it). Whatever isn't right stays in the box to fix.
+function checkTypedPart(text) {
+  const scale = q.kind === "sequence";
+  const r = checkTypedInOrder(text, (scale ? q.notes : q.chords).slice(step), scale ? "notes" : "chords");
+  if (r.error) {
+    say(r.error, "info");
+    return;
+  }
+  let kept = 0;
+  while (kept < r.marks.length && r.marks[kept].mark === "right") kept++;
+  step += kept;
+  const need = scale ? 7 : q.chords.length; // a scale's seven notes (the octave at the top may follow, or not)
+  if (step >= need) {
+    refocus = true;
+    finish(true);
+    return;
+  }
+  const left = words(text).slice(kept);
+  $("type-input").value = left.join(" ");
+  typed = left.length ? r.marks.slice(kept) : null;
+  const what = scale ? "note" : "chord";
+  if (!left.length) {
+    say(`Right so far: ${plural(need - step, what)} to go.`, "good");
+  } else {
+    mistakes++;
+    const first = typed[0];
+    say(first.mark === "spelling"
+      ? `${first.name} is the right key, spelled another way.${scale ? " A scale uses each letter once." : ""}`
+      : `${first.name} isn't the next ${what}.`, "bad");
+  }
+  render();
+}
+
 function checkTyped() {
   if (status !== "asking") return;
   const text = $("type-input").value;
+  if (q.kind === "sequence" || q.kind === "chord-seq") {
+    checkTypedPart(text);
+    return;
+  }
   let r;
-  if (q.kind === "sequence") {
-    r = checkTypedNotes(text, q.notes, { ordered: true });
-  } else if (q.kind === "chord-seq") {
-    r = checkTypedChords(text, q.chords);
-  } else if (settings.drill === "key" && words(text).length === 1) {
+  if (settings.drill === "key" && words(text).length === 1) {
     // a chord of a key can be answered with its name
     const c = readChord(words(text)[0]);
     if (!c) {
@@ -396,10 +440,10 @@ function checkTyped() {
 /* ---------- Drawing the page ---------- */
 
 const ASK = {
-  sequence: { play: "Play the scale going up, one octave", listen: "Play the scale going up on your piano", type: "Write the notes going up, one octave", self: "Play the scale going up on your piano, then check" },
-  chord: { play: "Play the chord", listen: "Play the chord on your piano", type: "Write its notes", self: "Play the chord on your piano, then check" },
-  keyChord: { play: "Play the chord", listen: "Play the chord on your piano", type: "Write its notes or its name", self: "Play the chord on your piano, then check" },
-  "chord-seq": { play: "Play the chords in order", listen: "Play the chords in order on your piano", type: "Write the chord names in order", self: "Play the chords in order on your piano, then check" },
+  sequence: { play: "Play the scale going up, one octave", type: "Write the notes going up, one octave" },
+  chord: { play: "Play the chord", type: "Write its notes" },
+  keyChord: { play: "Play the chord", type: "Write its notes or its name" },
+  "chord-seq": { play: "Play the chords in order", type: "Write the chord names in order" },
 };
 const PLACEHOLDER = {
   sequence: "Notes like C, F# or Bb",
@@ -446,7 +490,13 @@ function render() {
   // typed answer, marked
   const slots = [];
   if (typed && asking) {
-    typed.forEach((t) => slots.push({ text: t.name, cls: t.mark }));
+    // the notes or chords already kept, what is being typed after them (marked once checked), then the boxes to fill
+    const seq = q.kind === "chord-seq";
+    if (q.kind === "sequence") q.notes.slice(0, step).forEach((n) => slots.push({ text: n.name, cls: "right" }));
+    if (seq) q.chords.slice(0, step).forEach((c) => slots.push({ text: c.symbol, label: c.numeral, cls: "right" }));
+    typed.forEach((t, j) => slots.push({ text: t.name, label: seq ? String(step + j + 1) : "", cls: t.mark || "typed" }));
+    const total = q.kind === "sequence" ? q.notes.length : seq ? q.chords.length : 0;
+    for (let i = slots.length; i < total; i++) slots.push({ text: "", label: seq ? String(i + 1) : "", cls: "" });
   } else if (q.kind === "sequence") {
     q.notes.forEach((n, i) => slots.push(i < step || !asking ? { text: n.name, cls: status === "shown" ? "shown" : "right" } : { text: "", cls: "" }));
   } else if (q.kind === "chord-seq") {
@@ -508,10 +558,11 @@ function render() {
   $("main-btn").disabled = !!action && action.label === "Check" && picked.size < 2;
   $("hear-btn").hidden = q.kind !== "choice" && asking;
   $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : settings.nameHow === "see" ? "▶ Hear it" : "▶ Hear it again";
-  $("reveal-btn").hidden = !asking || q.kind === "choice" || (action && action.label === "Show answer");
+  $("reveal-btn").hidden = !asking || q.kind === "choice";
   $("clear-btn").hidden = !(asking && onPage && chordKind() && picked.size);
   $("skip-btn").hidden = !asking;
-  $("answer-hint").textContent = ANSWER_HINTS[settings.answer];
+  $("answer-hint").textContent = ANSWER_HINTS[settings.answer === "play" && settings.listen === "on" ? "listen" : settings.answer];
+  $("listen-option").hidden = settings.answer !== "play";
 
   // MIDI and the computer keys for playing, the microphone for listening
   $("midi-row").hidden = !onPage;
@@ -523,20 +574,18 @@ function render() {
   renderPiano();
 }
 
-// The main button: Check (chords on the screen keys), Show answer (self-check), Next question (once answered), or
-// nothing while the page waits for notes
+// The main button: Check (chords on the screen keys), Next question (once answered), or nothing while the page waits
+// for notes. Show answer is always a link beside it.
 function mainAction() {
   if (status !== "asking") return { label: "Next question", run: newQuestion };
-  if (settings.answer === "self" && q.kind !== "choice") return { label: "Show answer", run: () => finish(false) };
-  if (settings.answer === "play" && settings.drill !== "name" && chordKind()) return { label: "Check", run: checkPicked };
+  if (playing() && chordKind()) return { label: "Check", run: checkPicked };
   return null;
 }
 
 const ANSWER_HINTS = {
-  play: "Tap the keys below, or use your computer keys or a MIDI keyboard.",
-  listen: "Play your own piano: the page listens through the microphone.",
-  type: "Write the note names, like C E G or F# A C#.",
-  self: "Play it on any piano, then press Show answer to check yourself.",
+  play: "Tap the keys below, or use your computer keys or a MIDI keyboard. To play your own piano, turn on listening.",
+  listen: "Play your own piano and the page listens, or tap the keys below, use your computer keys or a MIDI keyboard.",
+  type: "Write the note names, like C E G or F# A C#. Or play it on any piano and press Show answer to check yourself.",
 };
 
 // one line under "Settings" that says what is chosen
@@ -740,7 +789,7 @@ $("drills").addEventListener("click", (e) => {
 });
 
 // the options: one choice (seg) or several (chips, at least one kept)
-const KEEP_QUESTION = ["answer", "autoNext", "sound", "nameHow"];
+const KEEP_QUESTION = ["answer", "listen", "autoNext", "sound", "nameHow"];
 document.querySelector(".practice").addEventListener("click", (e) => {
   const b = e.target.closest("[data-setting] button");
   if (!b) return;
@@ -758,7 +807,7 @@ document.querySelector(".practice").addEventListener("click", (e) => {
   }
   save();
   if (KEEP_QUESTION.includes(key)) {
-    if (key === "answer" || key === "nameHow") startAnswer();
+    if (key === "answer" || key === "listen" || key === "nameHow") startAnswer();
     else render();
     if (key === "nameHow" && settings.nameHow !== "see") playQuestion();
   } else {
@@ -810,11 +859,14 @@ $("type-form").addEventListener("submit", (e) => {
   e.preventDefault();
   checkTyped();
 });
+// as it is typed, the boxes show each note or chord written so far; a change clears the last check's marks and message
+const tidyName = (w) => w.replace(/^([a-g])/, (c) => c.toUpperCase()).replace(/^([A-G])#/, "$1♯").replace(/^([A-G])b/, "$1♭");
 $("type-input").addEventListener("input", () => {
-  if (typed) {
-    typed = null;
-    render();
-  }
+  if (status !== "asking") return;
+  const written = words($("type-input").value);
+  typed = written.length ? written.map((w) => ({ name: tidyName(w), mark: "" })) : null;
+  say("");
+  render();
 });
 
 $("main-btn").addEventListener("click", () => {
