@@ -221,6 +221,64 @@ const chordKind = () => q && (q.kind === "chord" || q.kind === "chord-seq");
 const answeringChord = (from) => answersFrom(from) && status === "asking" && chordKind();
 const currentChord = () => (q.kind === "chord-seq" ? q.chords[step] : q.chord);
 
+/* ---------- This session: how it is going ---------- */
+
+// Kept for as long as the tab is open (sessionStorage), across the drills, until "Start a new session".
+//   right: answered right, first: of those, with no wrong try; shown: the answer shown or a wrong choice made;
+//   skipped; run: right answers in a row now, best: the longest run; missed: the latest ones to go over again
+const SESSION_STORE = "pianoguide-practice-session";
+const NEW_SESSION = () => ({ right: 0, first: 0, shown: 0, skipped: 0, run: 0, best: 0, missed: [] });
+let session = NEW_SESSION();
+try {
+  session = { ...session, ...JSON.parse(sessionStorage.getItem(SESSION_STORE)) };
+} catch (e) {
+  // a new session
+}
+
+function tally(outcome) {
+  if (outcome === "right") {
+    session.right++;
+    if (!mistakes) session.first++;
+    session.run++;
+    session.best = Math.max(session.best, session.run);
+  } else {
+    session[outcome]++;
+    session.run = 0;
+    if (outcome === "shown") {
+      const what = q.kind === "choice" ? q.reveal.split(":")[0] : q.title;
+      session.missed = [what, ...session.missed.filter((m) => m !== what)].slice(0, 6);
+    }
+  }
+  try {
+    sessionStorage.setItem(SESSION_STORE, JSON.stringify(session));
+  } catch (e) {
+    // counted on this page only
+  }
+}
+
+function renderScore() {
+  const answered = session.right + session.shown;
+  $("score").hidden = !answered && !session.skipped;
+  $("score-line").textContent = `${session.right} of ${answered} right${session.run >= 2 ? ` · ${session.run} in a row` : ""}`;
+  const rows = [
+    ["Right first time", session.first],
+    ["Right after a wrong try", session.right - session.first],
+    ["Answer shown", session.shown],
+    ["Skipped", session.skipped],
+    ["Most right in a row", session.best],
+  ];
+  $("score-grid").innerHTML = "";
+  for (const [label, value] of rows) {
+    const dt = document.createElement("dt");
+    dt.textContent = label;
+    const dd = document.createElement("dd");
+    dd.textContent = value;
+    $("score-grid").append(dt, dd);
+  }
+  $("score-missed").hidden = !session.missed.length;
+  $("score-missed").textContent = `To go over again: ${session.missed.join(", ")}`;
+}
+
 function newQuestion() {
   for (let i = 0; i < 12; i++) {
     q = makeQuestion(KEYS, settings);
@@ -259,9 +317,21 @@ function startAnswer() {
   refocus = false;
 }
 
-function say(text, tone = "") {
-  $("feedback").textContent = text;
-  $("feedback").className = `pr-feedback${tone ? ` is-${tone}` : ""}`;
+// what happened, in bold, and (optional) the detail after it in plain type
+function say(text, tone = "", detail = "") {
+  const box = $("feedback");
+  box.className = `pr-feedback${tone ? ` is-${tone}` : ""}`;
+  box.textContent = "";
+  if (!text) return;
+  const lead = document.createElement("strong");
+  lead.textContent = text;
+  box.append(lead);
+  if (detail) {
+    const more = document.createElement("span");
+    more.className = "pr-feedback-detail";
+    more.textContent = detail;
+    box.append(" ", more);
+  }
 }
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -282,13 +352,13 @@ function finish(right) {
     : q.kind === "chord" ? `${q.chord.written || q.chord.symbol}: ${notes(q.chord.notes)}`
     : q.kind === "chord-seq" ? q.chords.map((c) => c.symbol).join(" ")
     : q.reveal) + (fingers ? ` · ${HAND_NAMES[q.hand]}: ${fingers.join(" ")}` : "");
+  tally(right ? "right" : "shown");
   if (right) {
-    const slips = mistakes ? ` (${plural(mistakes, "wrong try")} on the way)` : "";
-    say(`Right! ${answer}${slips}`, "good");
+    say(mistakes ? `Right, after ${plural(mistakes, "wrong try")}.` : "Right first time!", "good", answer);
     if (!playing()) playAnswer();
     if (settings.autoNext === "on") nextTimer = setTimeout(newQuestion, q.kind === "chord-seq" ? 2600 : 1800);
   } else {
-    say(q.kind === "choice" ? `Not quite. ${answer}` : `The answer: ${answer}`, "info");
+    say(q.kind === "choice" ? "Not quite." : "The answer:", "info", answer);
     playAnswer();
   }
   render();
@@ -484,6 +554,7 @@ function render() {
     $("minor-form").hidden = oneKeyChosen ? !(chosenKey && chosenKey.minor) : !settings.keyTypes.includes("minor");
   }
   $("options-summary").textContent = summary();
+  renderScore();
 
   // the question
   $("ask").textContent = q.kind === "choice"
@@ -653,21 +724,35 @@ function onMidi(note, on) {
   renderPiano();
 }
 
+// the keys held on a keyboard that has gone (unplugged) would sound for ever: let them go
+function releaseMidi() {
+  midiHeld.forEach((stop, abs) => { stop(); down.delete(abs); });
+  midiHeld.clear();
+  midiChord = new Set();
+  midiMatched = false;
+  renderPiano();
+}
+
 async function startMidi() {
-  if (!("requestMIDIAccess" in navigator)) {
-    $("midi-status").textContent = "This browser can't use MIDI. Chrome and Edge can.";
-    return;
-  }
+  $("midi-btn").disabled = true;
   $("midi-status").textContent = "Connecting…";
+  let had = 0; // keyboards connected last time the list changed
   try {
     await connectMidi(onMidi, (names) => {
-      $("midi-status").textContent = names.length ? `Connected: ${names.join(", ")}` : "No MIDI keyboard found. Plug one in and it will show up here.";
+      if (names.length < had) releaseMidi();
+      $("midi-status").textContent = names.length ? `Connected: ${names.join(", ")}`
+        : had ? "The MIDI keyboard was unplugged. Plug it back in and it carries on."
+        : "No MIDI keyboard found. Plug one in and it will show up here.";
+      had = names.length;
       $("midi-btn").hidden = true;
       $("midi-sound").hidden = false;
       renderMidiSound();
     });
   } catch (e) {
-    $("midi-status").textContent = "MIDI was blocked. Allow it in the browser's settings for this site.";
+    $("midi-btn").disabled = false;
+    $("midi-status").textContent = e && e.name === "SecurityError" || e && e.name === "NotAllowedError"
+      ? "MIDI is blocked for this site. Allow it in the browser's site settings, then try again."
+      : "The MIDI keyboard couldn't connect. Try again, or answer on the keys above.";
   }
 }
 
@@ -735,19 +820,26 @@ async function startListening() {
     onStrike: onMicStrike,
     onFrame: onMicChord,
     onLevel: (v) => { $("mic-level").style.width = `${Math.round(v * 100)}%`; },
+    onEnded: () => stopListening("The microphone stopped: it was unplugged, or another app took it. Allow it again to carry on."),
   });
   $("mic-allow").disabled = true;
+  $("mic-allow").textContent = "Waiting for the microphone…";
   try {
     await l.start();
   } catch (e) {
     l.stop();
-    $("mic-error").textContent = e && e.name === "NotAllowedError"
+    const name = e && e.name;
+    $("mic-error").textContent = name === "NotAllowedError" || name === "PermissionDeniedError"
       ? "The microphone is blocked for this site. Allow it in the browser's site settings (the icon at the left of the address bar), then try again."
-      : e && e.name === "NotFoundError" ? "No microphone was found. Plug one in, or answer another way."
-      : "The microphone couldn't start. Is another app using it?";
+      : name === "NotFoundError" || name === "OverconstrainedError" ? "No microphone was found. Plug one in, or answer another way."
+      : name === "NotReadableError" ? "The microphone is busy: another app or tab may be using it. Close that, then try again."
+      : name === "SecurityError" ? "This page isn't allowed to use the microphone here."
+      : name === "AbortError" ? "The microphone was stopped before it started. Try again."
+      : "The microphone couldn't start. Try again, or answer another way.";
     return;
   } finally {
     $("mic-allow").disabled = false;
+    $("mic-allow").textContent = "Allow the microphone";
   }
   // the person may have left "Listening", or the page, while the browser was asking
   if (!wantsMic() || document.hidden) {
@@ -895,7 +987,28 @@ $("clear-btn").addEventListener("click", () => {
 });
 $("hear-btn").addEventListener("click", () => (status === "asking" ? playQuestion() : playAnswer()));
 $("reveal-btn").addEventListener("click", () => finish(false));
-$("skip-btn").addEventListener("click", newQuestion);
+$("skip-btn").addEventListener("click", () => {
+  if (status === "asking") tally("skipped");
+  newQuestion();
+});
+$("score-reset").addEventListener("click", () => {
+  session = NEW_SESSION();
+  try {
+    sessionStorage.removeItem(SESSION_STORE);
+  } catch (e) {
+    // nothing kept
+  }
+  $("score").open = false;
+  renderScore();
+});
+// the session panel closes with a click elsewhere, or Escape
+document.addEventListener("click", (e) => { if (!$("score").contains(e.target)) $("score").open = false; });
+$("score").addEventListener("keydown", (e) => {
+  if (e.key !== "Escape" || !$("score").open) return;
+  e.preventDefault();
+  $("score").open = false;
+  $("score-line").focus();
+});
 // the page's own sound: off stops what is playing too (a MIDI keyboard's sound here has its own switch)
 $("sound-btn").addEventListener("click", () => {
   settings.sound = settings.sound === "on" ? "off" : "on";
@@ -911,6 +1024,10 @@ $("sound-btn").addEventListener("click", () => {
   }
 });
 $("midi-btn").addEventListener("click", startMidi);
+if (!("requestMIDIAccess" in navigator)) {
+  $("midi-btn").hidden = true;
+  $("midi-status").textContent = "MIDI keyboards work in Chrome, Edge and Firefox. In this browser, play on the keys above, or turn on listening.";
+}
 $("midi-sound").addEventListener("click", () => {
   settings.midiSound = settings.midiSound === "on" ? "off" : "on";
   save();

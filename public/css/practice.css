@@ -278,8 +278,19 @@
   margin-bottom: 16px;
 }
 
+/* what to do, and at the other end how the session is going */
+.pr-ask-row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-bottom: 8px;
+}
+
 .pr-ask {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -306,6 +317,100 @@
 .pr-sub {
   margin: 8px 0 0;
   color: var(--muted);
+}
+
+/* the session: "4 of 6 right" in a small pill, opening to the details */
+.pr-score {
+  margin-left: auto; /* on its own line on a phone, still at the right */
+}
+
+.pr-score[hidden] {
+  display: none;
+}
+
+.pr-score summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  list-style: none;
+  cursor: pointer;
+}
+
+.pr-score summary::-webkit-details-marker {
+  display: none;
+}
+
+.pr-score summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s var(--ease);
+}
+
+.pr-score[open] summary::after {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+.pr-score-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  width: min(320px, 100%);
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lift);
+}
+
+.pr-score-panel h3 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pr-score-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 16px;
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+}
+
+.pr-score-grid dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-score-missed {
+  margin: 0 0 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.pr-score-missed[hidden] {
+  display: none;
 }
 
 /* "Left hand" in ebony, "Right hand" in felt red, so the two are told apart at a glance; the mark is a small L or R */
@@ -540,6 +645,7 @@
   height: 44px;
 }
 
+/* what happened in bold ("Right first time!"), then the answer in plain type */
 .pr-feedback {
   min-height: 1.5em;
   margin: 0 0 14px;
@@ -547,6 +653,15 @@
   font-weight: 600;
   line-height: 1.5;
   color: var(--muted);
+}
+
+.pr-feedback strong {
+  font-weight: 700;
+}
+
+.pr-feedback-detail {
+  font-weight: 400;
+  color: var(--text);
 }
 
 .pr-feedback.is-good {

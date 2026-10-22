@@ -140,7 +140,18 @@ scripts: chords-data practice-music listen piano-sound practice
                 </div>
 
                 <div class="pr-question">
-                    <p class="pr-ask" id="ask"></p>
+                    <div class="pr-ask-row">
+                        <p class="pr-ask" id="ask"></p>
+                        <details class="pr-score" id="score" hidden>
+                            <summary id="score-line"></summary>
+                            <div class="pr-score-panel">
+                                <h3>This session</h3>
+                                <dl class="pr-score-grid" id="score-grid"></dl>
+                                <p class="pr-score-missed" id="score-missed" hidden></p>
+                                <button type="button" class="pr-link" id="score-reset">Start a new session</button>
+                            </div>
+                        </details>
+                    </div>
                     <div class="pr-title-row">
                         <h2 class="pr-title" id="title"></h2>
                         <span class="pr-hand" id="hand" hidden><span class="pr-hand-mark" aria-hidden="true"></span><span id="hand-name"></span></span>

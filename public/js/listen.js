@@ -14,7 +14,7 @@
 async function connectMidi(onNote, onDevices) {
   const access = await navigator.requestMIDIAccess();
   const attach = () => {
-    const inputs = [...access.inputs.values()];
+    const inputs = [...access.inputs.values()].filter((i) => i.state !== "disconnected"); // one unplugged can stay listed
     for (const input of inputs) {
       input.onmidimessage = (e) => {
         const [status, note, velocity] = e.data;
@@ -336,11 +336,12 @@ class StrikeFinder {
 /* ---------- The microphone ---------- */
 
 // Listens to the microphone. Every 60 ms or so: onFrame([{ midi, strength, power }]) with the notes sounding together,
-// and onStrike({ midi, strength, t }) for each key just struck. onLevel(0 to 1) feeds a level meter. quiet(seconds)
-// ignores what it hears for a moment while the page itself plays a sound, so it doesn't answer for you.
+// and onStrike({ midi, strength, t }) for each key just struck. onLevel(0 to 1) feeds a level meter. onEnded() if the
+// microphone stops by itself (unplugged, or taken by another app). quiet(seconds) ignores what it hears for a moment
+// while the page itself plays a sound, so it doesn't answer for you.
 class Listener {
-  constructor({ onFrame, onStrike, onLevel }) {
-    Object.assign(this, { onFrame, onStrike, onLevel, deafUntil: 0 });
+  constructor({ onFrame, onStrike, onLevel, onEnded }) {
+    Object.assign(this, { onFrame, onStrike, onLevel, onEnded, deafUntil: 0 });
   }
 
   async start() {
@@ -348,7 +349,10 @@ class Listener {
     this.stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
     });
+    this.stream.getAudioTracks().forEach((t) => t.addEventListener("ended", () => this.stream && this.onEnded && this.onEnded()));
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Safari can start it paused, after the wait for permission: it would hear nothing
+    if (this.ctx.state === "suspended") await this.ctx.resume();
     this.analyser = this.ctx.createAnalyser();
     this.analyser.fftSize = 8192; // the newest 170 ms
     this.ctx.createMediaStreamSource(this.stream).connect(this.analyser);
