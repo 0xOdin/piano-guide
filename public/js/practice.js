@@ -442,14 +442,14 @@ function checkTyped() {
 const ASK = {
   sequence: { play: "Play the scale going up, one octave", type: "Write the notes going up, one octave" },
   chord: { play: "Play the chord", type: "Write its notes" },
-  keyChord: { play: "Play the chord", type: "Write its notes or its name" },
-  "chord-seq": { play: "Play the chords in order", type: "Write the chord names in order" },
+  keyChord: { play: "Play the chord", type: "Write its notes, or the chord" },
+  "chord-seq": { play: "Play the chords in order", type: "Write the chords in order" },
 };
 const PLACEHOLDER = {
   sequence: "Notes like C, F# or Bb",
   chord: "Notes like C, F# or Bb",
-  keyChord: "Notes (D F A) or a name (Dm)",
-  "chord-seq": "Chord names like Dm, F#dim or Bbmaj7",
+  keyChord: "Notes (D F A) or a chord (Dm)",
+  "chord-seq": "Chords like Dm, F#dim or Bbmaj7",
 };
 
 function render() {
@@ -585,7 +585,7 @@ function mainAction() {
 const ANSWER_HINTS = {
   play: "Tap the keys below, or use your computer keys or a MIDI keyboard. To play your own piano, turn on listening.",
   listen: "Play your own piano and the page listens, or tap the keys below, use your computer keys or a MIDI keyboard.",
-  type: "Write the note names, like C E G or F# A C#. Or play it on any piano and press Show answer to check yourself.",
+  type: "Write the notes, like C E G or F# A C#. Or play it on any piano and press Show answer to check yourself.",
 };
 
 // one line under "Settings" that says what is chosen

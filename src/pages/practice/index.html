@@ -159,7 +159,9 @@ scripts: chords-data practice-music listen piano-sound practice
                 <div class="pr-choices" id="choices" role="group" aria-label="Answers"></div>
                 <form class="pr-type" id="type-form" autocomplete="off">
                     <label class="sr-only" for="type-input">Your answer</label>
-                    <input class="pr-input-text" id="type-input" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="done">
+                    <!-- not a field to fill from your contacts or saved details: no AutoFill, from the browser (Safari leaves a
+                         field named like a search alone) or password managers -->
+                    <input class="pr-input-text" id="type-input" name="answer-search" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="done" data-1p-ignore data-lpignore="true" data-form-type="other">
                     <button type="submit" class="kb-btn is-primary">Check</button>
                 </form>
                 <p class="pr-feedback" id="feedback" aria-live="polite"></p>
