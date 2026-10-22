@@ -185,7 +185,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px var(--pad);
+  padding: 8px var(--pad);
   background: var(--bg);
   border-top: 3px solid var(--accent); /* the felt strip */
   border-bottom: 1px solid var(--line);
@@ -195,9 +195,27 @@ header {
   font-size: 1.3rem;
 }
 
-.header-links a[aria-current="page"] {
-  color: var(--text);
-  font-weight: 600;
+/* the first thing the Tab key reaches: hidden above the page until then */
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 30;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--strong);
+  color: var(--on-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+main:focus {
+  outline: none;
 }
 
 .header-links,
@@ -209,24 +227,47 @@ header {
   padding: 1rem var(--pad);
   background: var(--bg);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 18px 28px -22px rgba(28, 25, 23, 0.35);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
 }
 
+/* shown at once on opening (not at the end of the fade), so what is in it can take the keyboard straight away */
 .header-links.is-open,
 .search-form.is-open {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
 }
 
+/* the menu on a phone and a tablet: every page as a large button, two or four to a row, the one you are on in felt */
 .header-links ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+}
+
+.header-links a {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem 1.5rem;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.header-links a:active {
+  background: var(--bg-alt);
+}
+
+.header-links a[aria-current="page"] {
+  background: var(--bg-alt);
+  box-shadow: inset 3px 0 0 var(--accent);
+  color: var(--text);
 }
 
 .header-btn-container {
@@ -234,12 +275,12 @@ header {
   gap: 4px;
 }
 
-.header-btn-container button {
+.header-btn-container > button {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: 12px;
   background: transparent;
@@ -249,7 +290,7 @@ header {
   transition: transform 0.2s ease;
 }
 
-.header-btn-container button:active {
+.header-btn-container > button:active {
   transform: scale(0.9);
 }
 
@@ -257,6 +298,26 @@ header {
 .theme-btn svg {
   width: 17px;
   height: 17px;
+}
+
+/* the menu button: three lines, a cross while the menu is open */
+.menu-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.menu-btn .menu-close,
+.menu-btn[aria-expanded="true"] .menu-open {
+  display: none;
+}
+
+.menu-btn[aria-expanded="true"] .menu-close {
+  display: block;
+}
+
+/* "/" in the search box, to say it is the key that gets there (desktop only, and gone once the box is in use) */
+.search-key {
+  display: none;
 }
 
 .theme-btn .sun,
@@ -325,6 +386,45 @@ header {
 .suggest-item strong {
   min-width: 0;
   font-weight: 600;
+}
+
+/* "= C♯ major" after D♭ major, when it was found by that spelling */
+.search-also {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* with nothing typed: a few things to try */
+.suggest-hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 8px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.suggest-hints button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.suggest-hints button:hover,
+.suggest-hints button:focus-visible {
+  border-color: var(--line-strong);
+  background: var(--bg-alt);
+  outline: none;
 }
 
 .suggest-item:hover,
@@ -583,7 +683,7 @@ footer a:focus-visible {
 
   /* Header */
   header {
-    padding: 18px var(--pad);
+    padding: 13px var(--pad);
   }
 
   .logo {
@@ -656,15 +756,31 @@ footer a:focus-visible {
   }
 
   .header-links ul {
-    flex-wrap: nowrap;
+    display: flex;
     gap: 32px;
   }
 
+  /* each link as tall as the header row, so it is easy to hit */
   .header-links a {
     position: relative;
+    display: block;
+    min-height: 0;
+    padding: 10px 0;
+    border-radius: 0;
     font-size: 0.92rem;
+    font-weight: 400;
     color: var(--muted);
     transition: color 0.2s ease;
+  }
+
+  .header-links a:active {
+    background: none;
+  }
+
+  .header-links a[aria-current="page"] {
+    background: none;
+    box-shadow: none;
+    font-weight: 600;
   }
 
   /* the page you are on: a short felt line under its name */
@@ -672,7 +788,7 @@ footer a:focus-visible {
     content: "";
     position: absolute;
     right: 0;
-    bottom: -9px;
+    bottom: 1px;
     left: 0;
     height: 2px;
     border-radius: 2px;
@@ -714,12 +830,40 @@ footer a:focus-visible {
     left: auto;
   }
 
+  @media (hover: hover) and (pointer: fine) {
+    .search-key {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--bg);
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1;
+      pointer-events: none;
+      transform: translateY(-50%);
+      transition: opacity 0.15s ease;
+    }
+
+    .search-form input:focus ~ .search-key,
+    .search-form input:not(:placeholder-shown) ~ .search-key {
+      opacity: 0;
+    }
+  }
+
   .search-suggest {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
     z-index: 20;
-    width: max(100%, 360px);
+    width: max(100%, 400px);
     margin: 0;
     padding: 6px;
     background: var(--surface);
@@ -739,14 +883,14 @@ footer a:focus-visible {
   }
 }
 
-/* Small desktops: the menu and the search box sit closer, so all six menu items fit beside them and the toggle */
+/* Small desktops: the menu and the search box sit closer, so all seven menu items fit beside them and the toggle */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .header-links ul {
-    gap: 18px;
+    gap: 16px;
   }
 
   .search-form input {
-    width: 150px;
+    width: 140px;
   }
 }
 

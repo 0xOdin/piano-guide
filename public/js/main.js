@@ -37,25 +37,69 @@ const headerLinks = document.querySelector(".header-links");
 const searchBtn = document.querySelector(".search-btn");
 const searchForm = document.querySelector(".search-form");
 
+// On a phone and a tablet the menu and the search box are panels that drop down under the header, one at a time.
+// They close with their button, a click elsewhere, or Escape (which gives the keyboard back to the button).
+function setMenu(open) {
+    headerLinks.classList.toggle("is-open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Menu");
+}
+
+function setSearch(open) {
+    searchForm.classList.toggle("is-open", open);
+    searchBtn.setAttribute("aria-expanded", String(open));
+}
+
 menuBtn.addEventListener("click", () => {
-    headerLinks.classList.toggle("is-open");
-    searchForm.classList.remove("is-open");
+    const open = !headerLinks.classList.contains("is-open");
+    setMenu(open);
+    setSearch(false);
+    // the links come before the button on the page, so Tab from the button would skip them: start on the first
+    if (open) headerLinks.querySelector("a").focus();
 });
 
 searchBtn.addEventListener("click", () => {
-    searchForm.classList.toggle("is-open");
-    headerLinks.classList.remove("is-open")
+    const open = !searchForm.classList.contains("is-open");
+    setSearch(open);
+    setMenu(false);
+    if (open) searchForm.querySelector("input").focus();
 });
 
 document.addEventListener("click", (event) => {
-    if (!headerLinks.contains(event.target) && !menuBtn.contains(event.target)) {
-        headerLinks.classList.remove("is-open");
-    }
-
-    if (!searchForm.contains(event.target) && !searchBtn.contains(event.target)) {
-        searchForm.classList.remove("is-open");
-    }
+    if (!headerLinks.contains(event.target) && !menuBtn.contains(event.target)) setMenu(false);
+    if (!searchForm.contains(event.target) && !searchBtn.contains(event.target)) setSearch(false);
 });
+
+document.addEventListener("keydown", (event) => {
+    // the search box's suggestions close first (search.js marks that Escape as used)
+    if (event.key === "Escape" && !event.defaultPrevented) {
+        if (headerLinks.classList.contains("is-open")) {
+            setMenu(false);
+            menuBtn.focus();
+        } else if (searchForm.classList.contains("is-open")) {
+            setSearch(false);
+            searchBtn.focus();
+        }
+        return;
+    }
+    // "/" goes to the search box from anywhere, unless a box has the keyboard (on the search page, its own box)
+    const typing = event.target instanceof Element && event.target.closest("input, select, textarea, [contenteditable]");
+    if (event.key !== "/" || typing || event.metaKey || event.ctrlKey || event.altKey) return;
+    event.preventDefault();
+    const pageBox = document.getElementById("search-input");
+    if (!pageBox && getComputedStyle(searchBtn).display !== "none") {
+        setSearch(true);
+        setMenu(false);
+    }
+    (pageBox || searchForm.querySelector("input")).focus();
+});
+
+// the panels belong to the narrow header: none is left open behind the desktop one
+window.matchMedia("(min-width: 1024px)").addEventListener("change", () => {
+    setMenu(false);
+    setSearch(false);
+});
+
 // Parts of a page marked .reveal fade up as they come into view (styles in main.css)
 const revealed = document.querySelectorAll(".reveal");
 if (revealed.length && "IntersectionObserver" in window) {

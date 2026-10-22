@@ -61,6 +61,7 @@ const NAV = [
   ["arpeggios", "/arpeggios/", "Arpeggios"],
   ["chords", "/chords/", "Chords"],
   ["theory", "/theory/", "Theory"],
+  ["keyboard", "/keyboard/", "Keyboard"],
   ["practice", "/practice/", "Practice"],
   ["metronome", "/metronome/", "Metronome"],
 ];
@@ -699,10 +700,17 @@ function keySwitch(key, page) {
 const keyTemplate = readPage(path.join(SRC, "templates", "key.html"));
 
 // The site's search (public/js/search.js) looks through these, written to /search-index.json at the end:
-// { t: title, k: kind, s: a line under it, u: url, w: other words it can be found by (another spelling, a symbol) }.
+// { t: title, k: kind, s: a line under it, u: url, w: other words it can be found by (a symbol, a description),
+//   a: (optional) the title spelled another way, found as readily as the title itself }.
 // They are kept in the order they are added, which is the order results with the same score come in.
 const searchEntries = [];
 const SEARCH_KINDS = { scales: "Scale", arpeggios: "Arpeggio", chords: "Chord" };
+// Keys with no page of their own under this spelling, found at the key that plays the same notes: "C♯ major" finds
+// D♭ major. (F♯ and G♭ major, D♯ and E♭ minor each have pages in both spellings.)
+const SAME_KEYS = {
+  "D♭ major": "C♯ major", "E♭ major": "D♯ major", "A♭ major": "G♯ major", "B♭ major": "A♯ major", "B major": "C♭ major",
+  "F♯ minor": "G♭ minor", "C♯ minor": "D♭ minor", "G♯ minor": "A♭ minor", "B♭ minor": "A♯ minor",
+};
 
 function addKeyPage({ url, keyUrl, keyName, section, tabnav, out }) {
   const [, sectionUrl, sectionName] = NAV.find(([id]) => id === section);
@@ -750,15 +758,21 @@ for (const key of KEYS) {
     out.heroExtra = relativeLine(key, page) + (out.heroExtra || ""); // the relative key first, then the page's own links
     addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out });
 
-    // for the search: a minor key's main page is its (natural) minor scale
+    // for the search: a minor key's main page is its (natural) minor scale. A chord page is also found by its
+    // symbol (Am, F♯m, D♭), and every page by the other spelling of its key, if it has one.
     const natural = page.path === "" && isMinor(key);
     const notes = out.data.mode === "chord" ? out.data.inversions[0].rh.notes : out.data.octaves[1].notes.slice(0, page.section === "scales" ? 7 : 3);
+    const title = natural ? `${cap(key.name)} scale` : cap(out.heading.replace(/ fingering$/, ""));
+    const root = key.name.split(" ")[0];
+    const sameRoot = SAME_KEYS[key.name] && SAME_KEYS[key.name].split(" ")[0];
+    const symbols = page.section === "chords" ? [root, sameRoot].filter(Boolean).map((r) => r + (isMinor(key) ? "m" : "")) : [];
     searchEntries.push({
-      t: natural ? `${cap(key.name)} scale` : cap(out.heading.replace(/ fingering$/, "")),
+      t: title,
       k: SEARCH_KINDS[page.section],
       s: `${notes.map((n) => n.name).join(" ")} · ${cap(key.signature.split(" (")[0])}`,
       u: `${keyUrl}${page.path}`,
-      w: `${key.name} ${natural ? "natural" : ""} ${page.section === "chords" ? "triad" : ""}`,
+      w: [key.name, natural ? "natural" : "", page.section === "chords" ? "triad" : "", ...symbols].filter(Boolean).join(" "),
+      ...(sameRoot ? { a: title.replace(root, sameRoot) } : {}),
     });
   }
 }
@@ -779,13 +793,13 @@ for (const key of KEYS) {
       const name = `${root.name} ${type.name}`;
       if (keyChords.has(name)) continue;
       const notes = spellChord(root, type).map((n) => n.name);
-      const alt = root.alt ? `${root.alt.name} ${type.name} ${root.alt.name}${type.symbol}` : "";
       searchEntries.push({
         t: `${name} chord`,
         k: "Chord",
         s: `${root.name}${type.symbol} · ${notes.join(" ")}`,
         u: `/chords/?root=${noteSlug(root.name)}&type=${type.tab.toLowerCase()}`,
-        w: `${root.name}${type.symbol} ${type.symbol} ${type.tab} ${type.group} ${alt}`,
+        w: `${root.name}${type.symbol} ${type.symbol} ${type.tab} ${type.group}${root.alt ? ` ${root.alt.name}${type.symbol}` : ""}`,
+        ...(root.alt ? { a: `${root.alt.name} ${type.name} chord` } : {}),
       });
     }
   }

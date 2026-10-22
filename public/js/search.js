@@ -5,7 +5,8 @@
 //
 // Notes are written in many ways, so the words are tidied before they are compared: "F sharp", "F#", "f♯" are all
 // f#, "B flat", "Bb", "B♭" all bb, "seventh" is 7th, and a plural counts as the word ("chords" finds chord). Every word
-// typed must match: a note name exactly (b doesn't find bb), any other word by its start (arp finds arpeggio).
+// typed must match: a note name exactly (b doesn't find bb), any other word by its start (arp finds arpeggio). A key
+// is found under either spelling: "C sharp major" finds D♭ major, which plays the same keys.
 
 (() => {
   const headerForm = document.querySelector(".search-form");
@@ -32,7 +33,8 @@
       loading = fetch(indexUrl).then((r) => r.json()).then((entries) => {
         index = entries.map((e, order) => {
           const title = words(e.t);
-          return { ...e, order, title: title.join(" "), all: [...title, ...words(`${e.k} ${e.w || ""}`)] };
+          const alt = e.a ? words(e.a) : [];
+          return { ...e, order, title: title.join(" "), alt: alt.join(" "), all: [...title, ...alt, ...words(`${e.k} ${e.w || ""}`)] };
         });
         return index;
       });
@@ -40,8 +42,9 @@
     return loading;
   }
 
-  // the best matches first: each word found whole counts more than one found by its start, a title that begins with
-  // (or holds) the words typed counts more still, and a scale comes before its arpeggio and chord
+  // the best matches first: each word found whole counts more than one found by its start, a title (in either
+  // spelling) that begins with (or holds) the words typed counts more still, and a scale comes before its arpeggio
+  // and chord. A result found by its other spelling carries it, as `asTyped`, to show beside the title.
   const KIND_ORDER = { Scale: 0.3, Arpeggio: 0.2, Chord: 0.1 };
   function find(query, limit = Infinity) {
     const typed = words(query);
@@ -57,9 +60,11 @@
         else { ok = false; break; }
       }
       if (!ok) continue;
-      if (e.title.startsWith(phrase)) score += 4;
-      else if (e.title.includes(phrase)) score += 2;
-      scored.push({ e, score: score + (KIND_ORDER[e.k] || 0) });
+      const byAlt = e.alt && !typed.every((w) => e.title.split(" ").includes(w)) && typed.some((w) => e.alt.split(" ").includes(w));
+      const titles = [e.title, e.alt].filter(Boolean);
+      if (titles.some((t) => t.startsWith(phrase))) score += 4;
+      else if (titles.some((t) => t.includes(phrase))) score += 2;
+      scored.push({ e: byAlt ? { ...e, asTyped: e.a } : e, score: score + (KIND_ORDER[e.k] || 0) });
     }
     return scored.sort((a, b) => b.score - a.score || a.e.order - b.e.order).slice(0, limit).map((r) => r.e);
   }
@@ -71,6 +76,12 @@
     a.href = e.u;
     const title = document.createElement("strong");
     title.textContent = e.t;
+    if (e.asTyped) {
+      const also = document.createElement("span");
+      also.className = "search-also";
+      also.textContent = ` = ${e.asTyped.replace(/ (scale|arpeggio|chord)$/, "")}`;
+      title.append(also);
+    }
     const kind = document.createElement("span");
     kind.className = "search-kind";
     kind.textContent = e.k;
@@ -94,11 +105,33 @@
   headerInput.setAttribute("autocomplete", "off");
   headerInput.setAttribute("aria-controls", "search-suggest");
 
+  // with nothing typed yet, what can be looked for
+  const HINTS = ["F sharp minor", "Bb arpeggio", "G7", "metronome"];
+  function showHints() {
+    suggest.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "suggest-hints";
+    p.append("Try ");
+    HINTS.forEach((h, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = h;
+      b.addEventListener("click", () => {
+        headerInput.value = h;
+        showSuggestions();
+        headerInput.focus();
+      });
+      p.append(b, i < HINTS.length - 1 ? " " : "");
+    });
+    suggest.append(p);
+    suggest.hidden = false;
+  }
+
   function showSuggestions() {
     const q = headerInput.value.trim();
     suggest.innerHTML = "";
     if (!q) {
-      suggest.hidden = true;
+      showHints();
       return;
     }
     loadIndex().then(() => {
@@ -122,12 +155,12 @@
   }
 
   const closeSuggestions = () => { suggest.hidden = true; };
-  headerInput.addEventListener("focus", () => { loadIndex(); if (headerInput.value.trim()) showSuggestions(); });
+  headerInput.addEventListener("focus", () => { loadIndex(); showSuggestions(); });
   headerInput.addEventListener("input", showSuggestions);
 
   // the arrow keys move through the suggestions, Escape closes them; Enter in the box opens the search page
   headerForm.addEventListener("keydown", (e) => {
-    const items = [...suggest.querySelectorAll("a")];
+    const items = [...suggest.querySelectorAll("a, button")];
     const at = items.indexOf(document.activeElement);
     if (e.key === "ArrowDown" && !suggest.hidden && items.length) {
       e.preventDefault();
@@ -136,7 +169,8 @@
       e.preventDefault();
       if (at === 0) headerInput.focus();
       else items[at - 1].focus();
-    } else if (e.key === "Escape") {
+    } else if (e.key === "Escape" && !suggest.hidden) {
+      e.preventDefault(); // used up here: it doesn't also close the search panel (main.js) or empty the box
       closeSuggestions();
       headerInput.focus();
     }
