@@ -587,7 +587,12 @@ main .practice-card .options-row>.option {
     max-width: 560px;
   }
 
-  .practice-pair-arp #keyboards>.kb-block+.kb-block {
+  .practice-pair-arp #keyboards>.kb-block[data-hand="lh"]:not(:only-child) {
+    order: 0;
+    padding-right: 0;
+  }
+
+  .practice-pair-arp #keyboards>.kb-block[data-hand="rh"]:not(:only-child) {
     padding-left: 0;
     border-left: 0;
   }
@@ -596,19 +601,28 @@ main .practice-card .options-row>.option {
     gap: 32px;
   }
 
-  /* the keyboards: right hand and left hand next to each other, with a line between them. One hand on its own
-     keeps the single-keyboard width. */
+  /* the keyboards: next to each other as the hands sit at the piano, the left hand on the left and the right hand
+     on the right, with a line between them (in the page they come right hand first, as the staves do, which is how
+     they stack on a smaller screen). One hand on its own keeps the single-keyboard width. */
   #keyboards {
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-    column-gap: 28px;
   }
 
   #keyboards>.kb-block:not(:only-child) {
     max-width: none;
   }
 
-  #keyboards>.kb-block+.kb-block {
+  /* the space either side of the line is shared, so both keyboards are the same size */
+  #keyboards>.kb-block[data-hand="lh"] {
+    order: -1;
+  }
+
+  #keyboards>.kb-block[data-hand="lh"]:not(:only-child) {
+    padding-right: 28px;
+  }
+
+  #keyboards>.kb-block[data-hand="rh"]:not(:only-child) {
     padding-left: 28px;
     border-left: 1px solid rgba(250, 250, 249, 0.12);
   }
