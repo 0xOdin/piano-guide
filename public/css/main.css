@@ -561,14 +561,14 @@ footer a:focus-visible {
   }
 }
 
-/* Small desktops: the menu and the search box sit closer, so all five menu items fit beside it */
+/* Small desktops: the menu and the search box sit closer, so all six menu items fit beside it */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .header-links ul {
-    gap: 24px;
+    gap: 20px;
   }
 
   .search-form input {
-    width: 240px;
+    width: 196px;
   }
 }
 

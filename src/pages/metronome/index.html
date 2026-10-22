@@ -1,0 +1,85 @@
+---
+title: Online Metronome with Tempo Changes | PianoGuide
+description: A free online metronome for piano practice. Set the tempo and the beats in a bar, or plan tempo changes: 60 BPM for 4 bars, then 65, then 70.
+nav: metronome
+styles: page piano metronome
+scripts: metronome
+---
+        <section class="page-hero">
+            <p class="eyebrow">Keep time</p>
+            <h1>Metronome</h1>
+            <p>Set a tempo and play along, or plan the tempo changes in a piece: so many bars at one speed, then the next.</p>
+        </section>
+
+        <section class="practice">
+            <div class="practice-card met-tool">
+                <div class="option option-wide met-mode">
+                    <span class="option-label" id="mode-label">Metronome</span>
+                    <div class="seg" data-setting="mode" role="group" aria-labelledby="mode-label">
+                        <button type="button" data-v="basic">Basic</button>
+                        <button type="button" data-v="changes">Tempo changes</button>
+                    </div>
+                </div>
+
+                <div class="piano-case met-case">
+                    <span class="eyebrow eyebrow-brass" id="met-status">Ready</span>
+                    <div class="met-tempo">
+                        <button type="button" class="met-step" data-target="bpm" data-step="-1" aria-label="Slower">−</button>
+                        <div class="met-bpm">
+                            <input id="bpm" type="number" inputmode="numeric" min="20" max="300" step="1" aria-label="Tempo, in beats per minute">
+                            <span>BPM</span>
+                        </div>
+                        <button type="button" class="met-step" data-target="bpm" data-step="1" aria-label="Faster">+</button>
+                    </div>
+                    <p class="met-detail" id="met-detail" aria-live="polite"></p>
+                    <div class="met-beats" id="beats" aria-hidden="true"></div>
+                    <div class="case-foot">
+                        <span id="met-hint">Space starts and stops.</span>
+                        <span class="case-actions">
+                            <button type="button" class="case-btn" id="tap-btn">Tap tempo</button>
+                            <button type="button" class="case-btn is-primary case-play" id="start-btn">
+                                <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+                                <svg class="stop-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
+                                <span>Start</span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="met-options">
+                    <div class="option">
+                        <span class="option-label" id="beats-label">Beats in a bar</span>
+                        <div class="stepper" role="group" aria-labelledby="beats-label">
+                            <button type="button" data-target="beats" data-step="-1" aria-label="Fewer beats">−</button>
+                            <input id="beats-input" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="beats-label">
+                            <button type="button" data-target="beats" data-step="1" aria-label="More beats">+</button>
+                        </div>
+                    </div>
+                    <div class="option">
+                        <span class="option-label" id="accent-label">Beat 1</span>
+                        <div class="seg" data-setting="accent" role="group" aria-labelledby="accent-label">
+                            <button type="button" data-v="on">Accented</button>
+                            <button type="button" data-v="off">Like the others</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="met-plan" id="plan">
+                    <h2>Tempo changes</h2>
+                    <p class="met-plan-intro">Each section keeps its tempo for so many bars, then the next one starts.</p>
+                    <ol class="met-sections" id="sections"></ol>
+                    <div class="met-plan-foot">
+                        <button type="button" class="btn btn-quiet met-add" id="add-section">+ Add a section</button>
+                        <span class="met-total" id="met-total"></span>
+                    </div>
+                    <div class="option option-wide met-end">
+                        <span class="option-label" id="end-label">After the last section</span>
+                        <div class="seg" data-setting="end" role="group" aria-labelledby="end-label">
+                            <button type="button" data-v="stop">Stop</button>
+                            <button type="button" data-v="repeat">Start again</button>
+                            <button type="button" data-v="keep">Keep going</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>

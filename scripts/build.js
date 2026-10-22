@@ -62,6 +62,7 @@ const NAV = [
   ["chords", "/chords/", "Chords"],
   ["theory", "/theory/", "Theory"],
   ["practice", "/practice/", "Practice"],
+  ["metronome", "/metronome/", "Metronome"],
 ];
 const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
 

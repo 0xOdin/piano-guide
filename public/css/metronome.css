@@ -1,0 +1,371 @@
+/* The metronome (/metronome/). The page hero, card and option buttons come from page.css, the ebony case and its
+   buttons from piano.css. */
+
+/* Base (phones) */
+
+.met-mode {
+  margin-bottom: 18px;
+}
+
+/* The case: the tempo large, with − and + either side (Basic), the beat lights, and Start */
+.met-case {
+  margin-bottom: 22px;
+  padding: 20px 16px 14px;
+}
+
+.met-tempo {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.met-step {
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(250, 250, 249, 0.2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ebony-text);
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.1s var(--ease);
+}
+
+.met-step:active {
+  transform: scale(0.94);
+}
+
+.met-step:focus-visible {
+  outline-color: var(--ebony-text);
+}
+
+/* tempo changes: the tempo is set in the list of sections, so the case only shows it */
+.met-case.is-plan .met-step {
+  visibility: hidden;
+}
+
+.met-bpm {
+  display: grid;
+  justify-items: center;
+}
+
+.met-bpm input {
+  width: 3.4ch;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ebony-text);
+  font-family: var(--font-display);
+  font-size: clamp(3.6rem, 17vw, 5.2rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.met-bpm input::-webkit-inner-spin-button,
+.met-bpm input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button,
+.stepper input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.met-bpm input:focus-visible {
+  outline: 2px solid var(--ebony-text);
+  outline-offset: 2px;
+}
+
+.met-bpm input:read-only {
+  cursor: default;
+}
+
+.met-bpm span {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ebony-muted);
+}
+
+.met-detail {
+  min-height: 1.5em;
+  margin: 10px 0 18px;
+  font-size: 0.92rem;
+  text-align: center;
+  color: var(--ebony-muted);
+}
+
+/* one light for each beat; the first is ringed in felt red when it is accented, and lights red */
+.met-beats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.met-beats span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(250, 250, 249, 0.14);
+  transition: background-color 0.05s linear, transform 0.05s linear;
+}
+
+.met-beats .is-first {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.met-beats span.is-on {
+  background: var(--ebony-text);
+  transform: scale(1.15);
+}
+
+.met-beats .is-first.is-on {
+  background: var(--accent);
+}
+
+.met-beats.no-accent .is-first {
+  box-shadow: none;
+}
+
+.met-beats.no-accent .is-first.is-on {
+  background: var(--ebony-text);
+}
+
+/* the beats in a bar and the accent, under the case */
+.met-options {
+  display: grid;
+  gap: 14px;
+}
+
+/* a number with − and + beside it */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.stepper button {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background-color 0.2s var(--ease);
+}
+
+.stepper input {
+  width: 3.4ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stepper input:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--accent);
+}
+
+/* Tempo changes: the sections, one row each, the one playing picked out */
+.met-plan {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.met-plan[hidden] {
+  display: none;
+}
+
+.met-plan h2 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.met-plan-intro {
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.met-sections {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.met-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+
+.met-section.is-current {
+  border-color: var(--accent);
+  background: #fffaf9;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.met-section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.met-section.is-current .met-section-num {
+  background: var(--accent);
+  color: #fff;
+}
+
+.met-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.met-unit {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.met-remove {
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.met-remove[hidden] {
+  display: none;
+}
+
+.met-plan-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 12px 0 20px;
+}
+
+.met-add {
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: 0.88rem;
+}
+
+.met-add:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.met-total {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+@media (hover: hover) {
+  .met-step:hover {
+    background: rgba(250, 250, 249, 0.08);
+    border-color: rgba(250, 250, 249, 0.34);
+  }
+
+  .stepper button:hover {
+    background: var(--bg-alt);
+  }
+
+  .met-remove:hover {
+    background: var(--bg-alt);
+    color: var(--text);
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .met-case {
+    padding: 24px 22px 18px;
+  }
+
+  .met-tempo {
+    gap: 28px;
+  }
+
+  .met-step {
+    width: 60px;
+    height: 60px;
+  }
+
+  .met-options {
+    grid-template-columns: repeat(2, max-content);
+    gap: 18px 36px;
+  }
+
+  .met-beats span {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .met-tool {
+    max-width: 720px;
+  }
+}
