@@ -40,6 +40,7 @@
   --key-lit: #f6dcd8; /* a marked white key */
   --key-ink: #962622; /* felt red written on a white key, or a key picked */
   --key-muted: #6b655f;
+  --paper: #faf7f0; /* the sheet the music is printed on, on a dark screen */
   --case-top: #2b2623; /* the lacquered case: light catches the top */
   --case-mid: #1c1917;
   --case-bottom: #161311;

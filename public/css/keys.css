@@ -78,6 +78,18 @@ main .key-hero h1 {
   color: var(--muted);
 }
 
+/* on a dark screen, the key signature is on paper too, like the sheet music */
+@media screen {
+  :root[data-theme="dark"] .sig-tile {
+    background: var(--paper);
+    border-color: transparent;
+  }
+
+  :root[data-theme="dark"] .sig-tile figcaption {
+    color: var(--key-muted);
+  }
+}
+
 main .page-hero p {
   margin: 0;
   max-width: 68ch;
@@ -424,6 +436,7 @@ main .practice-card .options-row>.option {
 }
 
 .kb-block {
+  min-width: 0; /* a long keyboard scrolls inside its box instead of widening the card */
   max-width: 560px;
 }
 
