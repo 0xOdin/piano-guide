@@ -181,6 +181,7 @@
 
 .stepper input {
   width: 3.4ch;
+  height: 40px;
   padding: 0;
   border: 0;
   background: transparent;

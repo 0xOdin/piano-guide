@@ -647,11 +647,14 @@ footer .logo-mark rect:first-child {
 footer nav ul {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 24px;
+  gap: 2px 24px;
   font-size: 0.92rem;
 }
 
+/* a taller line to tap than the words alone */
 footer nav a {
+  display: inline-block;
+  padding: 7px 0;
   color: var(--ebony-text);
   transition: color 0.2s var(--ease);
 }
@@ -715,7 +718,7 @@ footer a:focus-visible {
 
   footer nav ul {
     grid-template-columns: repeat(3, auto);
-    gap: 12px 40px;
+    gap: 0 40px;
   }
 
   .footer-bottom {

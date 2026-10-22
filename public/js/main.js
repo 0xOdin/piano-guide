@@ -100,6 +100,36 @@ window.matchMedia("(min-width: 1024px)").addEventListener("change", () => {
     setSearch(false);
 });
 
+// The keyboards you can play (the homepage, Keyboard, Practice): the Tab key stops on one key, not on all twenty-five,
+// and the arrow keys move along the keys, Home and End to the ends. The key last moved to keeps the stop, also when
+// the keys are drawn again.
+function roveKeys(piano) {
+    const keys = [...piano.querySelectorAll("button.pkey")];
+    if (!keys.length) return;
+    const at = keys.find((k) => k.dataset.abs === piano.dataset.roveAt) || keys[0];
+    keys.forEach((k) => { k.tabIndex = k === at ? 0 : -1; });
+}
+
+document.querySelectorAll(".piano").forEach((piano) => {
+    roveKeys(piano);
+    new MutationObserver(() => roveKeys(piano)).observe(piano, { childList: true });
+    piano.addEventListener("focusin", (event) => {
+        const key = event.target.closest("button.pkey");
+        if (!key) return;
+        piano.dataset.roveAt = key.dataset.abs;
+        roveKeys(piano);
+    });
+    piano.addEventListener("keydown", (event) => {
+        const keys = [...piano.querySelectorAll("button.pkey")];
+        const i = keys.indexOf(event.target);
+        if (i < 0) return;
+        const to = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1, ArrowUp: i - 1, Home: 0, End: keys.length - 1 }[event.key];
+        if (to === undefined) return;
+        event.preventDefault();
+        keys[Math.max(0, Math.min(keys.length - 1, to))].focus();
+    });
+});
+
 // Parts of a page marked .reveal fade up as they come into view (styles in main.css)
 const revealed = document.querySelectorAll(".reveal");
 if (revealed.length && "IntersectionObserver" in window) {

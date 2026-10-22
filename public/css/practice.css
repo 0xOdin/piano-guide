@@ -731,7 +731,9 @@
   opacity: 1;
 }
 
+/* as tall as the button beside them, to tap */
 .pr-actions .pr-link {
+  min-height: 40px;
   font-size: 0.88rem;
 }
 

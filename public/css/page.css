@@ -47,6 +47,11 @@
   color: var(--muted);
 }
 
+/* padded above and below to tap, without moving the line */
+.crumbs a {
+  padding: 8px 0;
+}
+
 .crumbs a:hover {
   color: var(--text);
 }

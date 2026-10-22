@@ -59,6 +59,16 @@
   margin-top: 10px;
 }
 
+/* the two octaves fit a phone with white keys of 18px; on the narrowest phones they scroll sideways, as on the key
+   pages, instead of widening the page */
+#chord-keys {
+  overflow-x: auto;
+}
+
+#chord-keys .piano-static {
+  min-width: calc(var(--whites) * 18px);
+}
+
 /* the chords on the root: each card opens its chord in the viewer above; the one shown there is picked out */
 .chord-card {
   position: relative;
