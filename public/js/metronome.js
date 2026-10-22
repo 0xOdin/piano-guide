@@ -4,8 +4,9 @@
 //    then 65 for 4 bars of 6/8, ...). After the last section it stops, starts again, or keeps going at the last tempo.
 // The tempo counts the time signature's beats, as tempo marks in music do: crotchets in 4/4, minims in 2/2, dotted
 // crotchets in 6/8. The first beat of the bar clicks high (when accented); Subdivide adds softer clicks between the
-// beats (the quavers of 4/4, the three quavers of each beat in 6/8). Before a plan of tempo changes, a count-in of a
-// bar or two at the starting tempo can come first, so its first bar isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
+// beats (the quavers of 4/4, the three quavers of each beat in 6/8). A plan of tempo changes always starts with a
+// bar's count-in at the first section's tempo, shown as its own row above the sections, so the first bar of the plan
+// isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
 // ahead on its clock (not by timers, which drift), and the lights follow what is heard. The settings are kept in this
 // browser between visits.
 
@@ -30,7 +31,6 @@ const DEFAULTS = {
   time: "4/4",
   subdivide: "off",
   accent: "on",
-  countIn: "1", // bars before a plan of tempo changes: 0 | 1 | 2
   sections: [{ bpm: 60, bars: 4, time: "4/4" }, { bpm: 65, bars: 4, time: "4/4" }, { bpm: 70, bars: 4, time: "4/4" }],
   end: "stop", // stop | repeat | keep
 };
@@ -48,7 +48,6 @@ try {
   else if (okNumber(saved.beats)) settings.time = `${[2, 3, 4, 5].includes(saved.beats) ? saved.beats : 4}/4`; // saved before time signatures
   if (["on", "off"].includes(saved.subdivide)) settings.subdivide = saved.subdivide;
   if (["on", "off"].includes(saved.accent)) settings.accent = saved.accent;
-  if (["0", "1", "2"].includes(saved.countIn)) settings.countIn = saved.countIn;
   if (["stop", "repeat", "keep"].includes(saved.end)) settings.end = saved.end;
   if (Array.isArray(saved.sections)) {
     // sections saved before they had their own time signature take Basic's
@@ -163,7 +162,7 @@ async function start() {
   if (navigator.audioSession) navigator.audioSession.type = "playback";
   if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
   if (ctx.state === "suspended") await ctx.resume();
-  pos = { beat: 0, bar: 0, section: 0, countIn: settings.mode === "changes" ? Number(settings.countIn) : 0 }; // Basic just starts
+  pos = { beat: 0, bar: 0, section: 0, countIn: settings.mode === "changes" ? 1 : 0 }; // Basic just starts
   heard = [];
   shown = null;
   stopAt = null;
@@ -435,6 +434,7 @@ function renderNow() {
   $("beats").classList.toggle("is-counting", !!now && !!now.left);
   $("sections").querySelectorAll(".met-section").forEach((row, i) =>
     row.classList.toggle("is-current", !!now && !now.left && !now.past && now.section === i));
+  $("count-in").classList.toggle("is-current", !!now && !!now.left);
 }
 
 // a number with − and + beside it
@@ -493,6 +493,9 @@ function render() {
       row.querySelector("select").value = s.time;
     });
   }
+  // the count-in row: a bar of the first section's time signature, at its tempo
+  const first = settings.sections[0];
+  $("count-in-detail").textContent = `1 bar of ${first.time} at ${first.bpm} BPM`;
   $("add-section").disabled = settings.sections.length >= MAX_SECTIONS;
   renderTotal();
   renderNow();

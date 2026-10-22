@@ -83,6 +83,13 @@ scripts: metronome
                 <div class="met-plan" id="plan">
                     <h2>Tempo changes</h2>
                     <p class="met-plan-intro">Each section keeps its tempo and time signature for so many bars, then the next one starts.</p>
+                    <div class="met-count-in" id="count-in">
+                        <span class="met-count-in-mark" aria-hidden="true"></span>
+                        <div>
+                            <strong>Count-in</strong>
+                            <span id="count-in-detail"></span>
+                        </div>
+                    </div>
                     <ol class="met-sections" id="sections"></ol>
                     <div class="met-plan-foot">
                         <button type="button" class="btn btn-quiet met-add" id="add-section">+ Add a section</button>
@@ -94,14 +101,6 @@ scripts: metronome
                             <button type="button" data-v="stop">Stop</button>
                             <button type="button" data-v="repeat">Start again</button>
                             <button type="button" data-v="keep">Keep going</button>
-                        </div>
-                    </div>
-                    <div class="option option-wide met-count">
-                        <span class="option-label" id="count-label">Count-in before the first section</span>
-                        <div class="seg" data-setting="countIn" role="group" aria-labelledby="count-label">
-                            <button type="button" data-v="0">Off</button>
-                            <button type="button" data-v="1">1 bar</button>
-                            <button type="button" data-v="2">2 bars</button>
                         </div>
                     </div>
                 </div>
