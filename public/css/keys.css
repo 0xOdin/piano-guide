@@ -607,6 +607,7 @@ main .practice-card .options-row>.option {
   #keyboards {
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
+    column-gap: 0; /* the space either side of the line comes from the keyboards' own padding, the same both sides */
   }
 
   #keyboards>.kb-block:not(:only-child) {
