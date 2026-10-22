@@ -13,6 +13,7 @@
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface) url(/assets/icons/search.svg) no-repeat 16px center;
+  background-image: var(--search-icon, url(/assets/icons/search.svg));
   box-shadow: var(--shadow);
   font: inherit;
   font-size: 1rem;

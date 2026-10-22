@@ -208,7 +208,7 @@
 
 .interval-keys .pkey.white.is-shown .pkey-name {
   font-size: 0.74rem;
-  color: var(--accent-ink);
+  color: var(--key-ink);
 }
 
 .interval-hear {
@@ -265,7 +265,7 @@ a.cof-cell:hover path {
 }
 
 .cof .cof-divider {
-  stroke: rgba(18, 19, 22, 0.14);
+  stroke: var(--ink-faint);
   stroke-width: 1;
 }
 

@@ -7,8 +7,8 @@
   padding: 18px 16px 16px;
   border: 0;
   border-radius: 22px;
-  background: linear-gradient(180deg, #2b2623 0%, #1c1917 34%, #161311 100%);
-  box-shadow: 0 2px 6px rgba(28, 25, 23, 0.16), 0 32px 64px -30px rgba(28, 25, 23, 0.6);
+  background: linear-gradient(180deg, var(--case-top) 0%, var(--case-mid) 34%, var(--case-bottom) 100%);
+  box-shadow: 0 0 0 1px var(--case-edge), 0 2px 6px rgba(28, 25, 23, 0.16), 0 32px 64px -30px rgba(28, 25, 23, 0.6);
   color: var(--ebony-text);
 }
 
@@ -48,7 +48,7 @@
 
 .piano-case .seg button[aria-pressed="true"] {
   background: var(--ebony-text);
-  color: var(--text);
+  color: var(--ebony);
 }
 
 .piano-case .seg button:focus-visible {
@@ -74,7 +74,7 @@
 .case-btn.is-primary {
   background: var(--ebony-text);
   border-color: var(--ebony-text);
-  color: var(--text);
+  color: var(--ebony);
 }
 
 .case-btn[aria-pressed="true"] {
@@ -202,11 +202,11 @@
   flex: 1;
   min-width: 0; /* every white key the same width, whatever is written on it */
   margin-right: -1px; /* neighbours share one border */
-  background: var(--surface);
+  background: var(--key-white);
   border: 1px solid rgba(18, 19, 22, 0.22);
   border-top: 0;
   border-radius: 0 0 7px 7px;
-  color: var(--text);
+  color: var(--ebony);
 }
 
 .pkey.black {
@@ -215,7 +215,7 @@
   z-index: 1;
   height: 60%;
   padding-bottom: 8px;
-  background: var(--text);
+  background: var(--ebony);
   border-radius: 0 0 5px 5px;
   color: #fff;
 }
@@ -227,7 +227,7 @@
 
 /* a scale, arpeggio or chord shown on the keys */
 .pkey.white.is-shown {
-  background: var(--accent-light);
+  background: var(--key-lit);
 }
 
 .pkey.black.is-shown {
@@ -237,7 +237,7 @@
 /* keys picked by a click or tap */
 .pkey.white.is-selected,
 .pkey.black.is-selected {
-  background: var(--accent-ink);
+  background: var(--key-ink);
   color: #fff;
 }
 
@@ -278,12 +278,12 @@
 }
 
 .piano-static .pkey.white.is-shown {
-  color: var(--accent-ink);
+  color: var(--key-ink);
 }
 
 .piano-static .pkey.white .pkey-name {
   font-size: 0.66rem;
-  color: var(--muted);
+  color: var(--key-muted);
 }
 
 /* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music (key pages). The
@@ -303,7 +303,7 @@
 }
 
 .score-playing .piano-static .pkey.black.is-shown:not(.is-sounding) {
-  background: var(--text);
+  background: var(--ebony);
 }
 
 /* Desktop */

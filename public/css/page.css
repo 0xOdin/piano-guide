@@ -86,9 +86,9 @@
 }
 
 .scale-tabs button[aria-pressed="true"] {
-  background: var(--text);
-  border-color: var(--text);
-  color: #fff;
+  background: var(--strong);
+  border-color: var(--strong);
+  color: var(--on-strong);
 }
 
 /* Note chips: a scale's or chord's notes, each with its place in it, that sound when tapped (key pages, chords) */
@@ -236,8 +236,8 @@
 }
 
 .seg button[aria-pressed="true"] {
-  background: var(--text);
-  color: #fff;
+  background: var(--strong);
+  color: var(--on-strong);
 }
 
 /* Type row (minor page): full width on phones so the three buttons fit */
@@ -256,7 +256,15 @@
   padding: 0 8px;
 }
 
-/* The score */
+/* The score: drawn in black ink by VexFlow; on a dark screen the ink turns light (the felt red of a note playing
+   stays red). Printed, it stays black. */
+@media screen {
+  :root[data-theme="dark"] .score svg,
+  :root[data-theme="dark"] .sig-stave svg {
+    filter: invert(0.92) hue-rotate(180deg);
+  }
+}
+
 .score svg {
   display: block;
   width: 100%;

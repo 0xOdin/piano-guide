@@ -86,17 +86,17 @@
 }
 
 .mini-kb .w {
-  fill: var(--surface);
-  stroke: var(--line-strong);
+  fill: var(--key-white);
+  stroke: #d3d0ca;
   stroke-width: 1;
 }
 
 .mini-kb .b {
-  fill: var(--text);
+  fill: var(--ebony);
 }
 
 .mini-kb .w.on {
-  fill: color-mix(in srgb, var(--accent) 26%, #fff); /* a shade stronger than on the key pages, to show at this size */
+  fill: color-mix(in srgb, var(--accent) 26%, var(--key-white)); /* a shade stronger than on the key pages, to show at this size */
 }
 
 .mini-kb .b.on {
@@ -108,7 +108,7 @@
 }
 
 .mini-kb .dot {
-  fill: var(--accent-ink);
+  fill: var(--key-ink);
 }
 
 .mini-kb .dot-light {

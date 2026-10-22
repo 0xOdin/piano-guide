@@ -107,13 +107,13 @@
 }
 
 .kb-btn.is-primary {
-  background: var(--text);
-  border-color: var(--text);
-  color: #fff;
+  background: var(--strong);
+  border-color: var(--strong);
+  color: var(--on-strong);
 }
 
 .kb-btn.is-primary:hover:not(:disabled) {
-  background: var(--text);
+  background: var(--strong);
   opacity: 0.88;
 }
 

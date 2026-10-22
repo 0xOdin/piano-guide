@@ -1,3 +1,37 @@
+// Light and dark. The script in the <head> has already set the theme; the toggle in the header flips it and
+// remembers the choice in this browser. Until it is used, the page follows the device's setting, even as it changes.
+const THEME_STORE = "pianoguide-theme";
+const themeBtn = document.querySelector(".theme-btn");
+const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const pickedTheme = () => {
+    try {
+        return localStorage.getItem(THEME_STORE);
+    } catch (e) {
+        return null;
+    }
+};
+
+function setTheme(theme, remember) {
+    document.documentElement.dataset.theme = theme;
+    const dark = theme === "dark";
+    themeBtn.setAttribute("aria-pressed", String(dark));
+    themeBtn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+    document.querySelector('meta[name="theme-color"]').content = dark ? "#141210" : "#fafaf9";
+    if (remember) {
+        try {
+            localStorage.setItem(THEME_STORE, theme);
+        } catch (e) {
+            // not kept: the toggle still works on this page
+        }
+    }
+}
+
+setTheme(document.documentElement.dataset.theme, false);
+themeBtn.addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true));
+darkQuery.addEventListener("change", (e) => {
+    if (!pickedTheme()) setTheme(e.matches ? "dark" : "light", false);
+});
+
 const menuBtn = document.querySelector(".menu-btn");
 const headerLinks = document.querySelector(".header-links");
 const searchBtn = document.querySelector(".search-btn");

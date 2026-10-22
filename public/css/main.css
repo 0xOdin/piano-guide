@@ -27,6 +27,59 @@
   --shadow: 0 1px 2px rgba(28, 25, 23, 0.05), 0 8px 24px -12px rgba(28, 25, 23, 0.14);
   --shadow-lift: 0 2px 4px rgba(28, 25, 23, 0.06), 0 18px 36px -14px rgba(28, 25, 23, 0.24);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --accent-deep: #962622; /* the felt button under the pointer */
+  --strong: #1c1917; /* a chosen option button or tab, filled */
+  --on-strong: #ffffff;
+  --ink-faint: rgba(18, 19, 22, 0.16); /* a faint dividing line */
+  --footer: #1c1917;
+
+  /* The piano itself looks the same in both themes: ebony, key-white keys, felt */
+  --ebony: #1c1917;
+  --key-white: #ffffff;
+  --key-lit: #f6dcd8; /* a marked white key */
+  --key-ink: #962622; /* felt red written on a white key, or a key picked */
+  --key-muted: #6b655f;
+  --case-top: #2b2623; /* the lacquered case: light catches the top */
+  --case-mid: #1c1917;
+  --case-bottom: #161311;
+  --case-edge: transparent;
+  color-scheme: light;
+}
+
+/* Dark: the room with the lights down. Ivory turns to a warm near-black, the felt brightens a little to keep its
+   glow, and the piano stays as it is. Screen only, so a printed fingering chart is always dark ink on white. The
+   theme is set on <html> by the script in the <head> (the toggle in the header, or else the device's setting). */
+@media screen {
+  :root[data-theme="dark"] {
+    --bg: #141210;
+    --bg-alt: #1c1917;
+    --surface: #201c1a;
+    --placeholder: #2a2623;
+    --text: #ede9e4;
+    --muted: #a8a19a;
+    --accent: #c4403a;
+    --accent-ink: #f0928b;
+    --accent-light: rgba(196, 64, 58, 0.24);
+    --accent-soft: rgba(212, 82, 76, 0.16);
+    --accent-deep: #a8332e;
+    --brass: #c9a978;
+    --line: #2f2a27;
+    --line-strong: #453e3a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 36px -14px rgba(0, 0, 0, 0.7);
+    --strong: #ede9e4;
+    --on-strong: #1c1917;
+    --ink-faint: rgba(237, 233, 228, 0.16);
+    --footer: #0d0b0a;
+    --key-white: #f4f1ec;
+    --case-top: #342e2a;
+    --case-mid: #25211e;
+    --case-bottom: #1f1b19;
+    --case-edge: rgba(250, 250, 249, 0.08);
+    --search-icon: url(/assets/icons/search-light.svg);
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -199,6 +252,33 @@ header {
   transform: scale(0.9);
 }
 
+/* the light and dark toggle: a moon in light, a sun in dark */
+.theme-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.theme-btn .sun,
+:root[data-theme="dark"] .theme-btn .moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-btn .sun {
+  display: block;
+}
+
+/* the icons drawn in ink, and the logo's ebony square, show up on a dark screen */
+@media screen {
+  :root[data-theme="dark"] .header-btn-container img,
+  :root[data-theme="dark"] .way-icon img {
+    filter: invert(0.92);
+  }
+
+  :root[data-theme="dark"] header .logo-mark rect:first-child {
+    fill: #2c2825;
+  }
+}
+
 .search-form input {
   -webkit-appearance: none;
   appearance: none;
@@ -208,6 +288,7 @@ header {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface) url(/assets/icons/search.svg) no-repeat 14px center;
+  background-image: var(--search-icon, url(/assets/icons/search.svg));
   font: inherit;
   font-size: 0.85rem;
   color: var(--text);
@@ -270,8 +351,8 @@ a.key-badge {
 }
 
 a.key-badge:hover {
-  background: var(--text);
-  color: #fff;
+  background: var(--strong);
+  color: var(--on-strong);
 }
 
 a.key-badge.is-minor:hover {
@@ -338,6 +419,13 @@ a.key-badge:active {
   opacity: 0.55;
 }
 
+@media screen {
+  :root[data-theme="dark"] .key-strip {
+    filter: invert(1);
+    opacity: 0.35;
+  }
+}
+
 /* parts of a page fade up as they come into view (main.js); without JavaScript, or with reduced motion, they are
    simply there */
 .js .reveal {
@@ -368,7 +456,7 @@ a.key-badge:active {
 /* Footer: lacquered ebony */
 footer {
   padding: 40px var(--pad) 28px;
-  background: var(--text);
+  background: var(--footer);
   color: var(--ebony-text);
 }
 
@@ -511,7 +599,7 @@ footer a:focus-visible {
 
   .header-links ul {
     flex-wrap: nowrap;
-    gap: 36px;
+    gap: 32px;
   }
 
   .header-links a {
@@ -542,8 +630,21 @@ footer a:focus-visible {
     display: none;
   }
 
+  /* beside the search box, the toggle gets the same height and outline */
+  .header-btn-container {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-btn-container .theme-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
   .search-form input {
-    width: 280px;
+    width: 220px;
   }
 
   /* Section headers */
@@ -561,20 +662,20 @@ footer a:focus-visible {
   }
 }
 
-/* Small desktops: the menu and the search box sit closer, so all six menu items fit beside it */
+/* Small desktops: the menu and the search box sit closer, so all six menu items fit beside them and the toggle */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .header-links ul {
-    gap: 20px;
+    gap: 18px;
   }
 
   .search-form input {
-    width: 196px;
+    width: 150px;
   }
 }
 
 @media (hover: hover) {
   .btn-primary:hover {
-    background: var(--accent-ink);
+    background: var(--accent-deep);
     transform: translateY(-1px);
   }
 

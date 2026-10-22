@@ -11,6 +11,16 @@
   --near-light: #fbefd5;
 }
 
+@media screen {
+  :root[data-theme="dark"] {
+    --good: #3f9a63;
+    --good-ink: #8fd4a8;
+    --good-light: rgba(63, 154, 99, 0.22);
+    --near: #e0b45c;
+    --near-light: rgba(224, 180, 92, 0.18);
+  }
+}
+
 /* Base (phones) */
 
 /* every part of the card can be hidden, whatever its display */
@@ -64,16 +74,28 @@
   }
 
   .pr-drills button[aria-pressed="true"]:hover {
-    border-color: var(--text);
+    border-color: var(--strong);
     transform: none;
   }
 }
 
-/* the drill chosen: lacquered ebony, like the piano's case */
+/* the drill chosen: lacquered ebony, like the piano's case (on a dark page, the light one stands out instead) */
 .pr-drills button[aria-pressed="true"] {
-  border-color: var(--text);
-  background: linear-gradient(180deg, #2b2623 0%, #1c1917 60%);
+  border-color: var(--ebony);
+  background: linear-gradient(180deg, var(--case-top) 0%, var(--case-mid) 60%);
   color: #fff;
+}
+
+@media screen {
+  :root[data-theme="dark"] .pr-drills button[aria-pressed="true"] {
+    border-color: var(--strong);
+    background: var(--strong);
+    color: var(--on-strong);
+  }
+
+  :root[data-theme="dark"] .pr-drills button[aria-pressed="true"] span {
+    color: rgba(28, 25, 23, 0.68);
+  }
 }
 
 .pr-drills button[aria-pressed="true"] span {
@@ -218,9 +240,9 @@
 }
 
 .chips button[aria-pressed="true"] {
-  background: var(--text);
-  border-color: var(--text);
-  color: #fff;
+  background: var(--strong);
+  border-color: var(--strong);
+  color: var(--on-strong);
 }
 
 /* the question */
@@ -286,13 +308,13 @@
 }
 
 .pr-hand.is-lh {
-  background: var(--text);
-  color: var(--ebony-text);
+  background: var(--strong);
+  color: var(--on-strong);
 }
 
 .pr-hand.is-lh .pr-hand-mark {
-  background: var(--ebony-text);
-  color: var(--text);
+  background: var(--on-strong);
+  color: var(--strong);
 }
 
 .pr-hand.is-lh .pr-hand-mark::before {
@@ -508,7 +530,7 @@
 /* the keys: right ones turn green, wrong ones red with a cross (picked and shown keys are styled in keyboard.css) */
 .pkey.white.is-right {
   background: #c6e5d1; /* a little stronger than --good-light, to show on a white key */
-  color: var(--good-ink);
+  color: #1f5c37;
 }
 
 .pkey.black.is-right {
@@ -556,7 +578,7 @@
 }
 
 .pr-actions .kb-btn.is-primary:hover:not(:disabled) {
-  background: var(--accent-ink);
+  background: var(--accent-deep);
   opacity: 1;
 }
 

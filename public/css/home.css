@@ -72,8 +72,8 @@
 
 /* keys held down: a felt tint on the white keys, the felt itself on the black ones */
 .home-play .pkey.white.is-selected {
-  background: var(--accent-light);
-  color: var(--accent-ink);
+  background: var(--key-lit);
+  color: var(--key-ink);
 }
 
 .home-play .pkey.black.is-selected {
@@ -234,7 +234,8 @@
   gap: 32px;
   padding: 32px 24px;
   border-radius: 24px;
-  background: var(--text);
+  background: var(--case-mid);
+  box-shadow: 0 0 0 1px var(--case-edge);
   color: var(--ebony-text);
 }
 
@@ -256,7 +257,7 @@
 
 .btn-light {
   background: var(--ebony-text);
-  color: var(--text);
+  color: var(--ebony);
 }
 
 .btn-light:focus-visible {

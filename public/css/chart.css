@@ -93,7 +93,7 @@
 @media (hover: hover) {
   .chart-table tbody tr:hover th,
   .chart-table tbody tr:hover td {
-    background: #fcfbfa;
+    background: color-mix(in srgb, var(--surface) 60%, var(--bg-alt));
   }
 }
 
@@ -140,7 +140,7 @@
 .chart-table .hand + .hand {
   margin-top: 5px;
   padding-top: 5px;
-  border-top: 1px solid rgba(18, 19, 22, 0.16);
+  border-top: 1px solid var(--ink-faint);
 }
 
 .chart-table .hand abbr {
@@ -186,7 +186,7 @@
   height: 1.1em;
   margin: 0 5px;
   vertical-align: middle;
-  background: rgba(18, 19, 22, 0.2);
+  background: var(--ink-faint);
 }
 
 .chart-foot {

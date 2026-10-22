@@ -200,9 +200,9 @@ main .page-hero .hero-more + .hero-more {
 }
 
 .key-tabs.pills button[aria-pressed="true"] {
-  background: var(--text);
-  border-color: var(--text);
-  color: #fff;
+  background: var(--strong);
+  border-color: var(--strong);
+  color: var(--on-strong);
 }
 
 .tabs-label {

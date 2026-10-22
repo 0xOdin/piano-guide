@@ -245,7 +245,7 @@
 
 .met-section.is-current {
   border-color: var(--accent);
-  background: #fffaf9;
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
   box-shadow: 0 0 0 1px var(--accent);
 }
 
