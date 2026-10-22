@@ -68,12 +68,37 @@ function listenForOptions(onChange) {
 // past the highest: at least two octaves, ending on a white key. The keys of the scale, arpeggio or chord are lit and
 // the finger number is written on each of them (when `showFingers` is on).
 // marks: [{ abs, finger }], where abs is the semitone from middle C (0 = C4).
-function keyboardFor(marks, showFingers, label) {
+// `range` (optional): the keys to show instead, { from, to } (see keysBelow).
+function keyboardFor(marks, showFingers, label, range = keysFrom(marks)) {
+  return pianoKeysHTML({ ...range, marks, showFingers, label });
+}
+
+const isWhite = (abs) => NATURAL_SEMIS.includes(((abs % 12) + 12) % 12);
+const whitesIn = ({ from, to }) => Array.from({ length: to - from + 1 }, (_, i) => from + i).filter(isWhite).length;
+
+// the usual keys: from the C below the lowest note, at least two octaves, ending on a white key
+function keysFrom(marks) {
   const all = marks.map((m) => m.abs);
   const from = Math.floor(Math.min(...all) / 12) * 12;
   let to = Math.max(from + 23, Math.max(...all));
-  while (!NATURAL_SEMIS.includes(((to % 12) + 12) % 12)) to++; // finish on a white key
-  return pianoKeysHTML({ from, to, marks, showFingers, label });
+  while (!isWhite(to)) to++;
+  return { from, to };
+}
+
+// The same number of white keys, but ending just above the highest note, so the empty keys are on the left. For the
+// left hand's keyboard when it sits to the left of the right hand's: the two hands' notes then meet in the middle,
+// as on the piano.
+function keysBelow(marks, whites) {
+  const all = marks.map((m) => m.abs);
+  let to = Math.max(...all);
+  while (!isWhite(to)) to++;
+  let from = to;
+  let count = 1;
+  while (count < whites || from > Math.min(...all) || !isWhite(from)) {
+    from--;
+    if (isWhite(from)) count++;
+  }
+  return { from, to };
 }
 
 /* =====================================================================================
@@ -284,15 +309,25 @@ function runMelodic() {
   }
 
   // one keyboard per hand shown, with the finger numbers on the keys
+  // One keyboard per hand shown, with the finger numbers on the keys. Where the two sit side by side (a scale on a
+  // desktop, keys.css), the left hand's keyboard keeps its empty keys on the left, so the hands meet in the middle.
+  const sideBySide = window.matchMedia("(min-width: 1024px)");
   function drawKeyboards() {
     const v = view();
     const showFingers = state.fingers === "on";
+    const marksOf = (hand) => v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i] }));
+    const split = shownHands().length === 2 && sideBySide.matches && !document.querySelector(".practice-pair-arp");
     $("keyboards").innerHTML = shownHands().map((hand) => {
       const side = hand === "rh" ? "Right hand" : "Left hand";
-      const marks = v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i] }));
-      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardFor(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`)}</div></div>`;
+      const marks = marksOf(hand);
+      const range = split && hand === "lh" ? keysBelow(marks, whitesIn(keysFrom(marksOf("rh")))) : keysFrom(marks);
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardFor(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`, range)}</div></div>`;
     }).join("");
   }
+  sideBySide.addEventListener("change", () => {
+    stopPlaying();
+    drawKeyboards();
+  });
 
   // the fingering table at the top of the page: the one-octave table or the two-octave tables
   function showFingeringTable() {

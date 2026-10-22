@@ -209,6 +209,11 @@
   color: var(--ebony);
 }
 
+/* the last white key has no neighbour to share its border with, so it ends inside the keyboard (no 1px overflow) */
+.pkey.white:last-child {
+  margin-right: 0;
+}
+
 .pkey.black {
   position: absolute;
   top: 0;
