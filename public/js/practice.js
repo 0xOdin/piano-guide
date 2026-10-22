@@ -132,6 +132,10 @@ function bringIntoView(notes) {
   box.scrollTo({ left: (first.offsetLeft + last.offsetLeft + last.offsetWidth) / 2 - box.clientWidth / 2 });
 }
 
+// "Name it": how the question is shown. With the page's sound off it can only be seen, whatever was chosen (the
+// choice is kept for when the sound comes back).
+const nameHow = () => (settings.sound === "off" ? "see" : settings.nameHow);
+
 const HAND_NAMES = { rh: "Right hand", lh: "Left hand" };
 // the hand to play with (an answer that is typed may be played on a piano and checked too)
 const handShown = () => !!q.hand;
@@ -228,7 +232,7 @@ function newQuestion() {
     : lastHands[0] && lastHands[0] === lastHands[1] ? (lastHands[0] === "rh" ? "lh" : "rh") : pick(["rh", "lh"]);
   if (q.hand) lastHands = [q.hand, lastHands[0]];
   startAnswer();
-  if (q.kind === "choice" && settings.nameHow !== "see") playTimers.push(setTimeout(playQuestion, 250));
+  if (q.kind === "choice" && nameHow() !== "see") playTimers.push(setTimeout(playQuestion, 250));
 }
 
 // back to the start of the question: nothing played, typed or chosen yet
@@ -246,11 +250,11 @@ function startAnswer() {
   midiChord = new Set();
   micHits = 0;
   $("type-input").value = "";
-  if (q.kind === "choice" && settings.nameHow !== "hear") showNotes(q.notes, "shown", false);
+  if (q.kind === "choice" && nameHow() !== "hear") showNotes(q.notes, "shown", false);
   say("");
   render();
   // not for a sound to name: where it sits on the keys would give it away
-  if (q.kind !== "choice" || settings.nameHow !== "hear") bringIntoView(questionNotes());
+  if (q.kind !== "choice" || nameHow() !== "hear") bringIntoView(questionNotes());
   if (refocus && settings.answer === "type") $("type-input").focus({ preventScroll: true });
   refocus = false;
 }
@@ -464,6 +468,14 @@ function render() {
     if (el.tagName === "SELECT") el.value = v;
     else el.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(Array.isArray(v) ? v.includes(b.dataset.v) : v === b.dataset.v)));
   });
+  // Name it, with the sound off: only Keys can be chosen, and it is the one shown
+  const mute = settings.sound === "off";
+  document.querySelectorAll('[data-setting="nameHow"] button').forEach((b) => {
+    b.disabled = mute && b.dataset.v !== "see";
+    b.setAttribute("aria-pressed", String(b.dataset.v === nameHow()));
+  });
+  $("name-how-hint").textContent = mute ? "The sound is off, so it's shown on the keys. Turn the sound on to hear it too."
+    : "See it on the keys, hear it, or both. Then pick its name.";
   document.querySelectorAll("[data-for]").forEach((el) => { el.hidden = !el.dataset.for.split(" ").includes(settings.drill); });
   const oneKeyChosen = oneKey(settings.keys);
   if (settings.drill === "key") {
@@ -475,7 +487,7 @@ function render() {
 
   // the question
   $("ask").textContent = q.kind === "choice"
-    ? { see: "Look at the keys", hear: "Listen", both: "Look and listen" }[settings.nameHow]
+    ? { see: "Look at the keys", hear: "Listen", both: "Look and listen" }[nameHow()]
     : ASK[kind][settings.answer];
   $("title").textContent = q.title;
   $("hand").hidden = !handShown();
@@ -556,8 +568,8 @@ function render() {
   $("main-btn").hidden = !action;
   $("main-btn").textContent = action ? action.label : "";
   $("main-btn").disabled = !!action && action.label === "Check" && picked.size < 2;
-  $("hear-btn").hidden = q.kind !== "choice" && asking;
-  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : settings.nameHow === "see" ? "▶ Hear it" : "▶ Hear it again";
+  $("hear-btn").hidden = settings.sound === "off" || (q.kind !== "choice" && asking);
+  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : nameHow() === "see" ? "▶ Hear it" : "▶ Hear it again";
   $("reveal-btn").hidden = !asking || q.kind === "choice";
   $("clear-btn").hidden = !(asking && onPage && chordKind() && picked.size);
   $("skip-btn").hidden = !asking;
@@ -811,7 +823,7 @@ document.querySelector(".practice").addEventListener("click", (e) => {
   if (KEEP_QUESTION.includes(key)) {
     if (key === "answer" || key === "listen" || key === "nameHow") startAnswer();
     else render();
-    if (key === "nameHow" && settings.nameHow !== "see") playQuestion();
+    if (key === "nameHow" && nameHow() !== "see") playQuestion();
   } else {
     newQuestion();
   }
@@ -889,7 +901,14 @@ $("sound-btn").addEventListener("click", () => {
   settings.sound = settings.sound === "on" ? "off" : "on";
   if (settings.sound === "off") stopPlaying();
   save();
-  render();
+  // a question to name, not yet answered, is shown again the way it can be now: on the keys with the sound off,
+  // as chosen (and heard) with it on
+  if (q.kind === "choice" && status === "asking" && settings.nameHow !== "see") {
+    startAnswer();
+    if (nameHow() !== "see") playQuestion();
+  } else {
+    render();
+  }
 });
 $("midi-btn").addEventListener("click", startMidi);
 $("midi-sound").addEventListener("click", () => {

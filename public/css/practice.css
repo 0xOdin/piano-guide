@@ -130,6 +130,12 @@
   display: flex;
 }
 
+/* a choice that can't be made right now (Sound and Both, with the page's sound off) */
+.pr-mode .seg button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .pr-mode .seg button {
   flex: 1;
   padding: 0 4px;
