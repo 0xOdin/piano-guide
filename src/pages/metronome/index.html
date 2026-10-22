@@ -1,6 +1,6 @@
 ---
 title: Online Metronome with Tempo Changes | PianoGuide
-description: A free online metronome for piano practice. Set the tempo, the beat note and the time signature (4/4, 3/4, 6/8...), with a count-in, or plan tempo changes: 60 BPM for 4 bars, then 65, then 70.
+description: A free online metronome for piano practice. Set the tempo and the time signature (4/4, 3/4, 6/8...), hear the subdivisions, or plan tempo changes with a count-in: 60 BPM for 4 bars, then 65, then 70.
 nav: metronome
 styles: page piano metronome
 scripts: metronome
@@ -61,11 +61,7 @@ scripts: metronome
                                 <button type="button" data-v="9/8" aria-label="9/8"><span>9</span><span>8</span></button>
                                 <button type="button" data-v="12/8" aria-label="12/8"><span>12</span><span>8</span></button>
                             </div>
-                        </div>
-                        <div class="option met-time">
-                            <span class="option-label" id="note-label">Counted in</span>
-                            <div class="seg met-times met-notes" id="notes" data-setting="note" role="group" aria-labelledby="note-label"></div>
-                            <p class="met-time-hint" id="metre-hint"></p>
+                            <p class="met-time-hint" id="time-hint"></p>
                         </div>
                     </div>
                     <div class="option">
@@ -73,6 +69,13 @@ scripts: metronome
                         <div class="seg" data-setting="accent" role="group" aria-labelledby="accent-label">
                             <button type="button" data-v="on">Accented</button>
                             <button type="button" data-v="off">Like the others</button>
+                        </div>
+                    </div>
+                    <div class="option">
+                        <span class="option-label" id="subdivide-label">Subdivide</span>
+                        <div class="seg" data-setting="subdivide" role="group" aria-labelledby="subdivide-label">
+                            <button type="button" data-v="off">Off</button>
+                            <button type="button" data-v="on">On</button>
                         </div>
                     </div>
                 </div>

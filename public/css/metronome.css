@@ -108,9 +108,9 @@
   color: var(--ebony-muted);
 }
 
-/* one light for each click; the first is ringed in felt red when it is accented, and lights red. Clicks between
-   the time signature's beats are smaller, each beat starts after a wider gap, and a long bar has smaller lights.
-   In the count-in they light in brass. */
+/* one light for each click; the first is ringed in felt red when it is accented, and lights red. Subdivisions are
+   smaller, each beat starts after a wider gap, and a long bar has smaller lights. In the count-in they light in
+   brass. */
 .met-beats {
   display: flex;
   flex-wrap: wrap;
@@ -191,7 +191,7 @@
   gap: 8px;
 }
 
-/* on a phone, two rows: the ones counted in crotchet and minim beats, then the ones in quavers; one row on wider screens */
+/* on a phone, two rows: the ones counted in crotchets and minims, then the ones in quavers; one row on wider screens */
 .met-times {
   display: grid;
   grid-template-columns: repeat(5, auto);
@@ -210,17 +210,6 @@
   font-weight: 700;
   line-height: 0.95;
   font-variant-numeric: tabular-nums;
-}
-
-/* the notes to count in: a note drawn on each button; one that doesn't fit the time signature is greyed out */
-.met-notes .note-icon {
-  width: 17px;
-  height: 25px;
-}
-
-.seg.met-times button:disabled {
-  opacity: 0.3;
-  cursor: default;
 }
 
 .met-metre {
@@ -323,8 +312,8 @@
   list-style: none;
 }
 
-/* a section: its number, the beat and tempo beside it (on two lines on a phone), and the remove button; then the bars
-   and time signature, under it all on a phone, under the tempo on a wider screen */
+/* a section: its number, its tempo and the remove button; then the bars and time signature, under it all on a
+   phone, under the tempo on a wider screen */
 .met-section {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -383,19 +372,12 @@
   grid-column: 1 / -1;
 }
 
-/* "= 60" kept together when the line wraps */
-.met-equals {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .met-unit {
   font-size: 0.88rem;
   color: var(--muted);
 }
 
-/* a section's beat note and time signature */
+/* a section's time signature */
 .met-select {
   -webkit-appearance: none;
   appearance: none;
