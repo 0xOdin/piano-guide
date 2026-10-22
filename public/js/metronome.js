@@ -2,7 +2,7 @@
 //  - Basic: one tempo, set by typing it, with − and + (held down they keep going), or by tapping it.
 //  - Tempo changes: a list of sections, each a tempo and a time signature kept for so many bars (60 for 4 bars of 4/4,
 //    then 65 for 4 bars of 6/8, ...). After the last section it stops, starts again, or keeps going at the last tempo.
-// The tempo counts a note, as a metronome mark in music does (M.M. crotchet = 60, dotted crotchet = 60...), and the
+// The tempo counts a note, as a metronome mark in music does (crotchet = 60, dotted crotchet = 60...), and the
 // metronome clicks once for each of those notes: the first of the bar high (when accented), the ones that fall on the
 // time signature's beats a little louder than the ones between them. Before a plan of tempo changes, a count-in of a
 // bar or two at the starting tempo can come first, so its first bar isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
@@ -440,8 +440,7 @@ function renderTotal() {
   $("met-total").textContent = `${plural(bars, "bar")} in all, about ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-// what changes with every beat: the tempo shown and its mark, the line under it, the beat lights and the section
-// playing
+// what changes with every beat: the tempo shown, the line under it, the beat lights and the section playing
 function renderNow() {
   const changes = settings.mode === "changes";
   const now = running() && shown ? shown : null;
@@ -449,11 +448,6 @@ function renderNow() {
   const bpm = now ? now.bpm : s.bpm;
   if (document.activeElement !== $("bpm")) $("bpm").value = bpm;
   $("bpm").setAttribute("aria-label", `Tempo, in ${noteName(s.note, 2)} per minute`);
-  const mark = `M.M. ${noteSVG(s.note)} = ${bpm}`;
-  if ($("met-mark").dataset.mark !== mark) {
-    $("met-mark").dataset.mark = mark;
-    $("met-mark").innerHTML = mark;
-  }
   drawLights(s);
 
   let status = running() ? "Playing" : "Ready";
