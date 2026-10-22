@@ -52,7 +52,8 @@ const INVERSION_NAMES = ["Root position", "1st inversion", "2nd inversion", "3rd
 const FINGERING = {
   3: {
     rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-    lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+    // the 4th (the larger gap) is at the top of a 1st inversion and at the bottom of a 2nd: 5 2 1 spans it there
+    lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
   },
   4: {
     rh: [[1, 2, 3, 5], [1, 2, 3, 5], [1, 2, 3, 5], [1, 2, 3, 5]],

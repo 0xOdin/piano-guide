@@ -26,9 +26,10 @@
 //                   D♯ minor)
 //                 keySig is the minor key as VexFlow names it ("Am", "F#m", "Ebm" ...)
 //
-// C major uses the standard fingerings. Before you trust a key with black keys in it, check its numbers against
-// a reliable source or a teacher: many of them differ from the C major pattern. A "CHECK" comment marks numbers
-// that were entered as a first guess and still need that check. The build stops with a message if a key's
+// C major uses the standard fingerings. The minor scales and the arpeggios on black keys were checked against
+// published charts (pianoscales.org for the minor scales, robertkelleyphd.com and cs.miami.edu for the arpeggios),
+// with the thumbs kept off the black keys where a form raises a note onto one. A "CHECK" comment marks numbers that
+// still need checking, where charts disagree. The build stops with a message if a key's
 // scaleIndex or rootIndex points at the wrong place in the data files.
 module.exports = [
   {
@@ -41,7 +42,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -56,7 +57,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -69,7 +70,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -82,7 +83,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -95,25 +96,24 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio (left hand is a first guess)
     slug: "b-major",
     name: "B major",
     rootIndex: 11,
     scaleIndex: 5,
     keySig: "B",
     signature: "five sharps (F♯, C♯, G♯, D♯, A♯)",
-    arpeggio: { rh: [1, 2, 3, 5], lh: [4, 3, 2, 1] },
+    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio and chords (all black keys, so the numbers differ from C major)
+    // CHECK: arpeggio (all black keys; published charts differ)
     slug: "f-sharp-major",
     name: "F♯ major",
     rootIndex: 6,
@@ -123,12 +123,12 @@ module.exports = [
     arpeggio: { rh: [2, 4, 1, 2], lh: [4, 2, 1, 4] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
     // The same keys as F♯ major, written with flats, so it has F♯ major's fingering.
-    // CHECK: arpeggio and chords (as for F♯ major)
+    // CHECK: arpeggio (as for F♯ major)
     slug: "g-flat-major",
     name: "G♭ major",
     rootIndex: 6,
@@ -139,63 +139,67 @@ module.exports = [
     arpeggio: { rh: [2, 4, 1, 2], lh: [4, 2, 1, 4] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio and chords (copied from the C major pattern)
+    // Arpeggio starting on a black key: the thumb on the white 3rd, 2 and 4 on the black keys (as in published charts).
     slug: "d-flat-major",
     name: "D♭ major",
     rootIndex: 1,
     scaleIndex: 7,
     keySig: "Db",
     signature: "five flats (B♭, E♭, A♭, D♭, G♭)",
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio and chords (copied from the C major pattern)
+    // Arpeggio starting on a black key: the thumb on the white 3rd, 2 and 4 on the black keys (as in published charts).
     slug: "a-flat-major",
     name: "A♭ major",
     rootIndex: 8,
     scaleIndex: 8,
     keySig: "Ab",
     signature: "four flats (B♭, E♭, A♭, D♭)",
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio and chords (copied from the C major pattern)
+    // Arpeggio starting on a black key: the thumb on the white 3rd, 2 and 4 on the black keys (as in published charts).
     slug: "e-flat-major",
     name: "E♭ major",
     rootIndex: 3,
     scaleIndex: 9,
     keySig: "Eb",
     signature: "three flats (B♭, E♭, A♭)",
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: arpeggio and chords (copied from the C major pattern)
+    // Arpeggio starting on a black key: the thumbs on D and F, as in published charts.
     slug: "b-flat-major",
     name: "B♭ major",
     rootIndex: 10,
     scaleIndex: 10,
     keySig: "Bb",
     signature: "two flats (B♭, E♭)",
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [3, 2, 1, 3] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -208,7 +212,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -222,7 +226,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -236,43 +240,41 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scale (left hand) and arpeggio
     type: "minor",
     slug: "b-minor",
     name: "B minor",
     rootIndex: 11,
     keySig: "Bm",
     signature: "two sharps (F♯, C♯)",
-    // CHECK left hand: the old minor scales page had 4 3 2 1 4 3 2 1
-    scale: { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
+    scale: { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [4, 3, 2, 1, 4, 3, 2, 1] },
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scales (all three forms), arpeggio and chords
     type: "minor",
     slug: "f-sharp-minor",
     name: "F♯ minor",
     rootIndex: 6,
     keySig: "F#m",
     signature: "three sharps (F♯, C♯, G♯)",
-    // CHECK left hand: the old minor scales page had 3 2 1 4 3 2 1 3
     scale: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    // melodic: the raised 6th (D♯) is a black key, so the right hand's thumb goes on A and E♯ instead
+    forms: { melodic: { rh: [3, 4, 1, 2, 3, 4, 1, 2], lh: [4, 3, 2, 1, 3, 2, 1, 4] } },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scales (all three forms), arpeggio and chords
     type: "minor",
     slug: "c-sharp-minor",
     name: "C♯ minor",
@@ -281,14 +283,16 @@ module.exports = [
     keySig: "C#m",
     signature: "four sharps (F♯, C♯, G♯, D♯)",
     scale: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    // melodic: the raised 6th (A♯) is a black key, so the right hand's thumb goes on E and B♯ instead
+    forms: { melodic: { rh: [3, 4, 1, 2, 3, 4, 1, 2], lh: [3, 2, 1, 4, 3, 2, 1, 3] } },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scales (all three forms), arpeggio and chords
     type: "minor",
     slug: "g-sharp-minor",
     name: "G♯ minor",
@@ -296,31 +300,37 @@ module.exports = [
     altRoot: true,
     keySig: "G#m",
     signature: "five sharps (F♯, C♯, G♯, D♯, A♯)",
-    scale: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    // natural: the left hand's thumbs on B and E (F♯ is black); harmonic and melodic: on B and the white F𝄪
+    scale: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 3, 2, 1, 4, 3] },
+    forms: {
+      harmonic: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+      melodic: { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    },
+    arpeggio: { rh: [2, 1, 2, 4], lh: [2, 1, 4, 2] },
+    twoOctave: { arpeggio: { rh: [2, 1, 2, 4, 1, 2, 4] } },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scales (all three forms), arpeggio and chords
+    // CHECK: arpeggio (all black keys; charts differ)
     type: "minor",
     slug: "e-flat-minor",
     name: "E♭ minor",
     rootIndex: 3,
     keySig: "Ebm",
     signature: "six flats (B♭, E♭, A♭, D♭, G♭, C♭)",
-    scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [2, 1, 4, 3, 2, 1, 3, 2] },
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
     // The same keys as E♭ minor, written with sharps, so it has E♭ minor's fingering.
-    // CHECK: scales (all three forms), arpeggio and chords (as for E♭ minor)
+    // CHECK: arpeggio (as for E♭ minor)
     type: "minor",
     slug: "d-sharp-minor",
     name: "D♯ minor",
@@ -328,26 +338,25 @@ module.exports = [
     altRoot: true,
     keySig: "D#m",
     signature: "six sharps (F♯, C♯, G♯, D♯, A♯, E♯)",
-    scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    scale: { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [2, 1, 4, 3, 2, 1, 3, 2] },
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
-    // CHECK: scales (all three forms), arpeggio and chords
     type: "minor",
     slug: "b-flat-minor",
     name: "B♭ minor",
     rootIndex: 10,
     keySig: "Bbm",
     signature: "five flats (B♭, E♭, A♭, D♭, G♭)",
-    scale: { rh: [2, 1, 2, 3, 1, 2, 3, 4], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
-    arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
+    scale: { rh: [2, 1, 2, 3, 1, 2, 3, 4], lh: [2, 1, 3, 2, 1, 4, 3, 2] },
+    arpeggio: { rh: [2, 3, 1, 2], lh: [3, 2, 1, 3] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -361,7 +370,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -375,7 +384,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -389,7 +398,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
   {
@@ -403,7 +412,7 @@ module.exports = [
     arpeggio: { rh: [1, 2, 3, 5], lh: [5, 3, 2, 1] },
     chord: {
       rh: [[1, 3, 5], [1, 2, 5], [1, 3, 5]],
-      lh: [[5, 3, 1], [5, 2, 1], [5, 3, 1]],
+      lh: [[5, 3, 1], [5, 3, 1], [5, 2, 1]],
     },
   },
 ];
