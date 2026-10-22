@@ -467,6 +467,11 @@
   cursor: default;
 }
 
+/* the count-in, under "After the last section" */
+.met-count {
+  margin-top: 16px;
+}
+
 .met-total {
   font-size: 0.86rem;
   color: var(--muted);

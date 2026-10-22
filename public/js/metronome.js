@@ -4,8 +4,8 @@
 //    then 65 for 4 bars of 6/8, ...). After the last section it stops, starts again, or keeps going at the last tempo.
 // The tempo counts a note, as a metronome mark in music does (M.M. crotchet = 60, dotted crotchet = 60...), and the
 // metronome clicks once for each of those notes: the first of the bar high (when accented), the ones that fall on the
-// time signature's beats a little louder than the ones between them. A count-in of a bar or two at the starting tempo
-// can come first, so the first bar isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
+// time signature's beats a little louder than the ones between them. Before a plan of tempo changes, a count-in of a
+// bar or two at the starting tempo can come first, so its first bar isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
 // ahead on its clock (not by timers, which drift), and the lights follow what is heard. The settings are kept in this
 // browser between visits.
 
@@ -188,7 +188,7 @@ async function start() {
   if (navigator.audioSession) navigator.audioSession.type = "playback";
   if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
   if (ctx.state === "suspended") await ctx.resume();
-  pos = { beat: 0, bar: 0, section: 0, countIn: Number(settings.countIn) };
+  pos = { beat: 0, bar: 0, section: 0, countIn: settings.mode === "changes" ? Number(settings.countIn) : 0 }; // Basic just starts
   heard = [];
   shown = null;
   stopAt = null;
