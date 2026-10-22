@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#121316" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <path d="M9.2 3h5.6l4.2 18H5L9.2 3z"/>
-  <path d="M7 15.5h10"/>
-  <path d="M12 15.5l4.5-8.5"/>
-  <circle cx="15.6" cy="8.7" r="1.2"/>
+  <!-- Practice: a tick in a circle, for an answer that was right -->
+  <circle cx="12" cy="12" r="8.5"/>
+  <path d="M8.3 12.4l2.5 2.5 4.9-5.3"/>
 </svg>

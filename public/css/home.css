@@ -80,7 +80,7 @@
   background: var(--accent);
 }
 
-/* Three ways in: a large card for looking things up, two smaller ones beside it */
+/* Two ways in, side by side on wider screens: looking things up, and playing and practising */
 .home-ways {
   display: grid;
   gap: 14px;
@@ -111,23 +111,6 @@
   color: var(--muted);
 }
 
-/* the whole small card opens its page */
-.way-small h2 a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-}
-
-.way-go {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--accent-ink);
-}
-
-.way-go::after,
 .way-links a::after {
   content: " \203A";
 }
@@ -296,11 +279,6 @@
 }
 
 @media (hover: hover) {
-  .way-small:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
-  }
-
   .way-links a:hover {
     background: var(--bg-alt);
   }
@@ -343,13 +321,12 @@
   }
 
   .home-ways {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     padding: 56px var(--pad) 64px;
   }
 
-  .way-big {
-    grid-row: span 2;
+  .way {
     padding: 28px;
   }
 
@@ -374,7 +351,7 @@
     padding: 64px var(--gutter) 80px;
   }
 
-  .way-big {
+  .way {
     padding: 32px;
   }
 
