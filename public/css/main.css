@@ -705,8 +705,13 @@ footer a:focus-visible {
     width: 220px;
   }
 
+  /* in the header row beside the toggle, holding the suggestions that hang below it. The phone layout's place for
+     it (top: 100%, under the header) must not carry over: Safari would move it down by that much. */
   .search-form {
     position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
   }
 
   .search-suggest {
