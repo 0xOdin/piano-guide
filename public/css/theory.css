@@ -41,10 +41,40 @@
   outline: none;
 }
 
-.theory-card img {
+.theory-card img,
+.theory-card .cof-mini {
+  display: block;
   width: 100%;
   height: auto;
   margin-bottom: 16px;
+}
+
+/* the little circle of fifths on the Circle of Fifths card: the twelve keys round a ring, C at the top in felt red.
+   It is drawn in the page, so the letters take the text colour in light and dark. */
+.cof-mini .ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 40%, transparent);
+  stroke-width: 1.5;
+}
+
+.cof-mini .dot {
+  fill: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.cof-mini circle.is-c {
+  fill: var(--accent);
+}
+
+.cof-mini text {
+  fill: var(--text);
+  font-family: var(--font-body);
+  font-size: 7.6px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.cof-mini text.is-c {
+  fill: var(--accent-ink);
 }
 
 .theory-card h2 {
