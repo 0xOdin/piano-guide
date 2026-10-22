@@ -563,6 +563,8 @@ function render() {
   $("skip-btn").hidden = !asking;
   $("answer-hint").textContent = ANSWER_HINTS[settings.answer === "play" && settings.listen === "on" ? "listen" : settings.answer];
   $("listen-option").hidden = settings.answer !== "play";
+  $("sound-btn").setAttribute("aria-pressed", String(settings.sound === "on"));
+  $("sound-btn").querySelector("span").textContent = settings.sound === "on" ? "Sound on" : "Sound off";
 
   // MIDI and the computer keys for playing, the microphone for listening
   $("midi-row").hidden = !onPage;
@@ -882,6 +884,13 @@ $("clear-btn").addEventListener("click", () => {
 $("hear-btn").addEventListener("click", () => (status === "asking" ? playQuestion() : playAnswer()));
 $("reveal-btn").addEventListener("click", () => finish(false));
 $("skip-btn").addEventListener("click", newQuestion);
+// the page's own sound: off stops what is playing too (a MIDI keyboard's sound here has its own switch)
+$("sound-btn").addEventListener("click", () => {
+  settings.sound = settings.sound === "on" ? "off" : "on";
+  if (settings.sound === "off") stopPlaying();
+  save();
+  render();
+});
 $("midi-btn").addEventListener("click", startMidi);
 $("midi-sound").addEventListener("click", () => {
   settings.midiSound = settings.midiSound === "on" ? "off" : "on";
