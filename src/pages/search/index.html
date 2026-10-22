@@ -5,9 +5,9 @@ styles: page search
 sitemap: no
 ---
         <section class="page-hero">
-            <span>SEARCH</span>
+            <p class="eyebrow">Find anything</p>
             <h1>Search</h1>
-            <p>Find a scale, chord or key by name, for example “F sharp minor”, “Bb arpeggio” or “seventh chords”.</p>
+            <p>Find a scale, arpeggio or chord by its name, for example “F sharp minor”, “Bb arpeggio” or “G7”, or a page like “metronome”.</p>
         </section>
 
         <section class="search-page">
@@ -16,5 +16,6 @@ sitemap: no
                 <input id="search-input" type="search" name="q" placeholder="Search scales, chords, or keys..." autocomplete="off">
             </form>
             <p class="search-status" id="search-status" aria-live="polite"></p>
+            <div class="search-examples" id="search-examples" hidden><span></span><ul></ul></div>
             <ul class="search-results" id="search-results"></ul>
         </section>

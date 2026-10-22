@@ -41,11 +41,50 @@
   display: none;
 }
 
-/* same look as the topic list on the homepage (phone layout) */
+/* examples to try, when nothing has been typed or nothing was found */
+.search-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 16px 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.search-examples[hidden] {
+  display: none;
+}
+
+.search-examples ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.search-examples button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease);
+}
+
+.search-examples button:hover {
+  border-color: var(--line-strong);
+}
+
+/* the results: one card, a row for each, with its kind and the line under it (notes, key signature) */
 .search-results {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 14px;
   box-shadow: var(--shadow);
   overflow: hidden;
 }
@@ -54,14 +93,18 @@
   display: none;
 }
 
-.search-result {
-  position: relative;
-  padding: 16px 44px 16px 18px;
-  transition: background-color 0.2s ease;
+.search-results li + li {
+  border-top: 1px solid var(--line);
 }
 
-.search-result + .search-result {
-  border-top: 1px solid var(--line);
+.search-result {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 12px;
+  padding: 14px 44px 14px 18px;
+  transition: background-color 0.2s var(--ease);
 }
 
 .search-result::after {
@@ -74,25 +117,30 @@
   color: var(--accent);
 }
 
-.search-result:hover {
+.search-result:hover,
+.search-result:focus-visible {
   background: var(--bg-alt);
+  outline: none;
 }
 
-.search-result h3 {
-  margin: 0 0 3px;
+.search-result strong {
   font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.search-result h3 a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
+.search-result .search-kind {
+  grid-row: 1;
+  grid-column: 2;
 }
 
-.search-result p {
-  margin: 0;
+.search-result:hover .search-kind,
+.search-result:focus-visible .search-kind {
+  background: var(--surface);
+}
+
+.search-line {
+  grid-column: 1 / -1;
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--muted);

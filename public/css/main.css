@@ -300,6 +300,82 @@ header {
   color: var(--muted);
 }
 
+/* Suggestions as you type (search.js): the best matches, each with its kind, and a link to all of them. On a phone
+   they sit under the box in the panel that opens; on a desktop they hang below the box. */
+.search-suggest {
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.search-suggest[hidden] {
+  display: none;
+}
+
+.suggest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 0.88rem;
+}
+
+.suggest-item strong {
+  min-width: 0;
+  font-weight: 600;
+}
+
+.suggest-item:hover,
+.suggest-item:focus-visible {
+  background: var(--bg-alt);
+  outline: none;
+}
+
+.search-kind {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-alt);
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.suggest-item:hover .search-kind,
+.suggest-item:focus-visible .search-kind {
+  background: var(--surface);
+}
+
+.suggest-none {
+  margin: 0;
+  padding: 9px 10px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.suggest-all {
+  margin-top: 4px;
+  padding: 10px 10px 6px;
+  border-top: 1px solid var(--line);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.suggest-all::after {
+  content: " \203A";
+}
+
+.suggest-all:hover,
+.suggest-all:focus-visible {
+  color: var(--text);
+  outline: none;
+}
+
 .search-form input:focus {
   outline: none;
   border-color: var(--accent);
@@ -627,6 +703,24 @@ footer a:focus-visible {
 
   .search-form input {
     width: 220px;
+  }
+
+  .search-form {
+    position: relative;
+  }
+
+  .search-suggest {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 20;
+    width: max(100%, 360px);
+    margin: 0;
+    padding: 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lift);
   }
 
   /* Section headers */

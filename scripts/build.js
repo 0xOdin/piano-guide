@@ -8,7 +8,7 @@
 //                      description: ...
 //                      nav: chords                  the menu item to mark as the current page (see NAV)
 //                      styles: page chords          /css/<name>.css, after main.css
-//                      scripts: vexflow chords      /js/<name>.js after main.js ("vexflow" is the CDN copy)
+//                      scripts: vexflow chords      /js/<name>.js after main.js and search.js ("vexflow" is the CDN copy)
 //                      sitemap: no                  leave the page out of sitemap.xml
 //                      ---
 //                    src/pages/chords/index.html becomes /chords/
@@ -107,7 +107,7 @@ function addPage(url, out, { file, meta, body }, vars = {}) {
     nav: navList(meta.nav),
     footerNav: navList(null),
     content: fill(body.replace(/\s+$/, ""), vars, file),
-    scripts: ["main", ...words(meta.scripts)].map((n) => `    <script src="${SCRIPT_URLS[n] || `/js/${n}.js`}"></script>`).join("\n"),
+    scripts: ["main", "search", ...words(meta.scripts)].map((n) => `    <script src="${SCRIPT_URLS[n] || `/js/${n}.js`}"></script>`).join("\n"),
     year: new Date().getFullYear(),
   }, "src/layout.html");
   pages.push({ url, out, html: withBase(html), title: meta.title, description: meta.description, sitemap: meta.sitemap !== "no" });
@@ -672,6 +672,12 @@ function relativeLine(key, page) {
 // a chord page to Chords): that menu item is marked, and the breadcrumb starts with it.
 const keyTemplate = readPage(path.join(SRC, "templates", "key.html"));
 
+// The site's search (public/js/search.js) looks through these, written to /search-index.json at the end:
+// { t: title, k: kind, s: a line under it, u: url, w: other words it can be found by (another spelling, a symbol) }.
+// They are kept in the order they are added, which is the order results with the same score come in.
+const searchEntries = [];
+const SEARCH_KINDS = { scales: "Scale", arpeggios: "Arpeggio", chords: "Chord" };
+
 function addKeyPage({ url, keyUrl, keyName, section, tabnav, out }) {
   const [, sectionUrl, sectionName] = NAV.find(([id]) => id === section);
   addPage(url, `${url.slice(1)}index.html`, { ...keyTemplate, meta: { ...keyTemplate.meta, nav: section, title: out.title, description: out.description } }, {
@@ -715,6 +721,17 @@ for (const key of KEYS) {
     const out = page.build(key);
     out.heroExtra = relativeLine(key, page) + (out.heroExtra || ""); // the relative key first, then the page's own links
     addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out });
+
+    // for the search: a minor key's main page is its (natural) minor scale
+    const natural = page.path === "" && isMinor(key);
+    const notes = out.data.mode === "chord" ? out.data.inversions[0].rh.notes : out.data.octaves[1].notes.slice(0, page.section === "scales" ? 7 : 3);
+    searchEntries.push({
+      t: natural ? `${cap(key.name)} scale` : cap(out.heading.replace(/ fingering$/, "")),
+      k: SEARCH_KINDS[page.section],
+      s: `${notes.map((n) => n.name).join(" ")} · ${cap(key.signature.split(" (")[0])}`,
+      u: `${keyUrl}${page.path}`,
+      w: `${key.name} ${natural ? "natural" : ""} ${page.section === "chords" ? "triad" : ""}`,
+    });
   }
 }
 
@@ -722,7 +739,44 @@ for (const key of KEYS) {
 {
   const out = chromaticPage();
   addKeyPage({ url: "/keys/chromatic/", keyUrl: "/keys/chromatic/", keyName: "Chromatic scale", section: "scales", tabnav: out.tabnav, out });
+  searchEntries.push({ t: "Chromatic scale", k: "Scale", s: "Every key in turn, from any starting note", u: "/keys/chromatic/", w: "semitones half steps" });
 }
+
+// Every chord on every root, in the chord explorer (/chords/). A major or minor chord that has its own key page,
+// spelled the same way, is found there instead.
+{
+  const keyChords = new Set(KEYS.map((key) => key.name)); // "C major", "F♯ minor"
+  for (const type of CHORD_TYPES) {
+    for (const root of CHORD_ROOTS) {
+      const name = `${root.name} ${type.name}`;
+      if (keyChords.has(name)) continue;
+      const notes = spellChord(root, type).map((n) => n.name);
+      const alt = root.alt ? `${root.alt.name} ${type.name} ${root.alt.name}${type.symbol}` : "";
+      searchEntries.push({
+        t: `${name} chord`,
+        k: "Chord",
+        s: `${root.name}${type.symbol} · ${notes.join(" ")}`,
+        u: `/chords/?root=${noteSlug(root.name)}&type=${type.tab.toLowerCase()}`,
+        w: `${root.name}${type.symbol} ${type.symbol} ${type.tab} ${type.group} ${alt}`,
+      });
+    }
+  }
+}
+
+// The other pages
+searchEntries.push(
+  { t: "Scales", k: "List", s: "Every major and minor scale, with fingering", u: "/scales/", w: "all scales major minor" },
+  { t: "Arpeggios", k: "List", s: "Every major and minor arpeggio, with fingering", u: "/arpeggios/", w: "all arpeggios" },
+  { t: "Scale fingering chart", k: "Chart", s: "Every scale's fingering on one page, to print", u: "/scales/fingering-chart/", w: "printable print table" },
+  { t: "Arpeggio fingering chart", k: "Chart", s: "Every arpeggio's fingering on one page, to print", u: "/arpeggios/fingering-chart/", w: "printable print table" },
+  { t: "Chords", k: "Chords", s: "Every chord on every root, with inversions", u: "/chords/", w: "chord explorer seventh sus diminished augmented inversion" },
+  { t: "Theory", k: "Theory", s: "The ideas behind the scales and chords", u: "/theory/", w: "music theory" },
+  { t: "Intervals", k: "Theory", s: "The distance between two notes, and how to name it", u: "/theory/intervals/", w: "interval semitone tone major minor perfect augmented diminished unison second third fourth fifth sixth seventh octave tritone" },
+  { t: "Circle of fifths", k: "Theory", s: "Key signatures, relative minors, and the order of sharps and flats", u: "/theory/circle-of-fifths/", w: "key signature relative minor sharps flats" },
+  { t: "Keyboard", k: "Tool", s: "Play two octaves, and light up any scale or chord", u: "/keyboard/", w: "piano online play keys" },
+  { t: "Practice", k: "Tool", s: "Play or write what you are asked, and see what you got right", u: "/practice/", w: "quiz test drill microphone listen" },
+  { t: "Metronome", k: "Tool", s: "Keep time, with tempo changes bar by bar", u: "/metronome/", w: "tempo bpm beat tap click" },
+);
 
 /* ---------- The lists: /scales/, /arpeggios/ ---------- */
 
@@ -1078,6 +1132,8 @@ for (const page of pages) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, page.html);
 }
+
+fs.writeFileSync(path.join(DIST, "search-index.json"), JSON.stringify(searchEntries.map((e) => ({ ...e, u: BASE_PATH + e.u, w: e.w.trim() || undefined }))));
 
 const listed = pages.filter((p) => p.sitemap).sort((a, b) => a.url.localeCompare(b.url));
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
