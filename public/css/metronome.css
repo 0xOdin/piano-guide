@@ -92,11 +92,18 @@
   cursor: default;
 }
 
+/* the count-in: the big number counts down the beats to go, in brass, over "Count-in" */
+.met-case.is-counting .met-bpm input,
+.met-case.is-counting .met-bpm span {
+  color: var(--brass);
+}
+
 .met-bpm span {
   margin-top: 2px;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--ebony-muted);
 }
 
@@ -301,47 +308,6 @@
   margin: 0 0 14px;
   font-size: 0.9rem;
   color: var(--muted);
-}
-
-/* the count-in, above the sections: a bar before section 1, in brass while it plays, as the lights are */
-.met-count-in {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  border: 1px dashed var(--line-strong);
-  border-radius: 14px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
-}
-
-.met-count-in div {
-  display: grid;
-  gap: 2px;
-}
-
-.met-count-in span:not(.met-count-in-mark) {
-  font-size: 0.84rem;
-  color: var(--muted);
-}
-
-.met-count-in-mark {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--bg-alt) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 2l6 4-6 4z' fill='%2375706a'/%3E%3C/svg%3E") no-repeat center;
-}
-
-.met-count-in.is-current {
-  border-style: solid;
-  border-color: var(--brass);
-  background: color-mix(in srgb, var(--brass) 10%, var(--surface));
-}
-
-.met-count-in.is-current .met-count-in-mark {
-  background-color: var(--brass);
 }
 
 .met-sections {

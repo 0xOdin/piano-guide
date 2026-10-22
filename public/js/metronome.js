@@ -5,8 +5,8 @@
 // The tempo counts the time signature's beats, as tempo marks in music do: crotchets in 4/4, minims in 2/2, dotted
 // crotchets in 6/8. The first beat of the bar clicks high (when accented); Subdivide adds softer clicks between the
 // beats (the quavers of 4/4, the three quavers of each beat in 6/8). A plan of tempo changes always starts with a
-// bar's count-in at the first section's tempo, shown as its own row above the sections, so the first bar of the plan
-// isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment
+// bar's count-in at the first section's tempo, counted down on the case, so the first bar of the plan isn't spent
+// getting ready. The clicks are made by Web Audio and scheduled a moment
 // ahead on its clock (not by timers, which drift), and the lights follow what is heard. The settings are kept in this
 // browser between visits.
 
@@ -399,15 +399,19 @@ function renderNow() {
   const now = running() && shown ? shown : null;
   const s = sourceAt(now || { section: 0 });
   const bpm = now ? now.bpm : s.bpm;
-  if (document.activeElement !== $("bpm")) $("bpm").value = bpm;
+  // in the count-in, the big number counts down the beats to go, over "Count-in"
+  const counting = !!now && !!now.left;
+  document.querySelector(".met-case").classList.toggle("is-counting", counting);
+  if (document.activeElement !== $("bpm")) $("bpm").value = counting ? now.left : bpm;
+  $("bpm-label").textContent = counting ? "Count-in" : "BPM";
   $("bpm").setAttribute("aria-label", `Tempo, in ${TIMES[s.time].beat} beats per minute`);
   drawLights(s);
 
   let status = running() ? "Playing" : "Ready";
   let detail = tempoName(bpm);
-  if (now && now.left) {
-    status = "Count-in";
-    detail = `Starts in ${now.left}`;
+  if (counting) {
+    status = "Get ready";
+    detail = `Section 1 starts at ${bpm} BPM`;
   } else if (changes && now) {
     const n = settings.sections.length;
     if (now.past) {
@@ -423,7 +427,7 @@ function renderNow() {
       detail = `Bar ${now.bar + 1} of ${s.bars}${next ? ` · ${nextText} in ${plural(left, "bar")}` : after}`;
     }
   } else if (changes) {
-    detail = `${plural(settings.sections.length, "section")}, starting at ${bpm} BPM`;
+    detail = `A bar to count in, then ${plural(settings.sections.length, "section")} from ${bpm} BPM`;
   } else if (now) {
     detail = `${tempoName(bpm)} · bar ${now.bar + 1}`;
   }
@@ -434,7 +438,6 @@ function renderNow() {
   $("beats").classList.toggle("is-counting", !!now && !!now.left);
   $("sections").querySelectorAll(".met-section").forEach((row, i) =>
     row.classList.toggle("is-current", !!now && !now.left && !now.past && now.section === i));
-  $("count-in").classList.toggle("is-current", !!now && !!now.left);
 }
 
 // a number with − and + beside it
@@ -493,9 +496,6 @@ function render() {
       row.querySelector("select").value = s.time;
     });
   }
-  // the count-in row: a bar of the first section's time signature, at its tempo
-  const first = settings.sections[0];
-  $("count-in-detail").textContent = `1 bar of ${first.time} at ${first.bpm} BPM`;
   $("add-section").disabled = settings.sections.length >= MAX_SECTIONS;
   renderTotal();
   renderNow();

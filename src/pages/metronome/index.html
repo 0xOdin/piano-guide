@@ -27,7 +27,7 @@ scripts: metronome
                         <button type="button" class="met-step" data-target="bpm" data-step="-1" aria-label="Slower">−</button>
                         <div class="met-bpm">
                             <input id="bpm" type="number" inputmode="numeric" min="20" max="300" step="1" aria-label="Tempo, in beats per minute">
-                            <span>BPM</span>
+                            <span id="bpm-label">BPM</span>
                         </div>
                         <button type="button" class="met-step" data-target="bpm" data-step="1" aria-label="Faster">+</button>
                     </div>
@@ -83,13 +83,6 @@ scripts: metronome
                 <div class="met-plan" id="plan">
                     <h2>Tempo changes</h2>
                     <p class="met-plan-intro">Each section keeps its tempo and time signature for so many bars, then the next one starts.</p>
-                    <div class="met-count-in" id="count-in">
-                        <span class="met-count-in-mark" aria-hidden="true"></span>
-                        <div>
-                            <strong>Count-in</strong>
-                            <span id="count-in-detail"></span>
-                        </div>
-                    </div>
                     <ol class="met-sections" id="sections"></ol>
                     <div class="met-plan-foot">
                         <button type="button" class="btn btn-quiet met-add" id="add-section">+ Add a section</button>
