@@ -24,7 +24,7 @@
 //              /keys/a-minor/chord/index.html      chord
 //
 // plus the chromatic scale at /keys/chromatic/, the lists and fingering charts at /scales/ and /arpeggios/, and
-// /sitemap.xml.
+// /sitemap.xml (not while the site is hidden from search engines: HIDDEN_FROM_SEARCH below).
 // Finally every link to a page or file on the site is checked, and the build fails if one of them goes nowhere.
 //
 // Run it with   npm run build   (or npm run dev to build, serve and rebuild on every change).
@@ -46,6 +46,9 @@ const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "src");
 const PUBLIC = path.join(ROOT, "public");
 const DIST = path.join(ROOT, "dist");
+// While true, every page asks search engines not to list it (<meta name="robots" content="noindex">) and there is no
+// sitemap.xml: the site is public, but not found by searching. Set it to false to let search engines list it.
+const HIDDEN_FROM_SEARCH = true;
 
 /* ---------- Pages and the layout ---------- */
 
@@ -104,6 +107,7 @@ function addPage(url, out, { file, meta, body }, vars = {}) {
   const html = fill(layout, {
     title: esc(meta.title),
     description: esc(meta.description),
+    robots: HIDDEN_FROM_SEARCH ? '\n    <meta name="robots" content="noindex">' : "",
     canonical: SITE_URL + url,
     styles: ["main", ...words(meta.styles)].map((n) => `    <link rel="stylesheet" href="/css/${n}.css">`).join("\n"),
     nav: navList(meta.nav),
@@ -1179,12 +1183,14 @@ for (const page of pages) {
 
 fs.writeFileSync(path.join(DIST, "search-index.json"), JSON.stringify(searchEntries.map((e) => ({ ...e, u: BASE_PATH + e.u, w: e.w.trim() || undefined }))));
 
-const listed = pages.filter((p) => p.sitemap).sort((a, b) => a.url.localeCompare(b.url));
-fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
+const listed = HIDDEN_FROM_SEARCH ? [] : pages.filter((p) => p.sitemap).sort((a, b) => a.url.localeCompare(b.url));
+if (!HIDDEN_FROM_SEARCH) {
+  fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${listed.map((p) => `  <url><loc>${SITE_URL}${p.url}</loc></url>`).join("\n")}
 </urlset>
 `);
+}
 
 /* ---------- Checking the links ---------- */
 
@@ -1201,7 +1207,7 @@ for (const page of pages) {
   }
 }
 
-console.log(`Built ${pages.length} pages into dist/ (${listed.length} in sitemap.xml)`);
+console.log(`Built ${pages.length} pages into dist/ (${HIDDEN_FROM_SEARCH ? "hidden from search engines, no sitemap.xml" : `${listed.length} in sitemap.xml`})`);
 if (broken.length) {
   console.error(`\n${broken.length} broken link${broken.length > 1 ? "s" : ""}:\n${[...new Set(broken)].join("\n")}`);
   process.exitCode = 1;
