@@ -412,21 +412,6 @@ a.key-badge:active {
   transform: scale(0.98);
 }
 
-/* a row of small keys, faint, between parts of a page */
-.key-strip {
-  height: 16px;
-  margin: 0 var(--pad);
-  background: url(/assets/images/key-strip.svg) repeat-x left top / auto 100%;
-  opacity: 0.55;
-}
-
-@media screen {
-  :root[data-theme="dark"] .key-strip {
-    filter: invert(1);
-    opacity: 0.35;
-  }
-}
-
 /* parts of a page fade up as they come into view (main.js); without JavaScript, or with reduced motion, they are
    simply there */
 .js .reveal {
@@ -562,10 +547,6 @@ footer a:focus-visible {
     justify-items: end;
     gap: 24px;
   }
-
-  .key-strip {
-    height: 18px;
-  }
 }
 
 /* Desktop */
@@ -656,10 +637,6 @@ footer a:focus-visible {
   /* Footer */
   footer {
     padding: 64px var(--gutter) 36px;
-  }
-
-  .key-strip {
-    margin: 0 var(--gutter);
   }
 }
 
