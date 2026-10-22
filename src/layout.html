@@ -20,9 +20,9 @@
             document.documentElement.dataset.theme = dark ? "dark" : "light";
         })();
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <!-- the two typefaces (main.css), asked for at once rather than once the stylesheet is read -->
+    <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 {{styles}}
 </head>
 
@@ -72,7 +72,7 @@
             </nav>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {{year}} PianoGuide</p>
+            <p>&copy; {{year}} PianoGuide · <a href="/privacy/">Privacy and terms</a></p>
             <p>Piano sound: recordings of a Steinway by the University of Iowa Electronic Music Studios</p>
         </div>
     </footer>

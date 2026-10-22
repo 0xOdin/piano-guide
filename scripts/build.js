@@ -65,7 +65,8 @@ const NAV = [
   ["practice", "/practice/", "Practice"],
   ["metronome", "/metronome/", "Metronome"],
 ];
-const SCRIPT_URLS = { vexflow: "https://cdn.jsdelivr.net/npm/vexflow@4.2.5/build/cjs/vexflow.js" };
+// VexFlow 4.2.5 (draws the sheet music; MIT licence, beside it in /js/vendor/), served from the site, not a CDN
+const SCRIPT_URLS = { vexflow: "/js/vendor/vexflow.js" };
 
 const layout = fs.readFileSync(path.join(SRC, "layout.html"), "utf8");
 
@@ -818,6 +819,7 @@ searchEntries.push(
   { t: "Keyboard", k: "Tool", s: "Play two octaves, and light up any scale or chord", u: "/keyboard/", w: "piano online play keys" },
   { t: "Practice", k: "Tool", s: "Play or write what you are asked, and see what you got right", u: "/practice/", w: "quiz test drill microphone listen" },
   { t: "Metronome", k: "Tool", s: "Keep time, with tempo changes bar by bar", u: "/metronome/", w: "tempo bpm beat tap click" },
+  { t: "Privacy and terms", k: "Page", s: "What the site keeps on your device, the microphone, and the terms", u: "/privacy/", w: "privacy policy terms conditions cookies data microphone disclaimer credits licence" },
 );
 
 /* ---------- The lists: /scales/, /arpeggios/ ---------- */
