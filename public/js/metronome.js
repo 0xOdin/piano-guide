@@ -2,20 +2,27 @@
 //  - Basic: one tempo, set by typing it, with − and + (held down they keep going), or by tapping it.
 //  - Tempo changes: a list of sections, each a tempo kept for so many bars (60 BPM for 4 bars, then 65 for 4, ...).
 //    After the last section it stops, starts again, or keeps going at the last tempo.
-// Both have the beats in a bar and an accented first beat. The clicks are made by Web Audio and scheduled a moment
-// ahead on its clock (not by timers, which drift), and the lights follow what is heard. The settings are kept in
-// this browser between visits.
+// Both have a time signature and an accented first beat. In 6/8, 9/8 and 12/8 the tempo counts the beats felt (two,
+// three or four in a bar, as tempo marks in music count them), and each beat clicks three times, softer after the
+// first. The clicks are made by Web Audio and scheduled a moment ahead on its clock (not by timers, which drift), and
+// the lights follow what is heard. The settings are kept in this browser between visits.
 
 const $ = (id) => document.getElementById(id);
 
 /* ---------- Settings ---------- */
 
-const LIMITS = { bpm: [20, 300], beats: [1, 12], bars: [1, 999] };
+const LIMITS = { bpm: [20, 300], bars: [1, 999] };
 const MAX_SECTIONS = 20;
+// each time signature: the beats in a bar (what the tempo counts), and the clicks in each beat
+const TIMES = {
+  "2/4": { beats: 2, clicks: 1 }, "3/4": { beats: 3, clicks: 1 }, "4/4": { beats: 4, clicks: 1 }, "5/4": { beats: 5, clicks: 1 },
+  "2/2": { beats: 2, clicks: 1 }, "3/8": { beats: 3, clicks: 1 },
+  "6/8": { beats: 2, clicks: 3 }, "9/8": { beats: 3, clicks: 3 }, "12/8": { beats: 4, clicks: 3 },
+};
 const DEFAULTS = {
   mode: "basic", // basic | changes
   bpm: 60,
-  beats: 4,
+  time: "4/4",
   accent: "on",
   sections: [{ bpm: 60, bars: 4 }, { bpm: 65, bars: 4 }, { bpm: 70, bars: 4 }],
   end: "stop", // stop | repeat | keep
@@ -30,7 +37,8 @@ try {
   const saved = JSON.parse(localStorage.getItem(STORE) || "{}");
   if (["basic", "changes"].includes(saved.mode)) settings.mode = saved.mode;
   if (okNumber(saved.bpm)) settings.bpm = clamp(saved.bpm, LIMITS.bpm);
-  if (okNumber(saved.beats)) settings.beats = clamp(saved.beats, LIMITS.beats);
+  if (saved.time in TIMES) settings.time = saved.time;
+  else if (okNumber(saved.beats)) settings.time = `${[2, 3, 4, 5].includes(saved.beats) ? saved.beats : 4}/4`; // saved before time signatures
   if (["on", "off"].includes(saved.accent)) settings.accent = saved.accent;
   if (["stop", "repeat", "keep"].includes(saved.end)) settings.end = saved.end;
   if (Array.isArray(saved.sections)) {
@@ -54,14 +62,16 @@ function save() {
 
 let ctx = null;
 
-// A short wooden click: a high one on an accented first beat
-function click(time, accented) {
+// A short wooden click: high on an accented first beat, lower and softer for the clicks within a beat (6/8...)
+const CLICKS = { first: [1760, 0.9], beat: [1175, 0.55], within: [880, 0.3] };
+function click(time, kind) {
+  const [pitch, level] = CLICKS[kind];
   const osc = ctx.createOscillator();
   const env = ctx.createGain();
   osc.type = "triangle";
-  osc.frequency.value = accented ? 1760 : 1175;
+  osc.frequency.value = pitch;
   env.gain.setValueAtTime(0.0001, time);
-  env.gain.exponentialRampToValueAtTime(accented ? 0.9 : 0.55, time + 0.002);
+  env.gain.exponentialRampToValueAtTime(level, time + 0.002);
   env.gain.exponentialRampToValueAtTime(0.0001, time + 0.06);
   osc.connect(env).connect(ctx.destination);
   osc.start(time);
@@ -70,7 +80,7 @@ function click(time, accented) {
 
 /* ---------- Keeping time ---------- */
 
-// where the metronome is: the beat in the bar, the bar (in the section, for tempo changes) and the section. `past`:
+// where the metronome is: the click in the bar, the bar (in the section, for tempo changes) and the section. `past`:
 // the plan has ended and it keeps going at the last tempo.
 let pos = null;
 let nextTime = 0; // when the next click sounds, on the audio clock
@@ -81,12 +91,14 @@ let shown = null; // the click heard last
 let wakeLock = null;
 
 const running = () => timer !== null;
+const meter = () => TIMES[settings.time];
+const clicksInBar = () => meter().beats * meter().clicks;
 const bpmAt = (p) => (settings.mode === "basic" ? settings.bpm : settings.sections[Math.min(p.section, settings.sections.length - 1)].bpm);
 
-// moves on one beat, into the next bar and the next section as they come
+// moves on one click, into the next bar and the next section as they come
 function advance() {
   pos.beat++;
-  if (pos.beat < settings.beats) return;
+  if (pos.beat < clicksInBar()) return;
   pos.beat = 0;
   pos.bar++;
   if (settings.mode === "basic" || pos.past || pos.bar < settings.sections[pos.section].bars) return;
@@ -109,10 +121,10 @@ function advance() {
 function schedule() {
   const ahead = document.hidden ? 1.5 : 0.12;
   while (!pos.done && nextTime < ctx.currentTime + ahead) {
-    click(nextTime, pos.beat === 0 && settings.accent === "on" && settings.beats > 1);
+    click(nextTime, pos.beat === 0 && settings.accent === "on" ? "first" : pos.beat % meter().clicks === 0 ? "beat" : "within");
     const bpm = bpmAt(pos);
     heard.push({ time: nextTime, beat: pos.beat, bar: pos.bar, section: pos.section, past: !!pos.past, bpm });
-    nextTime += 60 / bpm;
+    nextTime += 60 / bpm / meter().clicks;
     advance();
     if (pos.done) stopAt = nextTime;
   }
@@ -194,13 +206,12 @@ function tap() {
 
 /* ---------- Changing the settings ---------- */
 
-// A number setting: "bpm", "beats", or a section's "bpm:2" / "bars:2"
+// A number setting: "bpm", or a section's "bpm:2" / "bars:2"
 function setValue(target, value) {
   const [what, i] = target.split(":");
   if (!okNumber(value)) return;
   if (i === undefined) settings[what] = clamp(value, LIMITS[what]);
   else settings.sections[Number(i)][what] = clamp(value, LIMITS[what]);
-  if (what === "beats" && pos && pos.beat >= settings.beats) pos.beat = settings.beats - 1; // fewer beats, mid-bar
   save();
   render();
 }
@@ -249,9 +260,9 @@ document.addEventListener("click", (e) => {
 
 // typed numbers: used as soon as they make sense, tidied when the box is left
 document.addEventListener("input", (e) => {
-  const box = e.target.closest("input[data-target], #bpm, #beats-input");
+  const box = e.target.closest("input[data-target], #bpm");
   if (!box) return;
-  const target = box.dataset.target || (box.id === "bpm" ? "bpm" : "beats");
+  const target = box.dataset.target || "bpm";
   const [what] = target.split(":");
   const v = Number(box.value);
   if (box.value !== "" && v >= LIMITS[what][0] && v <= LIMITS[what][1]) {
@@ -264,9 +275,9 @@ document.addEventListener("input", (e) => {
   }
 });
 document.addEventListener("change", (e) => {
-  const box = e.target.closest("input[data-target], #bpm, #beats-input");
+  const box = e.target.closest("input[data-target], #bpm");
   if (!box) return;
-  const target = box.dataset.target || (box.id === "bpm" ? "bpm" : "beats");
+  const target = box.dataset.target || "bpm";
   setValue(target, box.value === "" ? valueOf(target) : Number(box.value));
   box.value = valueOf(target); // a number out of range is brought into it
 });
@@ -278,6 +289,7 @@ document.querySelector(".met-tool").addEventListener("click", (e) => {
   const key = b.closest(".seg").dataset.setting;
   if (settings[key] === b.dataset.v) return;
   if (key === "mode" && running()) stop(); // a different metronome starts from the beginning
+  if (key === "time" && pos) pos.beat = 0; // a new time signature starts a new bar
   settings[key] = b.dataset.v;
   save();
   render();
@@ -326,7 +338,7 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 // how long the plan lasts, at its tempos
 function renderTotal() {
   const bars = settings.sections.reduce((sum, s) => sum + s.bars, 0);
-  const seconds = Math.round(settings.sections.reduce((sum, s) => sum + (s.bars * settings.beats * 60) / s.bpm, 0));
+  const seconds = Math.round(settings.sections.reduce((sum, s) => sum + (s.bars * meter().beats * 60) / s.bpm, 0));
   $("met-total").textContent = `${plural(bars, "bar")} in all, about ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
@@ -385,17 +397,24 @@ function render() {
   $("bpm").tabIndex = changes ? -1 : 0;
   $("tap-btn").hidden = changes;
   $("plan").hidden = !changes;
-  if (document.activeElement !== $("beats-input")) $("beats-input").value = settings.beats;
+  $("time-hint").textContent = meter().clicks > 1
+    ? `${meter().beats} beats in a bar, each clicked three times. The tempo counts the beats.` : "";
 
   const b = $("start-btn");
   b.classList.toggle("is-playing", running());
   b.querySelector("span").textContent = running() ? "Stop" : "Start";
 
-  // one light for each beat of the bar
-  if ($("beats").children.length !== settings.beats) {
-    $("beats").innerHTML = Array.from({ length: settings.beats }, (_, i) => `<span${i === 0 ? ' class="is-first"' : ""}></span>`).join("");
+  // one light for each click of the bar: the first ringed, the ones within a beat smaller, a gap before each beat
+  if ($("beats").dataset.time !== settings.time) {
+    $("beats").dataset.time = settings.time;
+    const { clicks } = meter();
+    $("beats").innerHTML = Array.from({ length: clicksInBar() }, (_, i) => {
+      const cls = i === 0 ? "is-first" : i % clicks ? "is-within" : clicks > 1 ? "is-beat" : "";
+      return `<span${cls ? ` class="${cls}"` : ""}></span>`;
+    }).join("");
   }
   $("beats").classList.toggle("no-accent", settings.accent === "off");
+  $("beats").classList.toggle("is-compound", meter().clicks > 1);
 
   // the sections: drawn again only when one is added or removed, otherwise their numbers are brought up to date
   // (redrawing would take the cursor or the keyboard away from a box or button in use)

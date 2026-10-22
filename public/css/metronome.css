@@ -108,7 +108,8 @@
   color: var(--ebony-muted);
 }
 
-/* one light for each beat; the first is ringed in felt red when it is accented, and lights red */
+/* one light for each click; the first is ringed in felt red when it is accented, and lights red. In 6/8, 9/8 and
+   12/8 the clicks within a beat are smaller, and each beat starts after a wider gap. */
 .met-beats {
   display: flex;
   flex-wrap: wrap;
@@ -146,10 +147,67 @@
   background: var(--ebony-text);
 }
 
-/* the beats in a bar and the accent, under the case */
+.met-beats.is-compound {
+  gap: 5px;
+}
+
+.met-beats.is-compound span {
+  width: 14px;
+  height: 14px;
+}
+
+.met-beats.is-compound .is-within {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+}
+
+.met-beats .is-beat {
+  margin-left: 6px;
+}
+
+/* the time signature and the accent, under the case */
 .met-options {
   display: grid;
-  gap: 14px;
+  gap: 16px;
+}
+
+/* the time signatures, written as in music: one number over the other */
+.met-time {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* on a phone, two rows: the ones counted in crotchet and minim beats, then the ones in quavers; one row on wider screens */
+.met-times {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 4px;
+  align-self: start;
+}
+
+.seg.met-times button {
+  display: grid;
+  place-content: center;
+  width: 42px;
+  height: 56px;
+  padding: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+
+.met-time-hint {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.met-time-hint:empty {
+  display: none;
 }
 
 /* a number with − and + beside it */
@@ -353,9 +411,12 @@
     height: 60px;
   }
 
-  .met-options {
-    grid-template-columns: repeat(2, max-content);
-    gap: 18px 36px;
+  .met-times {
+    grid-template-columns: repeat(9, auto);
+  }
+
+  .seg.met-times button {
+    width: 52px;
   }
 
   .met-beats span {

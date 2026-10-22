@@ -822,7 +822,7 @@ searchEntries.push(
   { t: "Circle of fifths", k: "Theory", s: "Key signatures, relative minors, and the order of sharps and flats", u: "/theory/circle-of-fifths/", w: "key signature relative minor sharps flats" },
   { t: "Keyboard", k: "Tool", s: "Play two octaves, and light up any scale or chord", u: "/keyboard/", w: "piano online play keys" },
   { t: "Practice", k: "Tool", s: "Play or write what you are asked, and see what you got right", u: "/practice/", w: "quiz test drill microphone listen" },
-  { t: "Metronome", k: "Tool", s: "Keep time, with tempo changes bar by bar", u: "/metronome/", w: "tempo bpm beat tap click" },
+  { t: "Metronome", k: "Tool", s: "Keep time, with tempo changes bar by bar", u: "/metronome/", w: "tempo bpm beat tap click time signature 2/4 3/4 4/4 6/8 9/8 12/8" },
   { t: "Privacy and terms", k: "Page", s: "What the site keeps on your device, the microphone, and the terms", u: "/privacy/", w: "privacy policy terms conditions cookies data microphone disclaimer credits licence" },
 );
 

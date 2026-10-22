@@ -1,6 +1,6 @@
 ---
 title: Online Metronome with Tempo Changes | PianoGuide
-description: A free online metronome for piano practice. Set the tempo and the beats in a bar, or plan tempo changes: 60 BPM for 4 bars, then 65, then 70.
+description: A free online metronome for piano practice. Set the tempo and the time signature (4/4, 3/4, 6/8...), or plan tempo changes: 60 BPM for 4 bars, then 65, then 70.
 nav: metronome
 styles: page piano metronome
 scripts: metronome
@@ -47,13 +47,20 @@ scripts: metronome
                 </div>
 
                 <div class="met-options">
-                    <div class="option">
-                        <span class="option-label" id="beats-label">Beats in a bar</span>
-                        <div class="stepper" role="group" aria-labelledby="beats-label">
-                            <button type="button" data-target="beats" data-step="-1" aria-label="Fewer beats">−</button>
-                            <input id="beats-input" type="number" inputmode="numeric" min="1" max="12" step="1" aria-labelledby="beats-label">
-                            <button type="button" data-target="beats" data-step="1" aria-label="More beats">+</button>
+                    <div class="option met-time">
+                        <span class="option-label" id="time-label">Time signature</span>
+                        <div class="seg met-times" data-setting="time" role="group" aria-labelledby="time-label">
+                            <button type="button" data-v="2/4" aria-label="2/4"><span>2</span><span>4</span></button>
+                            <button type="button" data-v="3/4" aria-label="3/4"><span>3</span><span>4</span></button>
+                            <button type="button" data-v="4/4" aria-label="4/4"><span>4</span><span>4</span></button>
+                            <button type="button" data-v="5/4" aria-label="5/4"><span>5</span><span>4</span></button>
+                            <button type="button" data-v="2/2" aria-label="2/2"><span>2</span><span>2</span></button>
+                            <button type="button" data-v="3/8" aria-label="3/8"><span>3</span><span>8</span></button>
+                            <button type="button" data-v="6/8" aria-label="6/8"><span>6</span><span>8</span></button>
+                            <button type="button" data-v="9/8" aria-label="9/8"><span>9</span><span>8</span></button>
+                            <button type="button" data-v="12/8" aria-label="12/8"><span>12</span><span>8</span></button>
                         </div>
+                        <p class="met-time-hint" id="time-hint"></p>
                     </div>
                     <div class="option">
                         <span class="option-label" id="accent-label">Beat 1</span>
