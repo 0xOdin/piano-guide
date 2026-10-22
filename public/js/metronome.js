@@ -2,13 +2,13 @@
 //  - Basic: one tempo, set by typing it, with − and + (held down they keep going), or by tapping it.
 //  - Tempo changes: a list of sections, each a tempo and a time signature kept for so many bars (60 for 4 bars of 4/4,
 //    then 65 for 4 bars of 6/8, ...). After the last section it stops, starts again, or keeps going at the last tempo.
-// The tempo counts the time signature's beats, as tempo marks in music do: crotchets in 4/4, minims in 2/2, dotted
-// crotchets in 6/8. The first beat of the bar clicks high (when accented); Subdivide adds softer clicks between the
-// beats (the quavers of 4/4, the three quavers of each beat in 6/8). A plan of tempo changes always starts with a
-// bar's count-in at the first section's tempo, counted down on the case, so the first bar of the plan isn't spent
-// getting ready. The clicks are made by Web Audio and scheduled a moment
-// ahead on its clock (not by timers, which drift), and the lights follow what is heard. The settings are kept in this
-// browser between visits.
+// As in most metronome apps (Soundbrenner's among them), the tempo counts the note in the time signature's bottom
+// number: crotchets in 4/4, minims in 2/2, quavers in 6/8, so 6/8 clicks six times a bar. Each beat has an accent,
+// set by tapping its light: strong, medium, soft or silent; the first beat starts strong, and in 6/8, 9/8 and 12/8
+// each group of three starts medium. Subdivide splits every beat into 2, 3 or 4 softer clicks. A plan of tempo changes
+// always starts with a bar's count-in at the first section's tempo, counted down on the case, so the first bar of the
+// plan isn't spent getting ready. The clicks are made by Web Audio and scheduled a moment ahead on its clock (not by
+// timers, which drift), and the lights follow what is heard. The settings are kept in this browser between visits.
 
 const $ = (id) => document.getElementById(id);
 
@@ -16,21 +16,24 @@ const $ = (id) => document.getElementById(id);
 
 const LIMITS = { bpm: [20, 300], bars: [1, 999] };
 const MAX_SECTIONS = 20;
-// each time signature: its beats in a bar, the note a beat is, and the clicks a beat splits into when subdivided
-// (two, or three in 6/8, 9/8 and 12/8, whose beats are dotted)
+// each time signature: its beats in a bar (the top number), the note a beat is (the bottom number), and whether its
+// beats fall in groups of three (6/8, 9/8, 12/8)
 const TIMES = {
-  "2/4": { beats: 2, beat: "crotchet", split: 2 }, "3/4": { beats: 3, beat: "crotchet", split: 2 },
-  "4/4": { beats: 4, beat: "crotchet", split: 2 }, "5/4": { beats: 5, beat: "crotchet", split: 2 },
-  "2/2": { beats: 2, beat: "minim", split: 2 }, "3/8": { beats: 3, beat: "quaver", split: 2 },
-  "6/8": { beats: 2, beat: "dotted crotchet", split: 3 }, "9/8": { beats: 3, beat: "dotted crotchet", split: 3 },
-  "12/8": { beats: 4, beat: "dotted crotchet", split: 3 },
+  "2/4": { beats: 2, beat: "crotchet" }, "3/4": { beats: 3, beat: "crotchet" }, "4/4": { beats: 4, beat: "crotchet" },
+  "5/4": { beats: 5, beat: "crotchet" }, "2/2": { beats: 2, beat: "minim" }, "3/8": { beats: 3, beat: "quaver" },
+  "6/8": { beats: 6, beat: "quaver", threes: true }, "9/8": { beats: 9, beat: "quaver", threes: true },
+  "12/8": { beats: 12, beat: "quaver", threes: true },
 };
+// accents: 3 strong, 2 medium, 1 soft, 0 silent
+const ACCENT_NAMES = ["silent", "soft", "medium", "strong"];
+const defaultAccents = (time, first = 3) => Array.from({ length: TIMES[time].beats }, (_, i) =>
+  (i === 0 ? first : TIMES[time].threes && i % 3 === 0 ? 2 : 1));
 const DEFAULTS = {
   mode: "basic", // basic | changes
   bpm: 60,
   time: "4/4",
-  subdivide: "off",
-  accent: "on",
+  subdivide: "1", // clicks to a beat: 1 (off) | 2 | 3 | 4
+  accents: {}, // time signature -> the accent of each beat, once changed from the defaults
   sections: [{ bpm: 60, bars: 4, time: "4/4" }, { bpm: 65, bars: 4, time: "4/4" }, { bpm: 70, bars: 4, time: "4/4" }],
   end: "stop", // stop | repeat | keep
 };
@@ -46,8 +49,18 @@ try {
   if (okNumber(saved.bpm)) settings.bpm = clamp(saved.bpm, LIMITS.bpm);
   if (saved.time in TIMES) settings.time = saved.time;
   else if (okNumber(saved.beats)) settings.time = `${[2, 3, 4, 5].includes(saved.beats) ? saved.beats : 4}/4`; // saved before time signatures
-  if (["on", "off"].includes(saved.subdivide)) settings.subdivide = saved.subdivide;
-  if (["on", "off"].includes(saved.accent)) settings.accent = saved.accent;
+  if (["1", "2", "3", "4"].includes(saved.subdivide)) settings.subdivide = saved.subdivide;
+  else if (saved.subdivide === "on") settings.subdivide = "2"; // saved when Subdivide was on or off
+  if (saved.accents && typeof saved.accents === "object") {
+    for (const [time, levels] of Object.entries(saved.accents)) {
+      if (time in TIMES && Array.isArray(levels) && levels.length === TIMES[time].beats && levels.every((l) => [0, 1, 2, 3].includes(l))) {
+        settings.accents[time] = levels;
+      }
+    }
+  } else if (saved.accent === "off") {
+    // saved when the first beat was accented or "like the others": every time signature's first beat soft
+    for (const time of Object.keys(TIMES)) settings.accents[time] = defaultAccents(time, 1);
+  }
   if (["stop", "repeat", "keep"].includes(saved.end)) settings.end = saved.end;
   if (Array.isArray(saved.sections)) {
     // sections saved before they had their own time signature take Basic's
@@ -75,10 +88,11 @@ function save() {
 
 let ctx = null;
 
-// A short wooden click: high on an accented first beat, lower and softer for the subdivisions between the beats. The
-// count-in clicks are lower still, so it can be told from the first bar.
-const CLICKS = { first: [1760, 0.9], beat: [1175, 0.55], within: [880, 0.32] };
+// A short wooden click: higher and louder the stronger its beat's accent, none for a silent beat, lowest and softest
+// for the subdivisions between the beats. The count-in clicks are lower still, so it can be told from the first bar.
+const CLICKS = { 3: [1760, 0.9], 2: [1400, 0.7], 1: [1175, 0.5], within: [880, 0.3] };
 function click(time, kind, counting) {
+  if (kind === 0) return;
   const [pitch, level] = CLICKS[kind];
   const osc = ctx.createOscillator();
   const env = ctx.createGain();
@@ -107,13 +121,15 @@ let wakeLock = null;
 const running = () => timer !== null;
 // what sets the tempo and the time signature at a place: Basic's own settings, or its section
 const sourceAt = (p) => (settings.mode === "basic" ? settings : settings.sections[Math.min(p.section, settings.sections.length - 1)]);
-// a bar in a time signature: its clicks (one a beat, or each beat split when subdivided) and which are beats
+// a time signature's accents: as set, or the defaults
+const accentsOf = (time) => settings.accents[time] || defaultAccents(time);
+// a bar in a time signature: its clicks (one a beat, or each beat split when subdivided)
 function barOf(s) {
-  const t = TIMES[s.time];
-  const per = settings.subdivide === "on" ? t.split : 1;
-  return { bpm: s.bpm, beats: t.beats, per, clicks: t.beats * per, onBeat: (i) => i % per === 0 };
+  const per = Number(settings.subdivide);
+  return { bpm: s.bpm, time: s.time, beats: TIMES[s.time].beats, per, clicks: TIMES[s.time].beats * per };
 }
-const kindAt = (i, bar) => (i === 0 && settings.accent === "on" ? "first" : bar.onBeat(i) ? "beat" : "within");
+// a click's kind: its beat's accent, or a subdivision
+const kindAt = (i, bar) => (i % bar.per ? "within" : accentsOf(bar.time)[i / bar.per]);
 
 // moves on one click, into the next bar and the next section as they come
 function advance() {
@@ -327,7 +343,7 @@ document.querySelector(".met-tool").addEventListener("click", (e) => {
   const key = b.closest(".seg").dataset.setting;
   if (settings[key] === b.dataset.v) return;
   if (key === "mode" && running()) stop(); // a different metronome starts from the beginning
-  if ((key === "time" || key === "subdivide") && pos) pos.beat = 0; // a new time signature starts a new bar
+  if ((key === "time" || key === "subdivide") && pos) pos.beat = 0; // a new time signature or subdivision starts a new bar
   settings[key] = b.dataset.v;
   save();
   render();
@@ -353,6 +369,20 @@ $("sections").addEventListener("click", (e) => {
   render();
 });
 
+// a tap on a beat's light changes its accent: strong, medium, soft, silent, then strong again. It is the accent of
+// that beat in the time signature shown, wherever that time signature is used.
+$("beats").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-i]");
+  if (!b) return;
+  const time = sourceAt(running() && shown ? shown : { section: 0 }).time;
+  const levels = [...accentsOf(time)];
+  const i = Number(b.dataset.i);
+  levels[i] = (levels[i] + 3) % 4;
+  settings.accents[time] = levels;
+  save();
+  renderNow();
+});
+
 $("start-btn").addEventListener("click", () => (running() ? stop() : start()));
 $("tap-btn").addEventListener("click", tap);
 
@@ -370,20 +400,23 @@ document.addEventListener("keydown", (e) => {
 // the Italian name of a tempo, as written in music
 const TEMPO_NAMES = [[40, "Grave"], [60, "Largo"], [66, "Larghetto"], [76, "Adagio"], [108, "Andante"], [120, "Moderato"],
   [168, "Allegro"], [200, "Presto"], [Infinity, "Prestissimo"]];
-const tempoName = (bpm) => TEMPO_NAMES.find(([upTo]) => bpm < upTo)[1];
+// for the beats felt: in 6/8, 9/8 and 12/8 one to each group of three quavers
+const tempoName = (bpm, time) => TEMPO_NAMES.find(([upTo]) => (TIMES[time].threes ? bpm / 3 : bpm) < upTo)[1];
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-// one light for each click of a bar: the first ringed, the subdivisions smaller, a gap before each beat after them
-function drawLights(s) {
-  const key = `${s.time} ${settings.subdivide}`;
+// one light for each beat of the bar, to tap: drawn by its accent (a felt ring for strong, brass for medium, a plain
+// light for soft, an empty ring for silent), with a gap before each group of three in 6/8, 9/8 and 12/8
+function drawLights(time) {
+  const levels = accentsOf(time);
+  const key = `${time} ${levels.join("")}`;
   if ($("beats").dataset.metre === key) return;
   $("beats").dataset.metre = key;
-  const bar = barOf(s);
-  $("beats").innerHTML = Array.from({ length: bar.clicks }, (_, i) => {
-    const cls = i === 0 ? "is-first" : !bar.onBeat(i) ? "is-within" : bar.per > 1 ? "is-beat" : "";
-    return `<span${cls ? ` class="${cls}"` : ""}></span>`;
+  $("beats").innerHTML = levels.map((level, i) => {
+    const group = TIMES[time].threes && i > 0 && i % 3 === 0 ? " is-group" : "";
+    return `<button type="button" class="met-beat lvl-${level}${group}" data-i="${i}" aria-label="Beat ${i + 1}: ${ACCENT_NAMES[level]}"></button>`;
   }).join("");
-  $("beats").classList.toggle("is-compact", bar.clicks > 6);
+  $("beats").classList.toggle("is-compact", levels.length > 6);
+  $("beats").classList.toggle("is-twelve", levels.length === 12);
 }
 
 // how long the plan lasts, at its tempos
@@ -404,11 +437,11 @@ function renderNow() {
   document.querySelector(".met-case").classList.toggle("is-counting", counting);
   if (document.activeElement !== $("bpm")) $("bpm").value = counting ? now.left : bpm;
   $("bpm-label").textContent = counting ? "Count-in" : "BPM";
-  $("bpm").setAttribute("aria-label", `Tempo, in ${TIMES[s.time].beat} beats per minute`);
-  drawLights(s);
+  $("bpm").setAttribute("aria-label", `Tempo, in ${TIMES[s.time].beat}s per minute`);
+  drawLights(s.time);
 
   let status = running() ? "Playing" : "Ready";
-  let detail = tempoName(bpm);
+  let detail = tempoName(bpm, s.time);
   if (counting) {
     status = "Get ready";
     detail = `Section 1 starts at ${bpm} BPM`;
@@ -429,12 +462,13 @@ function renderNow() {
   } else if (changes) {
     detail = `A bar to count in, then ${plural(settings.sections.length, "section")} from ${bpm} BPM`;
   } else if (now) {
-    detail = `${tempoName(bpm)} · bar ${now.bar + 1}`;
+    detail = `${tempoName(bpm, s.time)} · bar ${now.bar + 1}`;
   }
   $("met-status").textContent = status;
   $("met-detail").textContent = detail;
 
-  $("beats").querySelectorAll("span").forEach((dot, i) => dot.classList.toggle("is-on", !!now && now.beat === i));
+  const beatNow = now ? Math.floor(now.beat / Number(settings.subdivide)) : -1;
+  $("beats").querySelectorAll("button").forEach((dot, i) => dot.classList.toggle("is-on", beatNow === i));
   $("beats").classList.toggle("is-counting", !!now && !!now.left);
   $("sections").querySelectorAll(".met-section").forEach((row, i) =>
     row.classList.toggle("is-current", !!now && !now.left && !now.past && now.section === i));
@@ -456,6 +490,8 @@ function render() {
     seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(settings[seg.dataset.setting] === b.dataset.v))));
   const t = TIMES[settings.time];
   $("time-hint").textContent = `${t.beats} ${t.beat} beats in a bar: the tempo counts them.`;
+  $("subdivide-hint").textContent = settings.subdivide === "1" ? ""
+    : `Each beat split into ${settings.subdivide} clicks, the ones after the first softer.`;
 
   // Basic: the tempo and time signature are set here; tempo changes: in each section of the list below
   document.querySelector(".met-case").classList.toggle("is-plan", changes);
@@ -468,7 +504,6 @@ function render() {
   const b = $("start-btn");
   b.classList.toggle("is-playing", running());
   b.querySelector("span").textContent = running() ? "Stop" : "Start";
-  $("beats").classList.toggle("no-accent", settings.accent === "off");
 
   // the sections: drawn again only when one is added or removed, otherwise their numbers and menus are brought up to
   // date (redrawing would take the cursor or the keyboard away from a box or button in use)

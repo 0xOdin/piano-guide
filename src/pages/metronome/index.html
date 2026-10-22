@@ -32,7 +32,7 @@ scripts: metronome
                         <button type="button" class="met-step" data-target="bpm" data-step="1" aria-label="Faster">+</button>
                     </div>
                     <p class="met-detail" id="met-detail" aria-live="polite"></p>
-                    <div class="met-beats" id="beats" aria-hidden="true"></div>
+                    <div class="met-beats" id="beats" role="group" aria-label="Beats: tap one to change its accent"></div>
                     <div class="case-foot">
                         <span id="met-hint">Space starts and stops.</span>
                         <span class="case-actions">
@@ -64,20 +64,17 @@ scripts: metronome
                             <p class="met-time-hint" id="time-hint"></p>
                         </div>
                     </div>
-                    <div class="option">
-                        <span class="option-label" id="accent-label">Beat 1</span>
-                        <div class="seg" data-setting="accent" role="group" aria-labelledby="accent-label">
-                            <button type="button" data-v="on">Accented</button>
-                            <button type="button" data-v="off">Like the others</button>
-                        </div>
-                    </div>
-                    <div class="option">
+                    <div class="option met-time">
                         <span class="option-label" id="subdivide-label">Subdivide</span>
                         <div class="seg" data-setting="subdivide" role="group" aria-labelledby="subdivide-label">
-                            <button type="button" data-v="off">Off</button>
-                            <button type="button" data-v="on">On</button>
+                            <button type="button" data-v="1">Off</button>
+                            <button type="button" data-v="2" aria-label="2 clicks a beat">2</button>
+                            <button type="button" data-v="3" aria-label="3 clicks a beat">3</button>
+                            <button type="button" data-v="4" aria-label="4 clicks a beat">4</button>
                         </div>
+                        <p class="met-time-hint" id="subdivide-hint"></p>
                     </div>
+                    <p class="met-time-hint">Tap a beat’s light in the case to make it strong, medium, soft or silent.</p>
                 </div>
 
                 <div class="met-plan" id="plan">

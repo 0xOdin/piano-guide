@@ -115,77 +115,131 @@
   color: var(--ebony-muted);
 }
 
-/* one light for each click; the first is ringed in felt red when it is accented, and lights red. Subdivisions are
-   smaller, each beat starts after a wider gap, and a long bar has smaller lights. In the count-in they light in
-   brass. */
+/* one light for each beat, a button to tap that changes its accent. Strong is ringed in felt red, medium in brass,
+   soft is a plain light, silent an empty ring; the stronger, the larger. The beat playing lights up in its accent's
+   colour (brass for all in the count-in). In 6/8, 9/8 and 12/8 a gap comes before each group of three. */
 .met-beats {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  gap: 2px;
   margin-bottom: 4px;
 }
 
-.met-beats span {
-  width: 16px;
-  height: 16px;
+.met-beat {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.met-beat::before {
+  content: "";
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: rgba(250, 250, 249, 0.14);
+  background: rgba(250, 250, 249, 0.16);
   transition: background-color 0.05s linear, transform 0.05s linear;
 }
 
-.met-beats .is-first {
+.met-beat.lvl-3::before {
+  width: 18px;
+  height: 18px;
   box-shadow: inset 0 0 0 2px var(--accent);
 }
 
-.met-beats span.is-on {
+.met-beat.lvl-2::before {
+  width: 16px;
+  height: 16px;
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+.met-beat.lvl-0::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px rgba(250, 250, 249, 0.3);
+}
+
+.met-beat.is-on::before {
   background: var(--ebony-text);
   transform: scale(1.15);
 }
 
-.met-beats .is-first.is-on {
+.met-beat.lvl-3.is-on::before {
   background: var(--accent);
 }
 
-.met-beats.no-accent .is-first {
-  box-shadow: none;
-}
-
-.met-beats.no-accent .is-first.is-on {
-  background: var(--ebony-text);
-}
-
-.met-beats.is-compact {
-  gap: 5px;
-}
-
-.met-beats.is-compact span {
-  width: 14px;
-  height: 14px;
-}
-
-.met-beats .is-within {
-  width: 10px;
-  height: 10px;
-  margin-top: 3px;
-}
-
-.met-beats.is-compact .is-within {
-  width: 8px;
-  height: 8px;
-  margin-top: 3px;
-}
-
-.met-beats .is-beat {
-  margin-left: 6px;
-}
-
-.met-beats.is-counting span.is-on,
-.met-beats.is-counting .is-first.is-on {
+.met-beat.lvl-2.is-on::before {
   background: var(--brass);
 }
 
-/* the time signature and the accent, under the case */
+.met-beat.lvl-0.is-on::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--ebony-text);
+}
+
+.met-beats.is-counting .met-beat.is-on::before {
+  background: var(--brass);
+}
+
+.met-beat:focus-visible {
+  outline: 2px solid var(--ebony-text);
+  outline-offset: -2px;
+}
+
+.met-beat.is-group {
+  margin-left: 8px;
+}
+
+.met-beats.is-compact .met-beat {
+  width: 24px;
+}
+
+/* 12/8 on a phone: two rows of six */
+@media (max-width: 559px) {
+  .met-beats.is-twelve {
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    justify-content: center;
+  }
+
+  .met-beats.is-twelve .met-beat:nth-child(6n + 1) {
+    margin-left: 0;
+  }
+}
+
+/* the narrowest phones: nine beats (9/8) still fit on one line */
+@media (max-width: 380px) {
+  .met-beats.is-compact {
+    gap: 0;
+  }
+
+  .met-beats.is-compact .met-beat {
+    width: 21px;
+  }
+
+  .met-beats.is-compact .met-beat.is-group {
+    margin-left: 5px;
+  }
+}
+
+@media (hover: hover) {
+  .met-beat:hover::before {
+    background-color: rgba(250, 250, 249, 0.3);
+  }
+
+  .met-beat.lvl-0:hover::before {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(250, 250, 249, 0.55);
+  }
+}
+
+/* the time signature and the subdivision, under the case */
 .met-options {
   display: grid;
   gap: 16px;
@@ -217,6 +271,10 @@
   font-weight: 700;
   line-height: 0.95;
   font-variant-numeric: tabular-nums;
+}
+
+.met-time > .seg {
+  align-self: start;
 }
 
 .met-metre {
@@ -497,10 +555,6 @@
     width: 52px;
   }
 
-  .met-beats span {
-    width: 18px;
-    height: 18px;
-  }
 }
 
 /* Desktop */
