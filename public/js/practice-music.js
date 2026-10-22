@@ -172,13 +172,17 @@ function randomChord(s) {
   return chordOn(root, type, s.inversions === "on" ? Math.floor(Math.random() * type.tones.length) : 0);
 }
 
+// `written`: how the chord is written in music. An inversion is a slash chord, the chord over its lowest note: A minor
+// in 1st inversion is Am/C, in 2nd inversion Am/E; root position is just Am.
 function chordOn(root, type, inv = 0) {
   const tones = spellChord(root, type);
+  const notes = voiceChord(tones, inv, "rh").map((t) => ({ name: t.name, abs: t.abs })); // lowest first
+  const symbol = root.name + type.symbol;
   return {
-    root: { ...root, pc: root.semi }, type, inv,
-    symbol: root.name + type.symbol,
+    root: { ...root, pc: root.semi }, type, inv, symbol,
+    written: inv ? `${symbol}/${notes[0].name}` : symbol,
     name: `${root.name} ${type.name}`,
-    notes: voiceChord(tones, inv, "rh").map((t) => ({ name: t.name, abs: t.abs })), // lowest first
+    notes,
   };
 }
 
@@ -223,7 +227,7 @@ function chordQuestion(s) {
   return {
     kind: "chord",
     id: `${chord.symbol}:${chord.inv}`,
-    title: chord.symbol,
+    title: chord.written,
     sub: chord.name,
     // with inversions on, which one to play is said beside the chord, with the note that goes at the bottom
     inversion: s.inversions === "on" ? { name: INVERSION_NAMES[chord.inv], bass: chord.notes[0].name } : null,

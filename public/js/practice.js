@@ -275,7 +275,7 @@ function finish(right) {
   if (q.kind === "chord-seq") step = q.chords.length;
   const notes = (list) => list.map((n) => n.name).join(" ");
   const answer = (q.kind === "sequence" ? notes(q.notes)
-    : q.kind === "chord" ? `${q.chord.symbol}: ${notes(q.chord.notes)}`
+    : q.kind === "chord" ? `${q.chord.written || q.chord.symbol}: ${notes(q.chord.notes)}`
     : q.kind === "chord-seq" ? q.chords.map((c) => c.symbol).join(" ")
     : q.reveal) + (fingers ? ` · ${HAND_NAMES[q.hand]}: ${fingers.join(" ")}` : "");
   if (right) {
