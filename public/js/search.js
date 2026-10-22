@@ -141,6 +141,9 @@
       headerInput.focus();
     }
   });
+  // Pressing on a suggestion keeps the focus in the box. Safari doesn't give a clicked link the focus, so the box
+  // would lose it on the press, the suggestions would close (below) and the click would land on nothing.
+  suggest.addEventListener("mousedown", (e) => e.preventDefault());
   // closed once the keyboard or a click leaves the search box and its suggestions
   headerForm.addEventListener("focusout", () => setTimeout(() => {
     if (!headerForm.contains(document.activeElement)) closeSuggestions();
