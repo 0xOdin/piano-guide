@@ -81,7 +81,7 @@ function drawStaff(el, notes, hand, label) {
 // left. The notes of the chord are lit, with the finger number on each one.
 function keyboardHTML(notes, fingers, hand, label) {
   const from = hand === "lh" ? -12 : 0;
-  const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i] }));
+  const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i], name: n.name }));
   return pianoKeysHTML({ from, to: from + 23, marks, label });
 }
 

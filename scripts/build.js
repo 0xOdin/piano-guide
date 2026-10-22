@@ -660,12 +660,38 @@ const keyPageUrl = (key, page = "") => `/keys/${key.slug}/${page}`;
 const sameSignature = (a, b) => signatureNotes(a).map((n) => n.name).sort().join() === signatureNotes(b).map((n) => n.name).sort().join();
 const relativeOf = (key) => KEYS.find((k) => isMinor(k) !== isMinor(key) && sameSignature(k, key));
 
+// the major or minor key on the same root, spelled the same way (C major and C minor)
+const parallelOf = (key) => KEYS.find((k) => isMinor(k) !== isMinor(key) && k.name.split(" ")[0] === key.name.split(" ")[0]);
+
+// The same kind of page in another key: a scale page goes to that key's scale (a minor form, harmonic or melodic, to
+// the same form when that key is minor too), an arpeggio to its arpeggio, a chord to its chord.
+const samePageIn = (page, key) =>
+  `/keys/${key.slug}/${page.section === "scales" ? (isMinor(key) ? page.path : "") : page.path}`;
+
+// The keys related to this one: the relative key (the same key signature) and the parallel key (the same root)
 function relativeLine(key, page) {
   const rel = relativeOf(key);
-  if (!rel) return "";
-  const path = page.section === "scales" ? "" : page.path;
+  const par = parallelOf(key);
+  const link = (k) => `<a class="text-link" href="${samePageIn(page, k)}">${esc(cap(k.name))}</a>`;
+  const parts = [];
+  if (rel) parts.push(`Relative ${isMinor(rel) ? "minor" : "major"}: ${link(rel)}, with the same key signature`);
+  if (par) parts.push(`Parallel ${isMinor(par) ? "minor" : "major"}: ${link(par)}, on the same root`);
+  return parts.length ? `
+            <p class="hero-more">${parts.join('<span class="hero-more-sep" aria-hidden="true"> · </span>')}</p>` : "";
+}
+
+// A menu of every key beside the tabs, opening the same kind of page in the key chosen (key-page.js). Its values
+// carry the site's folder themselves (the build adds it to links, not to these).
+function keySwitch(key, page) {
+  const option = (k) => `<option value="${BASE_PATH}${samePageIn(page, k)}"${k === key ? " selected" : ""}>${esc(cap(k.name))}</option>`;
   return `
-            <p class="hero-more">Relative ${isMinor(rel) ? "minor" : "major"}: <a class="text-link" href="/keys/${rel.slug}/${path}">${esc(cap(rel.name))}</a>, with the same key signature</p>`;
+        <label class="key-switch">
+            <span class="option-label">Key</span>
+            <select id="key-switch">
+                <optgroup label="Major keys">${majorKeys.map(option).join("")}</optgroup>
+                <optgroup label="Minor keys">${minorKeys.map(option).join("")}</optgroup>
+            </select>
+        </label>`;
 }
 
 // The key pages. Each one belongs to a section of the menu (a scale page to Scales, an arpeggio page to Arpeggios,
@@ -717,7 +743,9 @@ for (const key of KEYS) {
         ? `            <span class="tab-divider${clear ? "" : " is-faint"}" aria-hidden="true"></span>\n` : "";
       return `${divider}            <a href="${keyUrl}${p.path}"${current}>${p.tab}</a>`;
     }).join("\n");
-    const tabnav = `        <nav class="key-tabs" aria-label="${esc(cap(key.name))} pages">\n${tabs}\n        </nav>`;
+    const tabnav = `        <div class="key-nav">
+        <nav class="key-tabs" aria-label="${esc(cap(key.name))} pages">\n${tabs}\n        </nav>${keySwitch(key, page)}
+        </div>`;
     const out = page.build(key);
     out.heroExtra = relativeLine(key, page) + (out.heroExtra || ""); // the relative key first, then the page's own links
     addKeyPage({ url: `${keyUrl}${page.path}`, keyUrl, keyName: cap(key.name), section: page.section, tabnav, out });

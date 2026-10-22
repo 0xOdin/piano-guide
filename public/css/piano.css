@@ -291,6 +291,26 @@
   color: var(--key-muted);
 }
 
+/* a lit key's note name under its finger number, in the key's own colour */
+.piano-static .pkey.white.is-shown .pkey-name {
+  color: var(--key-ink);
+}
+
+.piano-static .pkey.black .pkey-name {
+  font-size: 0.62rem;
+}
+
+/* a keyboard too narrow for names on the black keys (a phone, two octaves) keeps just their finger numbers */
+.piano-fit {
+  container-type: inline-size;
+}
+
+@container (max-width: 400px) {
+  .piano-static .pkey.black .pkey-name {
+    display: none;
+  }
+}
+
 /* while playing: the key sounding now is pressed down in felt red, as its note is in the sheet music (key pages). The
    black keys of the scale go back to black meanwhile, so only the key sounding is red. */
 .piano-static .pkey.is-sounding {

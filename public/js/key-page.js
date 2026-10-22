@@ -315,13 +315,13 @@ function runMelodic() {
   function drawKeyboards() {
     const v = view();
     const showFingers = state.fingers === "on";
-    const marksOf = (hand) => v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i] }));
+    const marksOf = (hand) => v.notes.map((n, i) => ({ abs: handAbs(hand, n), finger: v[hand][i], name: n.name }));
     const split = shownHands().length === 2 && sideBySide.matches && !document.querySelector(".practice-pair-arp");
     $("keyboards").innerHTML = shownHands().map((hand) => {
       const side = hand === "rh" ? "Right hand" : "Left hand";
       const marks = marksOf(hand);
       const range = split && hand === "lh" ? keysBelow(marks, whitesIn(keysFrom(marksOf("rh")))) : keysFrom(marks);
-      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}">${keyboardFor(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`, range)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${side}</span><div id="kb-${hand}" class="piano-fit">${keyboardFor(marks, showFingers, `${data.name}, ${side.toLowerCase()}, shown on the keyboard`, range)}</div></div>`;
     }).join("");
   }
   sideBySide.addEventListener("change", () => {
@@ -454,9 +454,9 @@ function runChord() {
 
     // one keyboard per hand shown, like the scale pages
     $("chord-keys").innerHTML = current.map(({ hand, notes, fingers }) => {
-      const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i] }));
+      const marks = notes.map((n, i) => ({ abs: n.abs, finger: fingers[i], name: n.name }));
       const kbLabel = `${data.name} chord, ${inv.label.toLowerCase()}, ${SIDE[hand].toLowerCase()}, shown on the keyboard`;
-      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${SIDE[hand]}</span><div>${keyboardFor(marks, true, kbLabel)}</div></div>`;
+      return `<div class="kb-block" data-hand="${hand}"><span class="option-label">${SIDE[hand]}</span><div class="piano-fit">${keyboardFor(marks, true, kbLabel)}</div></div>`;
     }).join("");
 
     $("inv-seg").innerHTML = data.inversions.map((v, i) =>
@@ -485,5 +485,8 @@ function runChord() {
 
 drawSignature();
 listenToChips();
+// the menu of keys beside the tabs: the same kind of page in the key chosen
+const keySwitch = $("key-switch");
+if (keySwitch) keySwitch.addEventListener("change", () => { location.href = keySwitch.value; });
 if (data.mode === "chord") runChord();
 else runMelodic();
