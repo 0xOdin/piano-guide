@@ -1,7 +1,8 @@
 // The site offline (registered by main.js). It keeps the site's own files on this device, in the browser's cache, so
 // pages open without the internet:
 //  - pages come from the network when there is one, so they are always up to date, and a copy is kept; offline, the
-//    copy is used
+//    copy is used without trying the network at all (an iPhone in Airplane Mode would pop up a message for the try),
+//    and on a network too slow to answer within a few seconds, a page already kept opens from its copy
 //  - everything else (styles, scripts, fonts, the piano sound, pictures) comes from the copy once one is kept,
 //    otherwise from the network, and is kept
 // When it is installed it keeps the core of the site: the styles, the scripts and the pages other than the key pages.
@@ -83,16 +84,22 @@ self.addEventListener("fetch", (event) => {
   const path = url.href.slice(scope.length).split(/[?#]/)[0]; // the same page with any ?settings
 
   if (request.mode === "navigate") {
-    event.respondWith(fetch(request)
-      .then((response) => {
+    event.respondWith((async () => {
+      const kept = await caches.match(urlOf(path));
+      const offlinePage = () => new Response(OFFLINE_PAGE, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      if (self.navigator.onLine === false) return kept || offlinePage();
+      const network = fetch(request).then((response) => {
         if (response.ok) {
           const copy = unredirected(response.clone());
-          event.waitUntil(cacheFor(path).then((cache) => cache.put(urlOf(path), copy)));
+          return cacheFor(path).then((cache) => cache.put(urlOf(path), copy)).then(() => response);
         }
         return response;
-      })
-      .catch(async () => (await caches.match(urlOf(path)))
-        || new Response(OFFLINE_PAGE, { headers: { "Content-Type": "text/html; charset=utf-8" } })));
+      });
+      event.waitUntil(network.catch(() => {})); // keeps the fresh copy even if the kept one was shown
+      if (!kept) return network.catch(offlinePage);
+      const slow = new Promise((resolve) => { setTimeout(() => resolve(kept), 4000); });
+      return Promise.race([network, slow]).catch(() => kept);
+    })());
     return;
   }
 

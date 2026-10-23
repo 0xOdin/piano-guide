@@ -13,16 +13,24 @@ const swWanted = (() => {
     }
 })();
 const offlineOn = !!document.querySelector('link[rel="manifest"]');
-if (swWanted && !offlineOn) {
-    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister())).catch(() => {});
-    if (window.caches) caches.keys().then((names) => names.filter((n) => n.startsWith("pianoguide-")).forEach((n) => caches.delete(n))).catch(() => {});
-} else if (swWanted) {
-    navigator.serviceWorker.register(new URL("../sw.js", document.currentScript.src)).then(() => {
+const swUrl = new URL("../sw.js", document.currentScript.src);
+// Registering checks the network for a new sw.js, so it waits while the device is offline: an iPhone in Airplane Mode
+// would pop up a message for the try. A worker already installed keeps working meanwhile.
+function startOffline() {
+    navigator.serviceWorker.register(swUrl).then(() => {
         const homeScreen = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
         if (homeScreen) navigator.serviceWorker.ready.then((reg) => reg.active && reg.active.postMessage("save-all"));
     }).catch(() => {
         // not allowed here (a private window, say): the site works as before, online
     });
+}
+if (swWanted && !offlineOn) {
+    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister())).catch(() => {});
+    if (window.caches) caches.keys().then((names) => names.filter((n) => n.startsWith("pianoguide-")).forEach((n) => caches.delete(n))).catch(() => {});
+} else if (swWanted && navigator.onLine === false) {
+    window.addEventListener("online", startOffline, { once: true });
+} else if (swWanted) {
+    startOffline();
 }
 
 // Light and dark. The script in the <head> has already set the theme; the toggle in the header flips it and
