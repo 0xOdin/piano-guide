@@ -1,6 +1,7 @@
 // Offline (sw.js): the site keeps its own files on this device as they are used, and all of them once it is added to
-// the home screen and opened from there, so it works without the internet. Not on the dev server unless asked (?sw),
-// where kept files would hide the changes being made.
+// the home screen and opened from there, so it works without the internet. Only when the page links its manifest
+// (OFFLINE in scripts/build.js); when it doesn't, offline use has been turned off, and anything this device kept is
+// let go. Not on the dev server unless asked (?sw), where kept files would hide the changes being made.
 const swWanted = (() => {
     if (!("serviceWorker" in navigator)) return false;
     if (location.hostname !== "localhost") return true;
@@ -11,7 +12,11 @@ const swWanted = (() => {
         return false;
     }
 })();
-if (swWanted) {
+const offlineOn = !!document.querySelector('link[rel="manifest"]');
+if (swWanted && !offlineOn) {
+    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister())).catch(() => {});
+    if (window.caches) caches.keys().then((names) => names.filter((n) => n.startsWith("pianoguide-")).forEach((n) => caches.delete(n))).catch(() => {});
+} else if (swWanted) {
     navigator.serviceWorker.register(new URL("../sw.js", document.currentScript.src)).then(() => {
         const homeScreen = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
         if (homeScreen) navigator.serviceWorker.ready.then((reg) => reg.active && reg.active.postMessage("save-all"));

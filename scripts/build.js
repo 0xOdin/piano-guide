@@ -51,6 +51,10 @@ const DIST = path.join(ROOT, "dist");
 // While true, every page asks search engines not to list it (<meta name="robots" content="noindex">) and there is no
 // sitemap.xml: the site is public, but not found by searching. Set it to false to let search engines list it.
 const HIDDEN_FROM_SEARCH = true;
+// While true, the site can be added to a phone's home screen and works offline (src/sw.js). Set it to false to turn
+// that off: the pages lose the manifest, and sw.js becomes src/sw-off.js, which deletes the copy kept on each device
+// that had it and removes itself the next time the site is opened there online. (OFFLINE=0 npm run build tries it.)
+const OFFLINE = process.env.OFFLINE ? process.env.OFFLINE !== "0" : true;
 
 /* ---------- Pages and the layout ---------- */
 
@@ -110,6 +114,11 @@ function addPage(url, out, { file, meta, body }, vars = {}) {
     title: esc(meta.title),
     description: esc(meta.description),
     robots: HIDDEN_FROM_SEARCH ? '\n    <meta name="robots" content="noindex">' : "",
+    app: OFFLINE ? `
+    <!-- added to a phone's home screen, the site opens like an app, and works offline (sw.js) -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-title" content="PianoGuide">` : "",
     canonical: SITE_URL + url,
     styles: ["main", ...words(meta.styles)].map((n) => `    <link rel="stylesheet" href="/css/${n}.css">`).join("\n"),
     nav: navList(meta.nav),
@@ -1216,10 +1225,11 @@ ${listed.map((p) => `  <url><loc>${SITE_URL}${p.url}</loc></url>`).join("\n")}
   const asPath = (f) => f.replace(/(^|\/)index\.html$/, "$1");
   const all = kept.map(asPath);
   const core = all.filter((p) => !/^(keys\/|assets\/piano\/|js\/vendor\/)/.test(p));
-  fs.writeFileSync(path.join(DIST, "sw.js"), fs.readFileSync(path.join(SRC, "sw.js"), "utf8")
-    .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
-    .replace("__CORE__", JSON.stringify(core))
-    .replace("__ALL__", JSON.stringify(all)));
+  fs.writeFileSync(path.join(DIST, "sw.js"), !OFFLINE ? fs.readFileSync(path.join(SRC, "sw-off.js"), "utf8")
+    : fs.readFileSync(path.join(SRC, "sw.js"), "utf8")
+      .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
+      .replace("__CORE__", JSON.stringify(core))
+      .replace("__ALL__", JSON.stringify(all)));
 }
 
 /* ---------- Checking the links ---------- */
