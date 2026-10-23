@@ -24,7 +24,8 @@
 //              /keys/a-minor/chord/index.html      chord
 //
 // plus the chromatic scale at /keys/chromatic/, the lists and fingering charts at /scales/ and /arpeggios/, and
-// /sitemap.xml (not while the site is hidden from search engines: HIDDEN_FROM_SEARCH below).
+// /sitemap.xml (not while the site is hidden from search engines: HIDDEN_FROM_SEARCH below), and /sw.js, which keeps
+// the site on a phone for use offline (from src/sw.js).
 // Finally every link to a page or file on the site is checked, and the build fails if one of them goes nowhere.
 //
 // Run it with   npm run build   (or npm run dev to build, serve and rebuild on every change).
@@ -35,6 +36,7 @@
 // canonical links and the sitemap. If the site lives in a folder of that address, as GitHub Pages puts a project
 // (https://you.github.io/piano-guide/), set BASE_PATH to the folder too (BASE_PATH=/piano-guide): it goes in front of
 // every link to a page or file on the site, in the pages, their data and the stylesheets. Without it, nothing changes.
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
@@ -1190,6 +1192,34 @@ if (!HIDDEN_FROM_SEARCH) {
 ${listed.map((p) => `  <url><loc>${SITE_URL}${p.url}</loc></url>`).join("\n")}
 </urlset>
 `);
+}
+
+/* ---------- Offline: sw.js ---------- */
+
+// The service worker (src/sw.js) gets the site's files, as paths from its folder ("scales/" for scales/index.html, ""
+// for the homepage), and a version made from their contents, so every change to the site is a new version that phones
+// pick up. CORE, kept on the first visit, leaves out the key pages, the piano recordings and VexFlow; ALL, kept once
+// the site is on the home screen, is everything.
+{
+  const files = [];
+  const walk = (dir) => {
+    for (const name of fs.readdirSync(dir)) {
+      const full = path.join(dir, name);
+      if (fs.statSync(full).isDirectory()) walk(full);
+      else files.push(path.relative(DIST, full).split(path.sep).join("/"));
+    }
+  };
+  walk(DIST);
+  const kept = files.filter((f) => f !== "sw.js" && f !== "sitemap.xml").sort();
+  const hash = crypto.createHash("sha256");
+  for (const f of kept) hash.update(f).update(fs.readFileSync(path.join(DIST, f)));
+  const asPath = (f) => f.replace(/(^|\/)index\.html$/, "$1");
+  const all = kept.map(asPath);
+  const core = all.filter((p) => !/^(keys\/|assets\/piano\/|js\/vendor\/)/.test(p));
+  fs.writeFileSync(path.join(DIST, "sw.js"), fs.readFileSync(path.join(SRC, "sw.js"), "utf8")
+    .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
+    .replace("__CORE__", JSON.stringify(core))
+    .replace("__ALL__", JSON.stringify(all)));
 }
 
 /* ---------- Checking the links ---------- */

@@ -1,3 +1,25 @@
+// Offline (sw.js): the site keeps its own files on this device as they are used, and all of them once it is added to
+// the home screen and opened from there, so it works without the internet. Not on the dev server unless asked (?sw),
+// where kept files would hide the changes being made.
+const swWanted = (() => {
+    if (!("serviceWorker" in navigator)) return false;
+    if (location.hostname !== "localhost") return true;
+    try {
+        if (/[?&]sw\b/.test(location.search)) sessionStorage.setItem("pianoguide-sw", "1");
+        return !!sessionStorage.getItem("pianoguide-sw");
+    } catch (e) {
+        return false;
+    }
+})();
+if (swWanted) {
+    navigator.serviceWorker.register(new URL("../sw.js", document.currentScript.src)).then(() => {
+        const homeScreen = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+        if (homeScreen) navigator.serviceWorker.ready.then((reg) => reg.active && reg.active.postMessage("save-all"));
+    }).catch(() => {
+        // not allowed here (a private window, say): the site works as before, online
+    });
+}
+
 // Light and dark. The script in the <head> has already set the theme; the toggle in the header flips it and
 // remembers the choice in this browser. Until it is used, the page follows the device's setting, even as it changes.
 const THEME_STORE = "pianoguide-theme";

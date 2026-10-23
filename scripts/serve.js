@@ -24,6 +24,8 @@ const TYPES = {
   ".xml": "application/xml; charset=utf-8",
   ".mp3": "audio/mpeg",
   ".woff2": "font/woff2",
+  ".m4a": "audio/mp4",
+  ".webmanifest": "application/manifest+json",
 };
 
 // In watch mode every page gets this script: it reloads the page when the server says the build is done.
