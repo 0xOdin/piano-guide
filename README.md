@@ -9,7 +9,8 @@ explorer at `/chords/` covers every chord type on every root, and links to the k
 
 `/practice/` asks for a random scale, chord or chord of a key to play or write out, or something to name by eye or
 ear. Answers can be played on the page's keys, on a MIDI keyboard, or on a real piano through the microphone, or
-typed.
+typed. Chords and Name it can show the question in sheet music (practice-staff.js), which fetches VexFlow only when
+it is first wanted.
 
 The piano you hear is a real Steinway: the recordings of the University of Iowa Electronic Music Studios
 (theremin.music.uiowa.edu), which "may be downloaded and used for any projects, without restrictions".

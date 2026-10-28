@@ -26,7 +26,8 @@ const DEFAULTS = {
   keyTypes: ["major", "minor"],
   minorForm: "natural", // the scale a minor key's chords are made from
   nameWhat: ["chords", "intervals", "scales"],
-  nameHow: "both", // see | hear | both
+  nameHow: "both", // see (on the keys) | music (in sheet music) | hear | both (the keys and the sound)
+  showAs: "name", // Chords: the question as its name | music (sheet music) | both
   hand: "mixed", // mixed (each question picks one) | rh | lh: the hand to play with
   autoNext: "on",
   sound: "on",
@@ -72,6 +73,16 @@ const HIGH = 24; // C6
 const isBlack = (abs) => ![0, 2, 4, 5, 7, 9, 11].includes(pcOf(abs));
 const withOctave = (abs) => `${noteName(abs)}${4 + Math.floor(abs / 12)}`;
 const onKeyboard = (abs) => abs >= LOW && abs <= HIGH;
+// The keys here have no octave: notes played lower or higher (on a MIDI keyboard or your own piano) light up on them
+// all the same, moved by whole octaves, as little as needed. A chord moves as one, so its lowest note stays lowest.
+function ontoKeys(absList) {
+  const lo = Math.min(...absList);
+  const hi = Math.max(...absList);
+  let by = 0;
+  while (lo + by < LOW) by += 12;
+  while (hi + by > HIGH && lo + by - 12 >= LOW) by -= 12;
+  return absList.map((abs) => abs + by);
+}
 
 // the computer keys, from the C they start on: the home row plays the white keys, the row above the black keys
 const COMPUTER_KEYS = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k", "o", "l", "p", ";"];
@@ -100,6 +111,7 @@ function drawPiano() {
 }
 
 function renderPiano() {
+  const lit = new Set(down.size ? ontoKeys([...down]) : []);
   keyEls.forEach((el, abs) => {
     const m = marks.get(abs);
     const mark = m ? m.mark : null;
@@ -107,12 +119,12 @@ function renderPiano() {
     el.classList.toggle("is-right", mark === "right");
     el.classList.toggle("is-wrong", mark === "wrong");
     el.classList.toggle("is-shown", mark === "shown");
-    el.classList.toggle("is-down", down.has(abs));
+    el.classList.toggle("is-down", lit.has(abs));
     el.setAttribute("aria-pressed", String(picked.has(abs)));
     el.querySelector(".pkey-finger").textContent = mark === "wrong" ? "✕" : m && m.finger ? m.finger : "";
-    el.querySelector(".pkey-name").textContent = m && m.name ? m.name : pcOf(abs) === 0 ? withOctave(abs) : "";
+    el.querySelector(".pkey-name").textContent = m && m.name ? m.name : "";
   });
-  $("kb-octave").textContent = withOctave(octave);
+  $("kb-octave").textContent = octave ? "second" : "first";
 }
 
 // lights the notes of an answer, named as the answer spells them, with the finger for each one when given
@@ -132,9 +144,17 @@ function bringIntoView(notes) {
   box.scrollTo({ left: (first.offsetLeft + last.offsetLeft + last.offsetWidth) / 2 - box.clientWidth / 2 });
 }
 
-// "Name it": how the question is shown. With the page's sound off it can only be seen, whatever was chosen (the
-// choice is kept for when the sound comes back).
-const nameHow = () => (settings.sound === "off" ? "see" : settings.nameHow);
+// VexFlow, for the sheet music (practice-staff.js): fetched the first time sheet music is wanted
+let music = typeof Vex !== "undefined" ? "ready" : "unloaded"; // unloaded | loading | ready | failed
+
+// "Name it": how the question is shown. With the page's sound off a sound to hear is shown on the keys instead (the
+// choice is kept for when the sound comes back), and so is sheet music that couldn't load.
+const sounds = (how) => how === "hear" || how === "both";
+const nameHow = () => (settings.sound === "off" && sounds(settings.nameHow) ? "see"
+  : settings.nameHow === "music" && music === "failed" ? "see" : settings.nameHow);
+const nameShowsKeys = () => nameHow() === "see" || nameHow() === "both";
+// Chords: the question as its name, in sheet music, or both. The name, if the sheet music couldn't load.
+const showAs = () => (settings.drill !== "chords" || music === "failed" ? "name" : settings.showAs);
 
 const HAND_NAMES = { rh: "Right hand", lh: "Left hand" };
 // the hand to play with (an answer that is typed may be played on a piano and checked too)
@@ -290,7 +310,7 @@ function newQuestion() {
     : lastHands[0] && lastHands[0] === lastHands[1] ? (lastHands[0] === "rh" ? "lh" : "rh") : pick(["rh", "lh"]);
   if (q.hand) lastHands = [q.hand, lastHands[0]];
   startAnswer();
-  if (q.kind === "choice" && nameHow() !== "see") playTimers.push(setTimeout(playQuestion, 250));
+  if (q.kind === "choice" && sounds(nameHow())) playTimers.push(setTimeout(playQuestion, 250));
 }
 
 // back to the start of the question: nothing played, typed or chosen yet
@@ -308,11 +328,11 @@ function startAnswer() {
   midiChord = new Set();
   micHits = 0;
   $("type-input").value = "";
-  if (q.kind === "choice" && nameHow() !== "hear") showNotes(q.notes, "shown", false);
+  if (q.kind === "choice" && nameShowsKeys()) showNotes(q.notes, "shown", false);
   say("");
   render();
-  // not for a sound to name: where it sits on the keys would give it away
-  if (q.kind !== "choice" || nameHow() !== "hear") bringIntoView(questionNotes());
+  // not for a sound or sheet music to name: where it sits on the keys would give it away
+  if (q.kind !== "choice" || nameShowsKeys()) bringIntoView(questionNotes());
   if (refocus && settings.answer === "type") $("type-input").focus({ preventScroll: true });
   refocus = false;
 }
@@ -334,7 +354,7 @@ function say(text, tone = "", detail = "") {
   }
 }
 
-const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const plural = (n, word, many = `${word}s`) => `${n} ${n === 1 ? word : many}`;
 
 // The answer is right, or was shown: light it on the keys and say so
 function finish(right) {
@@ -354,7 +374,7 @@ function finish(right) {
     : q.reveal) + (fingers ? ` · ${HAND_NAMES[q.hand]}: ${fingers.join(" ")}` : "");
   tally(right ? "right" : "shown");
   if (right) {
-    say(mistakes ? `Right, after ${plural(mistakes, "wrong try")}.` : "Right first time!", "good", answer);
+    say(mistakes ? `Right, after ${plural(mistakes, "wrong try", "wrong tries")}.` : "Right first time!", "good", answer);
     if (!playing()) playAnswer();
     if (settings.autoNext === "on") nextTimer = setTimeout(newQuestion, q.kind === "chord-seq" ? 2600 : 1800);
   } else {
@@ -380,21 +400,24 @@ function playedNote(abs, from) {
   }
 }
 
-// a scale, note by note
+// a scale, note by note. Played lower or higher, its notes light up where the first one did, and on up from there.
+let scaleBy = 0; // octaves the scale is moved by, onto the keys here
 function stepNote(abs, from) {
   const want = q.notes[step];
+  if (step === 0) scaleBy = ontoKeys([abs])[0] - abs;
+  const key = onKeyboard(abs + scaleBy) ? abs + scaleBy : ontoKeys([abs])[0];
   if (pcOf(abs) === pcOf(want.abs)) {
     step++;
-    if (onKeyboard(abs)) marks.set(abs, { mark: "right", name: want.name });
+    marks.set(key, { mark: "right", name: want.name });
     if (step === q.notes.length) return finish(true);
     say("");
   } else {
     // the microphone may hear an earlier note still ringing; going up, a scale never comes back to a note it has played
     if (from === "mic" && q.notes.slice(0, step).some((n) => pcOf(n.abs) === pcOf(abs))) return;
     if (from !== "mic") mistakes++; // what the microphone hears is said, not held against you: it can mishear
-    if (onKeyboard(abs) && !marks.has(abs)) {
-      marks.set(abs, { mark: "wrong" });
-      playTimers.push(setTimeout(() => { if (marks.get(abs) && marks.get(abs).mark === "wrong") marks.delete(abs); renderPiano(); }, 700));
+    if (!marks.has(key)) {
+      marks.set(key, { mark: "wrong" });
+      playTimers.push(setTimeout(() => { if (marks.get(key) && marks.get(key).mark === "wrong") marks.delete(key); renderPiano(); }, 700));
     }
     const heard = from === "mic" ? "Heard" : "That's";
     say(step === 0 ? `${heard} ${noteName(abs)}. Start on ${want.name}.` : `${heard} ${noteName(abs)}, not the next note.`, "bad");
@@ -402,22 +425,46 @@ function stepNote(abs, from) {
   render();
 }
 
+// A chord in sheet music, played on a MIDI keyboard, is played where it is written: those are its keys. Null when any
+// octave will do (the keys here, the computer keys and the microphone can't say which octave was played).
+function writtenKeys(from) {
+  if (from !== "midi" || q.kind !== "chord" || showAs() === "name" || q.staffShift === undefined || $("staff").hidden) return null;
+  return q.chord.notes.map((n) => n.abs + q.staffShift);
+}
+const keySet = (list) => [...new Set(list)].sort((a, b) => a - b).join();
+// "C5": a written note with its octave, from the natural note underneath any sharp or flat (C♭5 sits where C5 does)
+const writtenName = (n, abs) => `${n.name}${4 + Math.floor((abs - readNote(n.name).d) / 12)}`;
+
 // a chord: the keys clicked, held on a MIDI keyboard, or heard
 function judgeChord(absList, from) {
   const chord = currentChord();
   const result = checkPlayedChord(absList, chord);
   const nameOf = (abs) => (chord.notes.find((n) => pcOf(n.abs) === pcOf(abs)) || {}).name;
+  const keys = ontoKeys(absList); // where each note lights up here
   marks.clear();
+  const written = result.right && writtenKeys(from);
+  if (written && keySet(absList) !== keySet(written)) {
+    // the right chord, somewhere else than written: an octave or two away, or spread differently
+    mistakes++;
+    keys.forEach((key) => { if (onKeyboard(key)) marks.set(key, { mark: "right", name: nameOf(key) }); });
+    const by = Math.min(...absList) - written[0];
+    const octaves = Math.abs(by) / 12;
+    const away = by % 12 === 0 && keySet(absList.map((abs) => abs - by)) === keySet(written)
+      ? `${octaves === 1 ? "an octave" : `${octaves} octaves`} too ${by > 0 ? "high" : "low"}` : "not as written";
+    say(`Right notes, but ${away}.`, "bad", `Play it from ${writtenName(chord.notes[0], written[0])}, where it's written.`);
+    render();
+    return;
+  }
   if (result.right) {
     if (q.kind === "chord") return finish(true);
     step++;
     picked.clear();
     if (step === q.chords.length) return finish(true);
-    for (const abs of absList) if (onKeyboard(abs)) marks.set(abs, { mark: "right", name: nameOf(abs) });
+    keys.forEach((key) => { if (onKeyboard(key)) marks.set(key, { mark: "right", name: nameOf(key) }); });
     say(`${chord.numeral} is ${chord.symbol}. Now chord ${step + 1}.`, "good");
   } else {
     mistakes++;
-    for (const abs of absList) if (onKeyboard(abs)) marks.set(abs, nameOf(abs) ? { mark: "right", name: nameOf(abs) } : { mark: "wrong" });
+    keys.forEach((key) => { if (onKeyboard(key)) marks.set(key, nameOf(key) ? { mark: "right", name: nameOf(key) } : { mark: "wrong" }); });
     say(result.notesRight
       ? `Right notes. Now put ${chord.notes[0].name} at the bottom, for the ${INVERSION_NAMES[chord.inv].toLowerCase()}.`
       : `Not quite: that's ${namePlayed(absList)}.`, "bad");
@@ -538,14 +585,14 @@ function render() {
     if (el.tagName === "SELECT") el.value = v;
     else el.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(Array.isArray(v) ? v.includes(b.dataset.v) : v === b.dataset.v)));
   });
-  // Name it, with the sound off: only Keys can be chosen, and it is the one shown
+  // Name it, with the sound off: Sound and Both can't be chosen, and the keys are shown instead
   const mute = settings.sound === "off";
   document.querySelectorAll('[data-setting="nameHow"] button').forEach((b) => {
-    b.disabled = mute && b.dataset.v !== "see";
+    b.disabled = mute && sounds(b.dataset.v);
     b.setAttribute("aria-pressed", String(b.dataset.v === nameHow()));
   });
-  $("name-how-hint").textContent = mute ? "The sound is off, so it's shown on the keys. Turn the sound on to hear it too."
-    : "See it on the keys, hear it, or both. Then pick its name.";
+  $("name-how-hint").textContent = mute && sounds(settings.nameHow) ? "The sound is off, so it's shown on the keys. Turn the sound on to hear it too."
+    : "See it on the keys or in sheet music, hear it, or both (the keys and the sound). Then pick its name.";
   document.querySelectorAll("[data-for]").forEach((el) => { el.hidden = !el.dataset.for.split(" ").includes(settings.drill); });
   const oneKeyChosen = oneKey(settings.keys);
   if (settings.drill === "key") {
@@ -558,16 +605,20 @@ function render() {
 
   // the question
   $("ask").textContent = q.kind === "choice"
-    ? { see: "Look at the keys", hear: "Listen", both: "Look and listen" }[nameHow()]
+    ? { see: "Look at the keys", music: "Read the music", hear: "Listen", both: "Look and listen" }[nameHow()]
     : ASK[kind][settings.answer];
-  $("title").textContent = q.title;
-  $("hand").hidden = !handShown();
+  // in sheet music only, the chord's name is kept back until it is answered
+  const nameKept = asking && showAs() === "music";
+  $("title").textContent = nameKept ? "" : q.title;
+  $("title").hidden = nameKept;
+  $("hand").hidden = !handShown() || showAs() !== "name"; // in sheet music the clef says which hand
   if (handShown()) {
     $("hand").className = `pr-hand is-${q.hand}`;
     $("hand-name").textContent = HAND_NAMES[q.hand];
   }
-  $("sub").textContent = q.sub || "";
-  $("sub").hidden = !q.sub;
+  $("sub").textContent = nameKept ? "" : q.sub || "";
+  $("sub").hidden = !$("sub").textContent;
+  renderStaff();
 
   // the answer so far: the notes of a scale, the chords of a key, the notes of a chord once it is done, or the
   // typed answer, marked
@@ -640,7 +691,7 @@ function render() {
   $("main-btn").textContent = action ? action.label : "";
   $("main-btn").disabled = !!action && action.label === "Check" && picked.size < 2;
   $("hear-btn").hidden = settings.sound === "off" || (q.kind !== "choice" && asking);
-  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : nameHow() === "see" ? "▶ Hear it" : "▶ Hear it again";
+  $("hear-btn").textContent = q.kind !== "choice" || !asking ? "▶ Hear the answer" : !sounds(nameHow()) ? "▶ Hear it" : "▶ Hear it again";
   $("reveal-btn").hidden = !asking || q.kind === "choice";
   $("clear-btn").hidden = !(asking && onPage && chordKind() && picked.size);
   $("skip-btn").hidden = !asking;
@@ -658,6 +709,65 @@ function render() {
 
   renderPiano();
 }
+
+// The question in sheet music, when it is wanted: a chord to play (Chords), or what to name (Name it). The right
+// hand on a treble stave, the left hand on a bass stave. A chord to play sits in any octave that keeps it near its
+// stave (C major in the right hand from middle C, or from C5), picked once for each question.
+let staffFor = null; // the question drawn
+const STAVE_RANGE = { treble: [-3, 24], bass: [-24, 4] }; // A3 to C6, C2 to E4: no more than two ledger lines
+function renderStaff() {
+  const wanted = settings.drill === "name" ? settings.nameHow === "music" : settings.drill === "chords" && settings.showAs !== "name";
+  $("staff-note").hidden = !(wanted && music === "failed");
+  $("staff").hidden = !(wanted && music === "ready");
+  if (!wanted || music === "failed") return;
+  if (music !== "ready") {
+    if (music === "unloaded") {
+      music = "loading";
+      loadVexflow().then((ok) => {
+        music = ok ? "ready" : "failed";
+        if (!ok && q.kind === "choice") startAnswer(); // shown on the keys instead
+        else render();
+      });
+    }
+    return;
+  }
+  if (staffFor === q) return;
+  staffFor = q;
+  const lh = q.hand === "lh";
+  const move = (notes, by) => notes.map((n) => ({ name: n.name, abs: n.abs + by }));
+  // a chord is one group of notes sounding together; an interval or a scale is one note after another
+  let groups = q.kind === "chord" ? [q.chord.notes] : q.together ? [q.notes] : q.notes.map((n) => [n]);
+  if (q.kind === "chord") {
+    if (q.staffShift === undefined) {
+      const [low, high] = STAVE_RANGE[lh ? "bass" : "treble"];
+      const abs = q.chord.notes.map((n) => n.abs);
+      const fits = [-36, -24, -12, 0, 12, 24].filter((by) => Math.min(...abs) + by >= low && Math.max(...abs) + by <= high);
+      q.staffShift = fits.length ? pick(fits) : lh ? -12 : 0;
+    }
+    groups = [move(q.chord.notes, q.staffShift)];
+  }
+  drawStaff($("staff"), groups, {
+    clef: lh ? "bass" : "treble",
+    fit: $("staff").parentElement.clientWidth - 34, // less the paper's padding, on a dark screen
+    label: `Sheet music, ${lh ? "bass" : "treble"} clef: ${groups.map((g) => g.map((n) => n.name).join(" ")).join(", then ")}`,
+  });
+}
+// a narrower or wider screen: the music is drawn again, on more lines or fewer
+let staffWidth = 0;
+window.addEventListener("resize", () => {
+  const width = $("staff").parentElement.clientWidth;
+  if (width === staffWidth) return;
+  staffWidth = width;
+  staffFor = null;
+  if (q && !$("staff").hidden) renderStaff();
+});
+// back online: sheet music that couldn't load can be tried again
+window.addEventListener("online", () => {
+  if (music !== "failed") return;
+  music = "unloaded";
+  if (q.kind === "choice") startAnswer();
+  else render();
+});
 
 // The main button: Check (chords on the screen keys), Next question (once answered), or nothing while the page waits
 // for notes. Show answer is always a link beside it.
@@ -775,11 +885,9 @@ const MIC_IDLE = 5 * 60 * 1000; // the microphone goes off after this long witho
 function onMicStrike(strike) {
   lastPlayed = performance.now();
   const abs = strike.midi - 60;
-  if (onKeyboard(abs)) {
-    down.add(abs);
-    playTimers.push(setTimeout(() => { down.delete(abs); renderPiano(); }, 250));
-    renderPiano();
-  }
+  down.add(abs);
+  playTimers.push(setTimeout(() => { down.delete(abs); renderPiano(); }, 250));
+  renderPiano();
   if (!q || q.kind !== "sequence" || status !== "asking") return;
   if (pcOf(abs) !== pcOf(q.notes[step].abs) && strike.strength < 0.6) return;
   playedNote(abs, "mic");
@@ -895,7 +1003,7 @@ $("drills").addEventListener("click", (e) => {
 });
 
 // the options: one choice (seg) or several (chips, at least one kept)
-const KEEP_QUESTION = ["answer", "listen", "autoNext", "sound", "nameHow"];
+const KEEP_QUESTION = ["answer", "listen", "autoNext", "sound", "nameHow", "showAs"];
 document.querySelector(".practice").addEventListener("click", (e) => {
   const b = e.target.closest("[data-setting] button");
   if (!b) return;
@@ -915,7 +1023,7 @@ document.querySelector(".practice").addEventListener("click", (e) => {
   if (KEEP_QUESTION.includes(key)) {
     if (key === "answer" || key === "listen" || key === "nameHow") startAnswer();
     else render();
-    if (key === "nameHow" && nameHow() !== "see") playQuestion();
+    if (key === "nameHow" && sounds(nameHow())) playQuestion();
   } else {
     newQuestion();
   }
@@ -1016,9 +1124,9 @@ $("sound-btn").addEventListener("click", () => {
   save();
   // a question to name, not yet answered, is shown again the way it can be now: on the keys with the sound off,
   // as chosen (and heard) with it on
-  if (q.kind === "choice" && status === "asking" && settings.nameHow !== "see") {
+  if (q.kind === "choice" && status === "asking" && sounds(settings.nameHow)) {
     startAnswer();
-    if (nameHow() !== "see") playQuestion();
+    if (sounds(nameHow())) playQuestion();
   } else {
     render();
   }

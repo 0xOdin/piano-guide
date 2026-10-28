@@ -3,7 +3,7 @@ title: Piano Practice: Scales, Chords and Keys Quiz | PianoGuide
 description: Practise piano scales and chords with random questions: play or write out a scale, a chord or the chords of a key, or name a chord, interval or scale by eye or by ear. Answer on the keys, with a MIDI keyboard or through your microphone.
 nav: practice
 styles: page piano keyboard practice
-scripts: chords-data practice-music listen piano-sound practice
+scripts: chords-data practice-music listen piano-sound practice-staff practice
 ---
         <section class="page-hero">
             <p class="eyebrow">Quiz yourself at the piano</p>
@@ -36,14 +36,24 @@ scripts: chords-data practice-music listen piano-sound practice
                             </div>
                         </div>
                     </div>
+                    <div class="option pr-mode" data-for="chords">
+                        <span class="option-label" id="show-as-label">Show the question as</span>
+                        <div class="seg" data-setting="showAs" role="group" aria-labelledby="show-as-label">
+                            <button type="button" data-v="name">Name</button>
+                            <button type="button" data-v="music">Sheet music</button>
+                            <button type="button" data-v="both">Both</button>
+                        </div>
+                        <p class="pr-hint">Sheet music: read the chord from the staff. Its name shows once you've answered. On a MIDI keyboard, play it where it's written.</p>
+                    </div>
                     <div class="option pr-mode" data-for="name">
                         <span class="option-label" id="show-label">Show it as</span>
                         <div class="seg" data-setting="nameHow" role="group" aria-labelledby="show-label">
                             <button type="button" data-v="see">Keys</button>
+                            <button type="button" data-v="music">Sheet music</button>
                             <button type="button" data-v="hear">Sound</button>
                             <button type="button" data-v="both">Both</button>
                         </div>
-                        <p class="pr-hint" id="name-how-hint">See it on the keys, hear it, or both. Then pick its name.</p>
+                        <p class="pr-hint" id="name-how-hint"></p>
                     </div>
 
                     <details class="pr-options">
@@ -157,6 +167,8 @@ scripts: chords-data practice-music listen piano-sound practice
                         <span class="pr-hand" id="hand" hidden><span class="pr-hand-mark" aria-hidden="true"></span><span id="hand-name"></span></span>
                     </div>
                     <p class="pr-sub" id="sub"></p>
+                    <div class="score pr-staff" id="staff" hidden></div>
+                    <p class="pr-hint pr-staff-note" id="staff-note" hidden>The sheet music couldn't load, so the name is shown. It loads when you're online.</p>
                 </div>
 
                 <ol class="pr-slots" id="slots" aria-label="Your answer"></ol>
@@ -210,7 +222,7 @@ scripts: chords-data practice-music listen piano-sound practice
                     <span class="pr-status" id="midi-status" aria-live="polite"></span>
                     <button type="button" class="pr-link" id="midi-sound" hidden></button>
                 </div>
-                <p class="kb-help" id="kb-help">Computer keys: <kbd>A</kbd> to <kbd>;</kbd> play the white keys and <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> the black keys, from <span id="kb-octave">C4</span>. <kbd>Z</kbd> and <kbd>X</kbd> move them down or up an octave. <kbd>Enter</kbd> checks a chord, and goes on to the next question.</p>
+                <p class="kb-help" id="kb-help">Computer keys: <kbd>A</kbd> to <kbd>;</kbd> play the white keys and <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> the black keys, from the <span id="kb-octave">first</span> C. <kbd>Z</kbd> and <kbd>X</kbd> move them down or up an octave. <kbd>Enter</kbd> checks a chord, and goes on to the next question.</p>
             </div>
         </section>
 

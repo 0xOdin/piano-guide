@@ -319,6 +319,28 @@
   color: var(--muted);
 }
 
+/* the question in sheet music (practice-staff.js): as wide as its notes, or the card. On a dark screen it sits on
+   its own sheet of paper (.score, page.css). */
+.pr-staff {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 14px;
+}
+
+.pr-staff[hidden],
+.pr-staff-note[hidden] {
+  display: none;
+}
+
+.pr-staff svg {
+  max-width: 100%;
+  margin: 0;
+}
+
+.pr-staff-note {
+  margin-top: 10px;
+}
+
 /* the session: "4 of 6 right" in a small pill, opening to the details */
 .pr-score {
   margin-left: auto; /* on its own line on a phone, still at the right */
